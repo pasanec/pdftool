@@ -1,0 +1,15 @@
+{
+    "name": "Pdf Tool",
+    "description": "Merge and split PDF files.",
+    "type": "project",
+    "license": "AGPL",
+    "authors": [
+        {
+            "name": "Immanuel Pasanec"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^5.4"
+    }
+}
