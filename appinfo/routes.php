@@ -10,6 +10,10 @@
 return [
     'routes' => [
 	   ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST'],
+	   ['name' => 'pdf#merge', 'url' => '/merge', 'verb' => 'POST'],
+	   ['name' => 'pdf#split', 'url' => '/split', 'verb' => 'POST'],
+	   ['name' => 'pdf#sort', 'url' => '/sort', 'verb' => 'POST'],
+	   ['name' => 'pdf#preview', 'url' => '/preview', 'verb' => 'POST'],
+	   ['name' => 'pdf#renderStatus', 'url' => '/status/{uuid}', 'verb' => 'GET'],
     ]
 ];
