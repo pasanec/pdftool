@@ -19,6 +19,7 @@ class AuthorService {
             return
         }
         $extraContent = [
+            'type' => gettype($e),
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
             'file' => $e->getFile(),
