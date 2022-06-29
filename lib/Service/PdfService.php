@@ -6,7 +6,7 @@ use Exception;
 
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
-use \OCP\Files\IRootFolder;
+use OCP\Files\IRootFolder;
 
 class PdfService {
 
@@ -19,11 +19,14 @@ class PdfService {
     /** @var IRootFolder */
     private $rootFolder;
 
-	public function __construct(IRootFolder $rootFolder, string $appName, $userId) {
+    /** @var AuthorService */
+    private $log;
+
+	public function __construct(IRootFolder $rootFolder, AuthorService $log, string $appName, $userId) {
 		$this->appName = $appName;
         $this->userId = $userId;
         $this->rootFolder = $rootFolder;
-
+        $this->log = $log;
 	}
 
     private function checkPermission(int $fileId) : bool {
@@ -34,7 +37,8 @@ class PdfService {
             if($file->getPermissions() > 0 && $folder->getPermissions() > 5) return true;
             return false;
         } catch (Exception $e) {
-            // TODO: throw meaningful exception.
+            $message = 'checkPermissions(): tried to open file or folder.';
+            $this->log($message, $e);
             return false;
         }
 
