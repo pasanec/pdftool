@@ -17,10 +17,10 @@ class PdfService {
     /** @var IRootFolder */
     private $rootFolder;
 
-    /** @var AuthorService */
+    /** @var LogService */
     private $logger;
 
-	public function __construct(IRootFolder $rootFolder, AuthorService $logger, string $appName, $userId) {
+	public function __construct(IRootFolder $rootFolder, LogService $logger, string $appName, $userId) {
 		$this->appName = $appName;
         $this->userId = $userId;
         $this->rootFolder = $rootFolder;

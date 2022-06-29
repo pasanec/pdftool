@@ -4,7 +4,7 @@ namespace OCA\PdfTool\Service;
 use Psr\Log\LoggerInterface;
 use Exception;
 
-class AuthorService {
+class LogService {
     private LoggerInterface $logger;
     private string $appName;
 
