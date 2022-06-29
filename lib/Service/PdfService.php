@@ -20,13 +20,13 @@ class PdfService {
     private $rootFolder;
 
     /** @var AuthorService */
-    private $log;
+    private $logger;
 
-	public function __construct(IRootFolder $rootFolder, AuthorService $log, string $appName, $userId) {
+	public function __construct(IRootFolder $rootFolder, AuthorService $logger, string $appName, $userId) {
 		$this->appName = $appName;
         $this->userId = $userId;
         $this->rootFolder = $rootFolder;
-        $this->log = $log;
+        $this->logger = $logger;
 	}
 
     private function checkPermission(int $fileId) : bool {
@@ -38,7 +38,7 @@ class PdfService {
             return false;
         } catch (Exception $e) {
             $message = 'checkPermissions(): tried to open file or folder.';
-            $this->log($message, $e);
+            $this->logger->log($message, $e);
             return false;
         }
 
