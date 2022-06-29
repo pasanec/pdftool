@@ -4,8 +4,6 @@ namespace OCA\PdfTool\Service;
 
 use Exception;
 
-use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\Files\IRootFolder;
 
 class PdfService {
