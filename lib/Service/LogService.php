@@ -28,4 +28,8 @@ class LogService {
         ];
         $this->logger->error($message, $extraContent);
     }
+
+    public function logInfo(string $message) : void {
+        $this->logger->error($message);
+    }
 }
