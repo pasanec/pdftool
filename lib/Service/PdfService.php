@@ -28,12 +28,19 @@ class PdfService {
 	}
 
     public function merge(array $files, string $outputfile): string {
+        // TODO: logic for auto generate output file.
+        // TODO: decide for input file format ($fileId or path)
         $args = '';
         foreach ($files as $file) {
             $args .= escapeshellarg($file) . ' ';
         }
         $result = shell_exec('gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . escapeshellarg($outputfile) . ' -dBATCH ' . $args);
         if ($result === NULL) throw new Exception('PdfTools merge(): An error has ocurred.');
+        return $outputfile;
+    }
+
+    private function checkFileLocationIsSame(array $files) : bool {
+        return false;
     }
 
     private function checkPermission(int $fileId): bool {
