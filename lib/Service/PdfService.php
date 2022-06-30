@@ -27,7 +27,16 @@ class PdfService {
         $this->logger = $logger;
 	}
 
-    private function checkPermission(int $fileId) : bool {
+    public function merge(array $files, string $outputfile): string {
+        $args = '';
+        foreach ($files as $file) {
+            $args .= escapeshellarg($file) . ' ';
+        }
+        $result = shell_exec('gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . escapeshellarg($outputfile) . ' -dBATCH ' . $args);
+        if ($result === NULL) throw new Exception('PdfTools merge(): An error has ocurred.');
+    }
+
+    private function checkPermission(int $fileId): bool {
         try {
             $file = $this->rootFolder->getById($fileId);
             if ($file->gettype() !== 'file') return false;
