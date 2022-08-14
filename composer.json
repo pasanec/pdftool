@@ -1,5 +1,6 @@
+
 {
-    "name": "Pdf Tool",
+    "name": "pasanec/pdftool",
     "description": "Merge and split PDF files.",
     "type": "project",
     "license": "AGPL",
