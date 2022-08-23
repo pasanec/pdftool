@@ -38,16 +38,16 @@ class FilactionService {
     /** @var LogService */
     private LogService $logger;
 
-    public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, $userId) {
+    public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, string $userId) {
         $this->appName = $appName;
         $this->logger = $logger;
         $this->rootFolder = $rootFolder;
         $this->userId = $userId;
     }
 
-    private function inSameFolder(array $files) : bool {
+    private function inSameFolder(array $files): bool {
         if(!sizeof($files)) {
-            $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: empty $files array from user ' . $userId . '.');
+            $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: empty $files array from user ' . $this->userId . '.');
             return false;
         }
         if ($files[0]->gettype() !== 'file') return false;
@@ -68,7 +68,7 @@ class FilactionService {
             if($file->getPermissions() > 0 && $folder->getPermissions() > 5) return true;
             return false;
         } catch (Exception $e) {
-            $message = 'OCA\PdfTool\ServiceFilactionService::checkPermissions: ' . $userId . 'tried to open file or folder.';
+            $message = 'OCA\PdfTool\ServiceFilactionService::checkPermissions: ' . $this->userId . 'tried to open file or folder.';
             $this->logger->log($message, $e);
             return false;
         }
