@@ -68,7 +68,7 @@ class FilactionService {
             if($file->getPermissions() > 0 && $folder->getPermissions() > 5) return true;
             return false;
         } catch (Exception $e) {
-            $message = 'checkPermissions(): tried to open file or folder.';
+            $message = 'OCA\PdfTool\ServiceFilactionService::checkPermissions: ' . $userId . 'tried to open file or folder.';
             $this->logger->log($message, $e);
             return false;
         }
