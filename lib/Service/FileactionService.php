@@ -36,7 +36,7 @@ class FilactionService {
     private string $userId;
 
     /** @var LogService */
-    private LogService $loggerl;
+    private LogService $logger;
 
     public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, $userId) {
         $this->appName = $appName;
@@ -46,7 +46,18 @@ class FilactionService {
     }
 
     private function inSameFolder(array $files) : bool {
-        return false;
+        if(!sizeof($files)) {
+            $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: empty $files array from user ' . $userId . '.');
+            return false;
+        }
+        if ($files[0]->gettype() !== 'file') return false;
+
+        $folder = $files[0]->getParent();
+        $storage = $files[0]->getStorage()->getId();
+        foreach ($files as $file) {
+            if($folder !== $file->getParent() || $storage !== $file->getStorage()->getId()) return false;
+        }
+        return true;
     }
 
     private function hasPermissions(int $fileId): bool {
