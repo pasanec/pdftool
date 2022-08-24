@@ -59,7 +59,7 @@ class ComputeService {
             // TODO: Merge files
             // TODO: Copy file to source location
         } catch (Exception $e) {
-            throw $e
+            throw $e;
         }
     }
 
@@ -70,7 +70,7 @@ class ComputeService {
             // TODO: Merge files
             // TODO: Copy file to source location
         } catch (Exception $e) {
-            throw $e
+            throw $e;
         }
     }
 
