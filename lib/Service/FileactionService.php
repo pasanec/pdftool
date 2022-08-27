@@ -69,6 +69,16 @@ class FilactionService {
         return $nodes;
     }
 
+    public function cleanup(string $folder): void {
+        try {
+            $this->appData->getFolder($folder)->delete();
+        } catch (Exception $e) {
+            $this->logger->log('OCA\PdfTool\Service\FileactionService::cleanup: failed', $e);
+            // Cleanup is not vital for successful pdf convertion.
+            // throw $e;
+        }
+    }
+
     private function inSameFolder(array $files): bool {
         if(!sizeof($files)) {
             $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: empty $files array from user ' . $this->userId . '.');
