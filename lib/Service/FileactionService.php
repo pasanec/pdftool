@@ -27,6 +27,7 @@ use OCA\PdfTool\Service\LogService;
 use Exception;
 
 use OCP\Files\IRootFolder;
+use OCP\Files\IAppData;
 
 class FilactionService {
     /** @var string */
@@ -38,11 +39,34 @@ class FilactionService {
     /** @var LogService */
     private LogService $logger;
 
-    public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, string $userId) {
+    /** @var IAppData */
+    private IAppData $appData;
+
+    /** @var IRootFolder */
+    private IRootFolder $rootFolder;
+
+    public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, IAppData $appData, string $userId) {
         $this->appName = $appName;
         $this->logger = $logger;
         $this->rootFolder = $rootFolder;
+        $this->appData = $appData;
         $this->userId = $userId;
+    }
+
+    public function copyToAppFolder(array $files): array {
+
+        $sourceFolder = $this->appData->newFolder('source-' . uniqid($this->userId));
+        $nodes = [];
+        try {
+            foreach ($files as $file) {
+                $node = $this->rootFolder->getById($file);
+                $nodes[] = $sourceFolder->newFile($node->getName(), $node->fopen('r'));
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return $nodes;
     }
 
     private function inSameFolder(array $files): bool {
