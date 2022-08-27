@@ -54,13 +54,34 @@ class FilactionService {
     }
 
     public function copyToAppFolder(array $files): array {
-
+        if(!sizeof($files)) {
+            $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: empty $files array from user ' . $this->userId . '.');
+            throw new EmptyFilesArray('Empty $files array from user ' . $this->userId);
+        }
+        if(!$this->hasPermissions($files[0])) {
+            $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: ' . $this->userId . ' has no read permission in folder.');
+            throw new NoReadPermissionInFolder($this->userId . ' has no read permission in folder of file ' . $files[0]);
+        }
+        $sourceNodes = [];
+        try {
+            foreach ($files as $file) {
+                $sourceNodes[] = $this->rootFolder->getById($file);
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+        if(!$this->inSameFolder($sourceNodes)) {
+            $fileList = '';
+            foreach ($files as $file) {
+                $fileList .= $file . ' ';
+            }
+            throw new FilesNotInSameFolder($fileList);
+        }
         $sourceFolder = $this->appData->newFolder('source-' . uniqid($this->userId));
         $nodes = [];
         try {
-            foreach ($files as $file) {
-                $node = $this->rootFolder->getById($file);
-                $nodes[] = $sourceFolder->newFile($node->getName(), $node->fopen('r'));
+            foreach ($sourceNodes as $sourceNode) {
+                $nodes[] = $sourceFolder->newFile($sourceNode->getName(), $sourceNode->fopen('r'));
             }
         } catch (Exception $e) {
             throw $e;
@@ -73,17 +94,14 @@ class FilactionService {
         try {
             $this->appData->getFolder($folder)->delete();
         } catch (Exception $e) {
-            $this->logger->log('OCA\PdfTool\Service\FileactionService::cleanup: failed', $e);
+            $this->logger->log('OCA\PdfTool\Service\FileactionService::cleanup: of ' . $folder . ' failed', $e);
             // Cleanup is not vital for successful pdf convertion.
             // throw $e;
         }
     }
 
     private function inSameFolder(array $files): bool {
-        if(!sizeof($files)) {
-            $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: empty $files array from user ' . $this->userId . '.');
-            return false;
-        }
+
         if ($files[0]->gettype() !== 'file') return false;
 
         $folder = $files[0]->getParent();
