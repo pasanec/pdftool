@@ -40,10 +40,14 @@ class PdfService {
     /** @var LogService */
     private $logger;
 
-	public function __construct(string $appName, LogService $logger, $userId) {
+    /** @var FileactionService */
+    private $fs;
+
+	public function __construct(string $appName, LogService $logger, FileactionService $fs, $userId) {
 		$this->appName = $appName;
         $this->userId = $userId;
         $this->logger = $logger;
+        $this->fs = $fs;
 	}
 
     public function merge(array $files, string $outputfile): string {
