@@ -30,6 +30,7 @@ use OCP\Files\IRootFolder;
 use OCP\Files\IAppData;
 use OCP\Files\SimpleFS\ISimpleFolder;
 use OCP\Files\Folder;
+use OCP\Files\NotPermittedException;
 
 class FileactionService {
     /** @var string */
@@ -112,9 +113,13 @@ class FileactionService {
     }
 
     public function copyFilesToUserFolder(ISimpleFolder $outputFolder, Folder $userFolder): void {
-        // TODO: Test if destination folder is writable
-        // TODO: Copy files from output folder to destination
-        // TODO: Initiate file scan for user
+        if ($userFolder->getPermissions() < 4) {
+            throw new NotPermittedException('No read permission for ' . $userFolder->getFullPath() . ' by ' . $this->userId);
+        }
+        $list = $outputFolder->getDirectoryListing();
+        foreach ($list as $node) {
+            $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node->read());
+        }
     }
 
     private function inSameFolder(array $files): bool {
