@@ -29,6 +29,7 @@ use Exception;
 use OCP\Files\IRootFolder;
 use OCP\Files\IAppData;
 use OCP\Files\SimpleFS\ISimpleFolder;
+use OCP\Files\Folder;
 
 class FileactionService {
     /** @var string */
@@ -54,8 +55,8 @@ class FileactionService {
         $this->userId = $userId;
     }
 
-    public function tellUserSourceFolder(int $fileId): string {
-        return $this->rootFolder->getById($fileId)->getPath();
+    public function tellUserSourceFolder(int $fileId): Folder {
+        return $this->rootFolder->getById($fileId)->getParent();
     }
 
     public function copyToAppFolder(array $files): array {
