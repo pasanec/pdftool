@@ -111,7 +111,9 @@ class FileactionService {
     }
 
     public function copyFilesToUserFolder(ISimpleFolder $outputFolder): void {
-        // TODO
+        // TODO: Test if destination folder is writable
+        // TODO: Copy files from output folder to destination
+        // TODO: Initiate file scan for user
     }
 
     private function inSameFolder(array $files): bool {
