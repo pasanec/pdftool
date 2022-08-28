@@ -30,7 +30,7 @@ use OCP\Files\IRootFolder;
 use OCP\Files\IAppData;
 use OCP\Files\SimpleFS\ISimpleFolder;
 
-class FilactionService {
+class FileactionService {
     /** @var string */
     private string $appName;
 
