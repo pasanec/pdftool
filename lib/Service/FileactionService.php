@@ -28,6 +28,7 @@ use Exception;
 
 use OCP\Files\IRootFolder;
 use OCP\Files\IAppData;
+use OCP\Files\SimpleFS\ISimpleFolder;
 
 class FilactionService {
     /** @var string */
@@ -88,6 +89,11 @@ class FilactionService {
         }
 
         return $nodes;
+    }
+
+    public function createFolder(string $name): ISimpleFolder {
+        // Returns ISimpleFolder
+        return $this->appData->newFolder($name . '-' . uniqid($this->userId));
     }
 
     public function cleanup(string $folder): void {
