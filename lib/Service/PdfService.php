@@ -50,9 +50,16 @@ class PdfService {
         $this->fs = $fs;
 	}
 
-    public function merge(array $files, string $outputfile): string {
-        // TODO: logic for auto generate output file.
-        // TODO: decide for input file format ($fileId or path)
+    public function merge(array $files, string $outputfile = ''): string {
+        // TODO: Get user source folder
+        // TODO: Get file nodes array
+        // TODO: Set output file if not empty string
+        // TODO: Make output folder
+        // TODO: Assemble string of all absolute file paths separated by space
+        // TODO: Assemble String of output file path
+        // TODO: Execute ghostscript
+        // TODO: Copy output file into user folder
+        // TODO: Delete source and destination folder
         $args = '';
         foreach ($files as $file) {
             $args .= escapeshellarg($file) . ' ';
