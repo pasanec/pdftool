@@ -54,6 +54,11 @@ class FileactionService {
         $this->userId = $userId;
     }
 
+    public function tellUserSourceFolder(int $fileId): string {
+        // TODO
+        return '';
+    }
+
     public function copyToAppFolder(array $files): array {
         if(!sizeof($files)) {
             $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: empty $files array from user ' . $this->userId . '.');
@@ -104,6 +109,10 @@ class FileactionService {
             // Cleanup is not vital for successful pdf convertion.
             // throw $e;
         }
+    }
+
+    public function copyFilesToUserFolder(ISimpleFolder $outputFolder): void {
+        // TODO
     }
 
     private function inSameFolder(array $files): bool {
