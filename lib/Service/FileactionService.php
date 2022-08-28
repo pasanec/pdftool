@@ -55,8 +55,7 @@ class FileactionService {
     }
 
     public function tellUserSourceFolder(int $fileId): string {
-        // TODO
-        return '';
+        return $this->rootFolder->getById($fileId)->getPath();
     }
 
     public function copyToAppFolder(array $files): array {
