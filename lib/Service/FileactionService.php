@@ -22,8 +22,6 @@
 
 namespace OCA\PdfTool\Service;
 
-use OCA\PdfTool\Service\LogService;
-
 use Exception;
 
 use OCP\Files\IRootFolder;
