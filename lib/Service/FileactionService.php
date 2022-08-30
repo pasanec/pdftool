@@ -29,6 +29,7 @@ use OCP\Files\IAppData;
 use OCP\Files\SimpleFS\ISimpleFolder;
 use OCP\Files\Folder;
 use OCP\Files\NotPermittedException;
+use OCP\IConfig;
 
 class FileactionService {
     /** @var string */
@@ -46,16 +47,27 @@ class FileactionService {
     /** @var IRootFolder */
     private IRootFolder $rootFolder;
 
-    public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, IAppData $appData, string $userId) {
+    /** @var IConfig */
+    private IConfig $config;
+
+    public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, IAppData $appData, IConfig $config, string $userId) {
         $this->appName = $appName;
         $this->logger = $logger;
         $this->rootFolder = $rootFolder;
         $this->appData = $appData;
         $this->userId = $userId;
+        $this->config = $config;
     }
 
     public function tellUserSourceFolder(int $fileId): Folder {
         return $this->rootFolder->getById($fileId)->getParent();
+    }
+
+    public function tellAppFolder(): string {
+        $dataFolder = $this->config->getSystemValue('datadirectory');
+        $instanceId = $this->config->getSystemValue('instanceid');
+        $appFolder = $dataFolder . '/appdata_' . $instanceId . '/' . $this->appName . '/';
+        return $appFolder;
     }
 
     public function copyToAppFolder(array $files): array {
