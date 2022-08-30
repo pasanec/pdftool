@@ -28,6 +28,7 @@ use OCP\Files\IRootFolder;
 use OCP\Files\IAppData;
 use OCP\Files\SimpleFS\ISimpleFolder;
 use OCP\Files\Folder;
+use OCP\Files\File;
 use OCP\Files\NotPermittedException;
 use OCP\IConfig;
 
@@ -104,7 +105,7 @@ class FileactionService {
             throw $e;
         }
 
-        return $nodes;
+        return[$sourceFolder,  $nodes];
     }
 
     public function createFolder(string $name): ISimpleFolder {
@@ -122,14 +123,16 @@ class FileactionService {
         }
     }
 
-    public function copyFilesToUserFolder(ISimpleFolder $outputFolder, Folder $userFolder): void {
+    public function copyFilesToUserFolder(ISimpleFolder $outputFolder, Folder $userFolder): array {
         if ($userFolder->getPermissions() < 4) {
             throw new NotPermittedException('No read permission for ' . $userFolder->getFullPath() . ' by ' . $this->userId);
         }
         $list = $outputFolder->getDirectoryListing();
+        $fileNodes = [];
         foreach ($list as $node) {
-            $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node->read());
+            $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node->read());
         }
+        return $fileNodes;
     }
 
     private function inSameFolder(array $files): bool {
