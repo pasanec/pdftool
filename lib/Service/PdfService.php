@@ -51,22 +51,41 @@ class PdfService {
 	}
 
     public function merge(array $files, string $outputfile = ''): string {
-        // TODO: Get user source folder
-        // TODO: Get file nodes array
-        // TODO: Set output file if not empty string
-        // TODO: Make output folder
-        // TODO: Assemble string of all absolute file paths separated by space
-        // TODO: Assemble String of output file path
-        // TODO: Execute ghostscript
-        // TODO: Copy output file into user folder
-        // TODO: Delete source and destination folder
-        $args = '';
-        foreach ($files as $file) {
-            $args .= escapeshellarg($file) . ' ';
+        // Get user source folder
+        $userSourceFolder = $this->fs->tellUserSourceFolder((int)$files[0]);
+        // Get file nodes array
+
+        $sourceData = $this->fs->copyToAppFolder($files);
+        $inputFolder = $sourceData[0];
+        $fileNodes = $sourceData[1];
+        // Set output file if not empty string
+        if ($outputfile === '') {
+            $outputfile = substr_replace($fileNodes[0]->getName(), strlen($fileNodes[0]->getName()), -4) . '-merged.pdf';
+        } else if (!strpos($outputfile, '.pdf', -4) || !strpos($outputfile, '.PDF', -4)) {
+            $outputfile .= '.pdf';
         }
-        $result = shell_exec('gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . escapeshellarg($outputfile) . ' -dBATCH ' . $args);
+        // Make output folder
+        $outputFolder = $this->fs->createFolder('output-merge-' . uniqid($this->userId));
+        // Assemble string of all absolute file paths separated by space
+        $filePaths = ' ';
+        $appFolder = $this->fs->tellAppFolder();
+        foreach ($fileNodes as $fileNode) {
+            $filePaths .= $appFolder . $inputFolder->getName() . '/' . escapeshellarg($fileNode->Name()) . ' ';
+        }
+        // Assemble String of output file path for ghostscript
+        $outputPath = $appFolder . $outputFolder->getName() . '/' . escapeshellarg($outputfile) . ' ';
+
+        // Execute ghostscript
+        $result = shell_exec('gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . $outputfile . '-dBATCH' . $filePaths);
+        // TODO: Custom Exception
         if ($result === NULL) throw new Exception('PdfTools merge(): An error has ocurred.');
-        return $outputfile;
+        // Copy output file into user folder
+        $userFile = $this->fs->copyFilesToUserFolder($outputFolder, $userSourceFolder);
+        // Delete source and destination folder
+        $this->inputFolder->delete();
+        $this->outputFolder->delete();
+
+        return $userFile[0]->getInternalPath();
     }
 
 
