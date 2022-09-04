@@ -22,25 +22,45 @@
 
 namespace OCA\PdfTool\Controller;
 
+use OCA\PdfTool\Service\PdfService;
+
 use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 
 class PdfController extends Controller {
-	private $userId;
 
-	public function __construct($AppName, IRequest $request, $UserId){
+    /** @var string */
+	private string $AppName;
+
+	/** @var IRequest */
+	private IRequest $request;
+
+	/** @var PdfService */
+	private PdfService $pdf;
+
+    /** @var string */
+	private string $UserId;
+
+	use Errors;
+
+	public function __construct($AppName, IRequest $request, PdfService $pdf, $UserId){
 		parent::__construct($AppName, $request);
+		$this->AppName = $AppName;
 		$this->userId = $UserId;
+		$this->request = $request;
+		$this->pdf = $pdf;
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
-	public function merge(array $fileList) : DataResponse {
-		$filename = ['merged.pdf',];
-		return new DataResponse($filename);
+	public function merge(array $fileList, string $outputFile = '') : DataResponse {
+		
+		return $this->handleExceptions(function () use ($fileList, $outputFile) {
+			return $this->pdf->merge($fileList, $outputFile);
+		});
 	}
 
 	/**
