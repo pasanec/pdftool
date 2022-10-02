@@ -39,9 +39,15 @@ OCA.Files.fileActions.registerAction({
     permissions: OC.PERMISSION_READ,
     iconClass: 'icon-filetype-text',
     // icon: OC.imagePath('gallery', 'gallery-dark'),
-    actionHandler: () => {
+    actionHandler: (fileName, context) => {
         console.info('Action clicked')
-        console.info(OCA.Files.fileActions.getCurrentFile())
+        //console.info(OCA.Files)
+        console.info(fileName)
+        console.info(context.fileInfoModel.id)
+        // console.info(OCA.Files.fileActions)
+        // console.info(this)
+        // console.info(OCA.Files.FileActions.currentFile)
+        // console.info(OCA.Files.FileActions.getCurrentFile())
     },
     displayName: 'PDF Tool'
 })
@@ -53,7 +59,8 @@ OCA.Files.fileActions.registerAction({
 		attach(fileList) {
 			fileList.registerMultiSelectFileAction({
 				name: 'pdftool',
-				displayName: 'PDF Tool',
+				displayName: 'Pdf Merger',
+                permissions: OC.PERMISSION_READ, // Don't know if it's working
 				iconClass: 'mime-pdf',
 				order: 0,
 				action: (files) => {
@@ -77,12 +84,17 @@ OCA.Files.fileActions.registerAction({
             fileList.$el.on('change', data => {
                 console.info('PdfTool Multiselect change')
                 console.info(fileList.getSelectedFiles())
-                let showMultiselectAction = true
-                fileList.getSelectedFiles().forEach(selection => {
-                    if (selection.mimetype !== 'application/pdf') {
-                        showMultiselectAction = false
-                    }
-                });
+                let showMultiselectAction = false
+                if (fileList.getSelectedFiles().length > 1) {
+                showMultiselectAction = true
+                    fileList.getSelectedFiles().forEach(selection => {
+                            console.info('selection.mimetype', selection.mimetype)
+                            if (selection.mimetype !== 'application/pdf') {
+                            console.info('selection.mimetype if TRUE', selection.mimetype)
+                            showMultiselectAction = false
+                        }
+                    });
+                }
                 fileList.fileMultiSelectMenu.toggleItemVisibility('pdftool', showMultiselectAction)
             })
 		},
