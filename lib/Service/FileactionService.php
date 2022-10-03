@@ -118,7 +118,7 @@ class FileactionService {
             $this->appData->getFolder($folder)->delete();
         } catch (Exception $e) {
             $this->logger->log('OCA\PdfTool\Service\FileactionService::cleanup: of ' . $folder . ' failed', $e);
-            // Cleanup is not vital for successful pdf convertion.
+            // Cleanup is not vital for successful pdf conversion.
             // throw $e;
         }
     }
