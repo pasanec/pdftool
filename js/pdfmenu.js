@@ -41,13 +41,8 @@ OCA.Files.fileActions.registerAction({
     // icon: OC.imagePath('gallery', 'gallery-dark'),
     actionHandler: (fileName, context) => {
         console.info('Action clicked')
-        //console.info(OCA.Files)
         console.info(fileName)
         console.info(context.fileInfoModel.id)
-        // console.info(OCA.Files.fileActions)
-        // console.info(this)
-        // console.info(OCA.Files.FileActions.currentFile)
-        // console.info(OCA.Files.FileActions.getCurrentFile())
     },
     displayName: 'PDF Tool'
 })
