@@ -26,6 +26,9 @@ use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
+use OCP\Util;
+
+use OCA\PdfTool\AppInfo\Application;
 
 class PageController extends Controller {
 	private $userId;
@@ -46,7 +49,8 @@ class PageController extends Controller {
 	 * @NoCSRFRequired
 	 */
 	public function index() {
-		return new TemplateResponse('pdftool', 'index');  // templates/index.php
+		Util::addScript(Application::APP_ID, 'pdftool-main');
+		return new TemplateResponse('pdftool', 'merge');  // templates/merge.php
 	}
 
 }
