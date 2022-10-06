@@ -1,6 +1,14 @@
 <template>
 	<div id="content" class="app-pdftool">
-		<h1>Merge PDF</h1>
+		<h2>Merge PDF</h2>
+		<div class="desk">
+			<div class="document">Document</div>
+			<div class="document">Document</div>
+			<div class="document">Document</div>
+			<div class="document">Document</div>
+			<div class="document">Document</div>
+			<div class="document">Document</div>
+		</div>
 	</div>
 </template>
 
@@ -151,6 +159,27 @@ export default {
 		flex-direction: column;
 		flex-grow: 1;
 		background: rgba(180, 180, 180, 0.8);
+	}
+
+	.desk {
+		width: 100%;
+		max-width: 500px;
+		height: 90%;
+		border: 2px solid gray;
+		border-radius: 5px;
+		margin: 0 auto;
+		padding: 4px 0;
+		background: lightgray;
+	}
+
+	.document {
+		width: calc(100% - 12px);
+		border: 2px solid gray;
+		border-radius: 4px;
+		margin: 4px auto;
+		padding: 0 5px;
+		font-weight: 600;
+		background: lightskyblue;
 	}
 
 	input[type='text'] {
