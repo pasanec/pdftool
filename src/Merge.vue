@@ -143,13 +143,14 @@ export default {
 }
 </script>
 <style scoped>
-	#app-content > div {
-		width: 100%;
-		height: 100%;
-		padding: 20px;
+	#content {
+		/* width: 100%;
+		height: 100%; */
+		padding: 50px;
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
+		background: rgba(180, 180, 180, 0.8);
 	}
 
 	input[type='text'] {
