@@ -25,11 +25,70 @@
  import Merge from './Merge'
  
  // eslint-disable-next-line
- __webpack_public_path__ = generateFilePath(appName, 'merge', 'js/')
+ // __webpack_public_path__ = generateFilePath(appName, 'merge', 'js/')
  
- Vue.mixin({ methods: { t, n } })
+//  const merger = document.createElement('div')
+//  merger.setAttribute('id', 'pdftools-content')
+ (function() {
+	const FilesPlugin = {
+		attach(fileList) {
+			fileList.registerMultiSelectFileAction({
+				name: 'pdftool',
+				displayName: 'Pdf Merger',
+                permissions: OC.PERMISSION_READ, // Don't know if it's working
+				iconClass: 'mime-pdf',
+				order: 0,
+				action: (files) => {
+                    console.info('PdfTool Multiselect action')
+                    console.info(files)
+                    Vue.mixin({ methods: { t, n } })
  
- export default new Vue({
-     el: '#content',
-     render: h => h(Merge),
- })
+                    new Vue({
+                        el: '#pdftools-content',
+                        render: h => h(Merge),
+                    })                 
+				},
+			})
+
+			fileList.$el.on('fileActionsReady', data => {
+				console.info('fileActionsReady')
+                console.info(fileList)
+                // fileList.fileMultiSelectMenu.toggleItemVisibility('pdftool', true)
+				// console.info('fileActionsReady')
+			})
+			fileList.$el.on('afterChangeDirectory', data => {
+                console.info('afterChangeDirectory')
+                fileList.fileMultiSelectMenu.toggleItemVisibility('pdftool', true)
+                console.info(fileList)
+                // console.info(data)
+			})
+            fileList.$el.on('change', data => {
+                console.info('PdfTool Multiselect change')
+                console.info(fileList.getSelectedFiles())
+                let showMultiselectAction = false
+                if (fileList.getSelectedFiles().length > 1) {
+                showMultiselectAction = true
+                    fileList.getSelectedFiles().forEach(selection => {
+                            console.info('selection.mimetype', selection.mimetype)
+                            if (selection.mimetype !== 'application/pdf') {
+                            console.info('selection.mimetype if TRUE', selection.mimetype)
+                            showMultiselectAction = false
+                        }
+                    });
+                }
+                fileList.fileMultiSelectMenu.toggleItemVisibility('pdftool', showMultiselectAction)
+            })
+		},
+	}
+
+	OC.Plugins.register('OCA.Files.FileList', FilesPlugin)
+})()
+
+
+
+//  Vue.mixin({ methods: { t, n } })
+ 
+//  export default new Vue({
+//      el: '#pdftools-content',
+//      render: h => h(Merge),
+//  })
