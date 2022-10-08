@@ -1,19 +1,32 @@
 <template>
-	<div id="content" class="app-pdftool">
-		<h2>Merge PDFs</h2>
-		<draggable class="desk" v-model="files" group="files" @start="drag=true" @end="drag=false">
+	<div id="pdftool-content" class="app-pdftool">
+		<Modal 
+			class="pdftool-modal"
+			size="normal"
+			:outTransition="true">
+			<h2>Merge PDFs</h2>
+			<draggable class="desk" v-model="files" group="files" @start="drag=true" @end="drag=false">
    			<div class="document" v-for="element in files" :key="element.id">{{element.name}}</div>
-		</draggable>
+			</draggable>
+			<Button
+				:disabled="false"
+				:readonly="false"
+				type="primary">
+				<template>Merge</template>
+			</Button>
+		</Modal>
 	</div>
 </template>
 
 <script>
-import draggable from 'vuedraggable'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
 import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
 import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
+import draggable from 'vuedraggable'
+import Button from '@nextcloud/vue/dist/Components/Button'
+import Modal from '@nextcloud/vue/dist/Components/Modal'
 
 import '@nextcloud/dialogs/styles/toast.scss'
 import { generateUrl } from '@nextcloud/router'
@@ -23,12 +36,14 @@ import axios from '@nextcloud/axios'
 export default {
 	name: 'Merge',
 	components: {
-		draggable,
 		ActionButton,
 		AppContent,
 		AppNavigation,
 		AppNavigationItem,
 		AppNavigationNew,
+		draggable,
+		Button,
+		Modal,
 	},
 	data() {
 		return {
@@ -155,38 +170,46 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-	#content {
-		/* width: 100%;
-		height: 100%; */
-		padding: 50px;
-		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
-		background: rgba(180, 180, 180, 0.8);
+	// #pdftool-content {
+	// 	/* width: 100%;
+	// 	height: 100%; */
+	// 	padding: 50px;
+	// 	display: flex;
+	// 	flex-direction: column;
+	// 	flex-grow: 1;
+	// 	background: rgba(180, 180, 180, 0.8);
+	// 	h2 {
+	// 		text-align: center;
+	// 	}
+	// }
+	.pdftool-modal {
 		h2 {
 			text-align: center;
+			margin-top: 20px;
 		}
-	}
-
-	.desk {
-		width: 100%;
-		max-width: 500px;
-		height: 75%;
-		border: 2px solid gray;
-		border-radius: 5px;
-		margin: 0 auto;
-		padding: 4px 0;
-		background: lightgray;
-	}
-
-	.document {
-		width: calc(100% - 12px);
-		border: 2px solid gray;
-		border-radius: 4px;
-		margin: 4px auto;
-		padding: 0 5px;
-		font-weight: 600;
-		background: lightskyblue;
+		.desk {
+			width: 100%;
+			max-width: 500px;
+			height: fit-content;
+			border: 2px solid gray;
+			border-radius: 5px;
+			margin: 20px auto 20px auto;
+			padding: 4px 0;
+			background: lightgray;
+			.document {
+				width: calc(100% - 25px);
+				border: 2px solid gray;
+				border-radius: 4px;
+				margin: 4px auto;
+				padding: 0 5px;
+				font-weight: 600;
+				background: lightskyblue;
+			}
+		}
+		button {
+			height: 1em;
+			margin: 20px auto 20px auto;
+		}
 	}
 
 	input[type='text'] {
