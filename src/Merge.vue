@@ -1,18 +1,14 @@
 <template>
 	<div id="content" class="app-pdftool">
-		<h2>Merge PDF</h2>
-		<div class="desk">
-			<div class="document">Document</div>
-			<div class="document">Document</div>
-			<div class="document">Document</div>
-			<div class="document">Document</div>
-			<div class="document">Document</div>
-			<div class="document">Document</div>
-		</div>
+		<h2>Merge PDFs</h2>
+		<draggable class="desk" v-model="files" group="files" @start="drag=true" @end="drag=false">
+   			<div class="document" v-for="element in files" :key="element.id">{{element.name}}</div>
+		</draggable>
 	</div>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import AppContent from '@nextcloud/vue/dist/Components/AppContent'
 import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
@@ -27,6 +23,7 @@ import axios from '@nextcloud/axios'
 export default {
 	name: 'Merge',
 	components: {
+		draggable,
 		ActionButton,
 		AppContent,
 		AppNavigation,
@@ -36,6 +33,13 @@ export default {
 	data() {
 		return {
 			notes: [],
+			files: [
+				{id: 0, name: 'file 1'},
+				{id: 1, name: 'file 2'},
+				{id: 2, name: 'file 3'},
+				{id: 3, name: 'file 4'},
+				{id: 4, name: 'file 5'},
+			],
 			currentNoteId: null,
 			updating: false,
 			loading: true,
@@ -150,7 +154,7 @@ export default {
 	},
 }
 </script>
-<style scoped>
+<style scoped lang="scss">
 	#content {
 		/* width: 100%;
 		height: 100%; */
@@ -159,12 +163,15 @@ export default {
 		flex-direction: column;
 		flex-grow: 1;
 		background: rgba(180, 180, 180, 0.8);
+		h2 {
+			text-align: center;
+		}
 	}
 
 	.desk {
 		width: 100%;
 		max-width: 500px;
-		height: 90%;
+		height: 75%;
 		border: 2px solid gray;
 		border-radius: 5px;
 		margin: 0 auto;
