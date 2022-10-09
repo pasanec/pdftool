@@ -1,6 +1,8 @@
 <template>
-	<div id="pdftool-content" class="app-pdftool">
-		<Modal 
+	<div id="pdftools-content" class="app-pdftool">
+		<Modal
+			v-if="modal"
+			@close="closeModal"
 			class="pdftool-modal"
 			size="normal"
 			:outTransition="true">
@@ -55,6 +57,7 @@ export default {
 				{id: 3, name: 'file 4'},
 				{id: 4, name: 'file 5'},
 			],
+			modal: true,
 			currentNoteId: null,
 			updating: false,
 			loading: true,
@@ -166,22 +169,13 @@ export default {
 				showError(t('pdftool', 'Could not delete the note'))
 			}
 		},
+		closeModal() {
+			this.modal = false
+		},
 	},
 }
 </script>
 <style scoped lang="scss">
-	// #pdftool-content {
-	// 	/* width: 100%;
-	// 	height: 100%; */
-	// 	padding: 50px;
-	// 	display: flex;
-	// 	flex-direction: column;
-	// 	flex-grow: 1;
-	// 	background: rgba(180, 180, 180, 0.8);
-	// 	h2 {
-	// 		text-align: center;
-	// 	}
-	// }
 	.pdftool-modal {
 		h2 {
 			text-align: center;
