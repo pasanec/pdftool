@@ -38,14 +38,18 @@
                 permissions: OC.PERMISSION_READ, // Don't know if it's working
 				iconClass: 'mime-pdf',
 				order: 0,
-				action: (files) => {
+				action: (selection) => {
                     console.info('PdfTool Multiselect action')
-                    console.info(files)
+                    console.info(selection)
                     Vue.mixin({ methods: { t, n } })
  
                     new Vue({
                         el: '#pdftools-content',
-                        render: h => h(Merge),
+                        render: h => h(Merge, {
+                            props: {
+                                files: selection,
+                            },
+                        }),
                     })                 
 				},
 			})
