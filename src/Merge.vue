@@ -50,18 +50,14 @@ export default {
 	data() {
 		return {
 			notes: [],
-			files: [
-				{id: 0, name: 'file 1'},
-				{id: 1, name: 'file 2'},
-				{id: 2, name: 'file 3'},
-				{id: 3, name: 'file 4'},
-				{id: 4, name: 'file 5'},
-			],
 			modal: true,
 			currentNoteId: null,
 			updating: false,
 			loading: true,
 		}
+	},
+	props: {
+		files: [],
 	},
 	computed: {
 	},
