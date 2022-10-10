@@ -10,12 +10,22 @@
 			<draggable class="desk" v-model="files" group="files" @start="drag=true" @end="drag=false">
    			<div class="document" v-for="element in files" :key="element.id">{{element.name}}</div>
 			</draggable>
-			<Button
-				:disabled="false"
-				:readonly="false"
-				type="primary">
-				<template>Merge</template>
-			</Button>
+			<div class="buttons">
+				<Button
+					:disabled="false"
+					:readonly="false"
+					type="primary">
+					<template>Merge</template>
+				</Button>
+				<Button
+					@click="closeModal"
+					:disabled="false"
+					:readonly="false"
+					type="primary">
+					<template>Cancel</template>
+				</Button>
+			</div>
+
 		</Modal>
 	</div>
 </template>
@@ -196,10 +206,17 @@ export default {
 				background: lightskyblue;
 			}
 		}
-		button {
-			height: 1em;
-			margin: 20px auto 20px auto;
+		.buttons {
+			display: flex;
+			justify-content: space-evenly;
+			width: 60%;
+			margin: auto;
+			padding-bottom: 20px;
+			button {
+				height: 1em;
+			}
 		}
+
 	}
 
 	input[type='text'] {
