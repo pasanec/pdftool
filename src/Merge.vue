@@ -7,6 +7,10 @@
 			size="normal"
 			:outTransition="true">
 			<h2>Merge PDFs</h2>
+			<div class="pdftool-filename">
+				<label for="filename">{{ t('pdftool', 'Output file') }}</label>
+				<input v-model="filename" id="filename"/>
+			</div>
 			<draggable class="desk" v-model="fileList" group="files" @start="drag=true" @end="drag=false">
    			<div class="document" v-for="element in fileList" :key="element.id">{{element.name}}</div>
 			</draggable>
@@ -69,6 +73,7 @@ export default {
 			updating: false,
 			loading: true,
 			fileList: [],
+			filename: '',
 		}
 	},
 	props: {
@@ -81,6 +86,7 @@ export default {
 	 */
 	async mounted() {
 		this.fileList = this.files
+		this.filename = this.files[0].name.substring(0, this.files[0].name.length - 4) + '-' + t('pdftool', 'merged') + '.pdf'
 	},
 
 	methods: {
@@ -196,6 +202,16 @@ export default {
 		h2 {
 			text-align: center;
 			margin-top: 20px;
+		}
+		.pdftool-filename {
+			width: 100%;
+			max-width: 500px;
+			margin: auto;
+			padding: 4px 0;
+			#filename {
+				width: 80%;
+				margin-left: 4px;
+			}
 		}
 		.desk {
 			width: 100%;
