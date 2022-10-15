@@ -26,7 +26,9 @@
 					<template>Cancel</template>
 				</Button>
 			</div>
-
+		</Modal>
+		<Modal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
+			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
 		</Modal>
 	</div>
 </template>
@@ -214,6 +216,10 @@ export default {
 			.document.sortable-chosen {
 				cursor: grabbing;
 			}
+		}
+		.modal-error {
+			display: flex;
+			justify-content: space-around;
 		}
 		.buttons {
 			display: flex;
