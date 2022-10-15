@@ -1,5 +1,5 @@
 <template>
-	<div id="pdftools-content" class="app-pdftool">
+	<div id="pdftool-content" class="app-pdftool">
 		<Modal
 			v-if="modal"
 			@close="closeModal"
