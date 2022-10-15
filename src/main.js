@@ -44,7 +44,7 @@
                     Vue.mixin({ methods: { t, n } })
  
                     new Vue({
-                        el: '#pdftools-content',
+                        el: '#pdftool-content',
                         render: h => h(Merge, {
                             props: {
                                 files: selection,
