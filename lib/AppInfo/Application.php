@@ -40,8 +40,7 @@ class Application extends App {
         /* @var IEventDispatcher $eventDispatcher */
         $dispatcher = $this->getContainer()->query(IEventDispatcher::class);
         $dispatcher->addListener(BeforeTemplateRenderedEvent::class, function(BeforeTemplateRenderedEvent $event) {
-            // Util::addHeader('div', ['id' => 'pdftools-content'], 'pdftools');
-            Util::addHeader('div', ['id' => 'pdftools-content'], '');
+            Util::addHeader('div', ['id' => 'pdftool-content'], '');
         });
         $dispatcher->addListener(LoadAdditionalScriptsEvent::class, function(LoadAdditionalScriptsEvent $event) {
             // Util::addScript(Application::APP_ID, 'pdfmenu', 'viewer');
