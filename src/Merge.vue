@@ -12,6 +12,7 @@
 			</draggable>
 			<div class="buttons">
 				<Button
+					@click="merge"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
@@ -78,6 +79,10 @@ export default {
 	},
 
 	methods: {
+		async merge() {
+			console.info('Merged')
+			this.closeModal()
+		},
 		/**
 		 * Create a new note and focus the note content field automatically
 		 * @param {Object} note Note object
@@ -204,6 +209,10 @@ export default {
 				padding: 0 5px;
 				font-weight: 600;
 				background: lightskyblue;
+				cursor: grab;
+			}
+			.document.sortable-chosen {
+				cursor: grabbing;
 			}
 		}
 		.buttons {
