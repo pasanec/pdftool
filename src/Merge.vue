@@ -7,8 +7,8 @@
 			size="normal"
 			:outTransition="true">
 			<h2>Merge PDFs</h2>
-			<draggable class="desk" v-model="files" group="files" @start="drag=true" @end="drag=false">
-   			<div class="document" v-for="element in files" :key="element.id">{{element.name}}</div>
+			<draggable class="desk" v-model="fileList" group="files" @start="drag=true" @end="drag=false">
+   			<div class="document" v-for="element in fileList" :key="element.id">{{element.name}}</div>
 			</draggable>
 			<div class="buttons">
 				<Button
@@ -64,9 +64,11 @@ export default {
 		return {
 			notes: [],
 			modal: true,
+			error: false,
 			currentNoteId: null,
 			updating: false,
 			loading: true,
+			fileList: [],
 		}
 	},
 	props: {
@@ -78,6 +80,7 @@ export default {
 	 * Fetch list of notes when the component is loaded
 	 */
 	async mounted() {
+		this.fileList = this.files
 	},
 
 	methods: {
