@@ -61,7 +61,8 @@ class FileactionService {
     }
 
     public function tellUserSourceFolder(int $fileId): Folder {
-        return $this->rootFolder->getById($fileId)->getParent();
+        // TODO: How to get the original file which was shown in the files app?
+        return $this->rootFolder->getById($fileId)[0]->getParent();
     }
 
     public function tellAppFolder(): string {
@@ -72,18 +73,21 @@ class FileactionService {
     }
 
     public function copyToAppFolder(array $files): array {
+        $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder'. json_encode($files));
         if(!sizeof($files)) {
             $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: empty $files array from user ' . $this->userId . '.');
             throw new EmptyFilesArray('Empty $files array from user ' . $this->userId);
         }
-        if(!$this->hasPermissions($files[0])) {
+        // TODO: This is ugly!!!
+        if(!$this->hasPermissions($files[0]['id'])) {
             $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: ' . $this->userId . ' has no read permission in folder.');
             throw new NoReadPermissionInFolder($this->userId . ' has no read permission in folder of file ' . $files[0]);
         }
         $sourceNodes = [];
         try {
             foreach ($files as $file) {
-                $sourceNodes[] = $this->rootFolder->getById($file);
+                // TODO: As in all other ocurrences.
+                $sourceNodes[] = $this->rootFolder->getById($file['id'])[0];
             }
         } catch (Exception $e) {
             throw $e;
@@ -91,6 +95,7 @@ class FileactionService {
         if(!$this->inSameFolder($sourceNodes)) {
             $fileList = '';
             foreach ($files as $file) {
+                // DODO: Fix: Array to string conversion.
                 $fileList .= $file . ' ';
             }
             throw new FilesNotInSameFolder($fileList);
@@ -137,19 +142,26 @@ class FileactionService {
 
     private function inSameFolder(array $files): bool {
 
-        if ($files[0]->gettype() !== 'file') return false;
+        if ($files[0]->gettype() !== 'file') {
+            $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: filetype ' . $files[0]->gettype() . ' filename ' . $files[0]->getName());
 
+            return false;
+        }
         $folder = $files[0]->getParent();
         $storage = $files[0]->getStorage()->getId();
         foreach ($files as $file) {
-            if($folder !== $file->getParent() || $storage !== $file->getStorage()->getId()) return false;
+            if($folder->getId() !== $file->getParent()->getId() || $storage !== $file->getStorage()->getId()) {
+                $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: fo ' . $folder->getId() . ' s ' . $storage . ' fipa ' . $file->getParent()->getId() . ' fisto ' . $file->getStorage()->getId());
+                return false;
+            }
         }
         return true;
     }
 
     private function hasPermissions(int $fileId): bool {
         try {
-            $file = $this->rootFolder->getById($fileId);
+            // TODO: Research possible side effects.
+            $file = $this->rootFolder->getById($fileId)[0];
             if ($file->gettype() !== 'file') return false;
             $folder = $file->getParent();
             if($file->getPermissions() > 0 && $folder->getPermissions() > 5) return true;
