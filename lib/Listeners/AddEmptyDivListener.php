@@ -31,11 +31,11 @@ use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Util;
 
-class AddMenuItemsListener implements IEventListener {
+class AddEmptyDivListener implements IEventListener {
 	public function handle(Event $event): void {
 		// if (!$event instanceof LoadAdditionalScriptsEvent) {
 		// 	return;
 		// }
-		Util::addScript(Application::APP_ID, 'pdftool-main');
+		Util::addHeader('div', ['id' => 'pdftools-content'], 'pdftools');
 	}
 }

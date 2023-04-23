@@ -33,6 +33,18 @@
 		</Modal>
 		<Modal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
+			<div class="buttons">
+				<Button
+					@click="closeModal"
+					:disabled="false"
+					:readonly="false"
+					type="primary">
+					<template>{{ t('pdftool', 'OK') }}</template>
+				</Button>
+			</div>
+		</Modal>
+		<Modal v-if="merging" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
+			<div class="modal-error"><h2>{{ t('pdftool', 'Merging...') }}</h2></div>
 		</Modal>
 	</div>
 </template>
@@ -69,6 +81,7 @@ export default {
 			notes: [],
 			modal: true,
 			error: false,
+			merging: false,
 			currentNoteId: null,
 			updating: false,
 			loading: true,
@@ -91,7 +104,22 @@ export default {
 
 	methods: {
 		async merge() {
-			console.info('Merged')
+			console.info('Merging')
+			// this.merging = true
+			const data = {
+				fileList: this.fileList,
+				outputFile: this.filename,
+			}
+			console.info(data)
+			try {
+				const response = await axios.post(generateUrl('/apps/pdftool/merge'), data)
+				console.info(response)
+			} catch (e) {
+				console.error(e)
+				showError(t('pdftool', 'Could not merge PDF.'))
+				this.closeModal()
+			}
+			// this.merging = false
 			this.closeModal()
 		},
 		/**

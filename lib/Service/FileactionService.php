@@ -73,7 +73,7 @@ class FileactionService {
     }
 
     public function copyToAppFolder(array $files): array {
-        $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder'. json_encode($files));
+        // $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder'. json_encode($files));
         if(!sizeof($files)) {
             $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: empty $files array from user ' . $this->userId . '.');
             throw new EmptyFilesArray('Empty $files array from user ' . $this->userId);
@@ -135,9 +135,15 @@ class FileactionService {
         $list = $outputFolder->getDirectoryListing();
         $fileNodes = [];
         foreach ($list as $node) {
-            $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node->read());
+            $this->logger->log('::copyFilesToUserFolder: getDirectoryListing');
+            // $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node);
+            // $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node[0]);
+            // $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node[1]);
+
+            $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node[1]->read());
         }
-        return $fileNodes;
+        // return $fileNodes;
+        return $list;
     }
 
     private function inSameFolder(array $files): bool {

@@ -32,10 +32,10 @@ use OCP\AppFramework\Controller;
 class PdfController extends Controller {
 
     /** @var string */
-	private string $AppName;
+	protected string $AppName;
 
 	/** @var IRequest */
-	private IRequest $request;
+	protected IRequest $req;
 
 	/** @var PdfService */
 	private PdfService $pdf;
@@ -45,11 +45,11 @@ class PdfController extends Controller {
 
 	use Errors;
 
-	public function __construct($AppName, IRequest $request, PdfService $pdf, $UserId){
-		parent::__construct($AppName, $request);
+	public function __construct($AppName, IRequest $req, PdfService $pdf, $UserId){
+		parent::__construct($AppName, $req);
 		$this->AppName = $AppName;
 		$this->userId = $UserId;
-		$this->request = $request;
+		$this->req = $req;
 		$this->pdf = $pdf;
 	}
 

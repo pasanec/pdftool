@@ -52,7 +52,9 @@ class PdfService {
 
     public function merge(array $files, string $outputfile = ''): string {
         // Get user source folder
-        $userSourceFolder = $this->fs->tellUserSourceFolder((int)$files[0]);
+        $userSourceFolder = $this->fs->tellUserSourceFolder((int)$files[0]['id']);
+        $this->logger->log('::merge: $files[0] ' . json_encode($files[0]['id']));
+        $this->logger->log('::merge: $userSourceFolder name ' . $userSourceFolder->getName());
         // Get file nodes array
 
         $sourceData = $this->fs->copyToAppFolder($files);
@@ -66,24 +68,34 @@ class PdfService {
         }
         // Make output folder
         $outputFolder = $this->fs->createFolder('output-merge-' . uniqid($this->userId));
+        // $this->logger->log('::merge: ' . $inputFolder->getName());
         // Assemble string of all absolute file paths separated by space
         $filePaths = ' ';
         $appFolder = $this->fs->tellAppFolder();
         foreach ($fileNodes as $fileNode) {
-            $filePaths .= $appFolder . $inputFolder->getName() . '/' . escapeshellarg($fileNode->Name()) . ' ';
+            $filePaths .= $appFolder . $inputFolder->getName() . '/' . escapeshellarg($fileNode->getName()) . ' ';
         }
         // Assemble String of output file path for ghostscript
         $outputPath = $appFolder . $outputFolder->getName() . '/' . escapeshellarg($outputfile) . ' ';
 
         // Execute ghostscript
-        $result = shell_exec('gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . $outputfile . '-dBATCH' . $filePaths);
+        $this->logger->log('::merge: ' . 'gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . $outputPath . ' -dBATCH ' . $filePaths);
+        $result = shell_exec('gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . $outputPath . ' -dBATCH ' . $filePaths);
         // TODO: Custom Exception
-        if ($result === NULL) throw new Exception('PdfTools merge(): An error has ocurred.');
+        // $this->logger->log('::merge: result: ' . $result);
+        if ($result === NULL) {
+            throw new Exception('PdfTools merge(): An error has ocurred.');
+        }
         // Copy output file into user folder
+        $this->logger->log('::merge: outputFolder: ' . $outputFolder->getName());
+        $this->logger->log('::merge: userSourceFolder: ' . $userSourceFolder->getName());
+        //TODO: Copying files doesn't work.
         $userFile = $this->fs->copyFilesToUserFolder($outputFolder, $userSourceFolder);
+        $this->logger->log('::merge: userFile size: ' . sizeof($userFile));
         // Delete source and destination folder
-        $this->inputFolder->delete();
-        $this->outputFolder->delete();
+        //TODO: Function delete() doesn't exist.
+        // $this->inputFolder->delete();
+        // $this->outputFolder->delete();
 
         return $userFile[0]->getInternalPath();
     }
