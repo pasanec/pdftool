@@ -32,6 +32,8 @@ use OCP\Files\File;
 use OCP\Files\NotPermittedException;
 use OCP\IConfig;
 
+use function PHPSTORM_META\type;
+
 class FileactionService {
     /** @var string */
     private string $appName;
@@ -128,11 +130,16 @@ class FileactionService {
         }
     }
 
-    public function copyFilesToUserFolder(ISimpleFolder $outputFolder, Folder $userFolder): array {
+    // public function copyFilesToUserFolder(ISimpleFolder $outputFolder, Folder $userFolder): array {
+    public function copyFilesToUserFolder(array $outputFolder, Folder $userFolder): array {
         if ($userFolder->getPermissions() < 4) {
             throw new NotPermittedException('No read permission for ' . $userFolder->getFullPath() . ' by ' . $this->userId);
         }
-        $list = $outputFolder->getDirectoryListing();
+        // $list = $outputFolder->getDirectoryListing();
+        $list = $outputFolder;
+        // $this->logger->log('::copyFilesToUserFolder: NAME: ' . $outputFolder->getName());
+        // $this->logger->log('::copyFilesToUserFolder: LISTYPE: ' . gettype($list));
+
         $fileNodes = [];
         foreach ($list as $node) {
             $this->logger->log('::copyFilesToUserFolder: getDirectoryListing');
@@ -140,10 +147,11 @@ class FileactionService {
             // $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node[0]);
             // $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node[1]);
 
-            $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node[1]->read());
+            // $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node[1]->read());
+            $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node->read());
         }
-        // return $fileNodes;
-        return $list;
+        return $fileNodes;
+        // return $list;
     }
 
     private function inSameFolder(array $files): bool {

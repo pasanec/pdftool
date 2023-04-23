@@ -61,11 +61,15 @@ class PdfService {
         $inputFolder = $sourceData[0];
         $fileNodes = $sourceData[1];
         // Set output file if not empty string
-        if ($outputfile === '') {
-            $outputfile = substr_replace($fileNodes[0]->getName(), strlen($fileNodes[0]->getName()), -4) . '-merged.pdf';
-        } else if (!strpos($outputfile, '.pdf', -4) || !strpos($outputfile, '.PDF', -4)) {
-            $outputfile .= '.pdf';
-        }
+        // if ($outputfile === '') {
+        //     $outputfile = substr_replace($fileNodes[0]->getName(), strlen($fileNodes[0]->getName()), -4) . '-merged.pdf';
+        // } else if (!strpos($outputfile, '.pdf', -4) || !strpos($outputfile, '.PDF', -4)) {
+        //     $outputfile .= '.pdf';
+        // }
+        $outputfile = rtrim($outputfile, '.PDF');
+        $outputfile = rtrim($outputfile, '.pdf');
+        $outputfile .= '.pdf';
+        
         // Make output folder
         $outputFolder = $this->fs->createFolder('output-merge-' . uniqid($this->userId));
         // $this->logger->log('::merge: ' . $inputFolder->getName());
@@ -89,8 +93,13 @@ class PdfService {
         // Copy output file into user folder
         $this->logger->log('::merge: outputFolder: ' . $outputFolder->getName());
         $this->logger->log('::merge: userSourceFolder: ' . $userSourceFolder->getName());
+        // $this->logger->log('::merge: TYPEOF: ' . gettype(($outputFolder->getFile($outputfile))));
         //TODO: Copying files doesn't work.
-        $userFile = $this->fs->copyFilesToUserFolder($outputFolder, $userSourceFolder);
+        $srcFile = [];
+        $srcFile[] = $outputFolder->getFile($outputfile);
+
+        // $userFile = $this->fs->copyFilesToUserFolder($outputFolder, $userSourceFolder);
+        $userFile = $this->fs->copyFilesToUserFolder($srcFile, $userSourceFolder);
         $this->logger->log('::merge: userFile size: ' . sizeof($userFile));
         // Delete source and destination folder
         //TODO: Function delete() doesn't exist.
