@@ -289,4 +289,7 @@ export default {
 		flex-grow: 1;
 		width: 100%;
 	}
+	.mime-pdf {
+		background-image: url(/img/application-pdf.svg);
+	}
 </style>
