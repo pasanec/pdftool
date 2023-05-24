@@ -48,6 +48,7 @@
                         render: h => h(Merge, {
                             props: {
                                 files: selection,
+                                filelistObj: fileList,
                             },
                         }),
                     })                 
