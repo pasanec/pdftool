@@ -17524,7 +17524,8 @@ __webpack_require__.r(__webpack_exports__);
   },
 
   props: {
-    files: []
+    files: [],
+    filelistObj: {}
   },
   computed: {},
 
@@ -17548,13 +17549,13 @@ __webpack_require__.r(__webpack_exports__);
 
       try {
         const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_11__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_9__.generateUrl)('/apps/pdftool/merge'), data);
-        console.info(response);
+        await this.filelistObj.reload();
+        this.filelistObj.scrollTo(response.data.substring(response.data.indexOf('/') + 1));
       } catch (e) {
         console.error(e);
         (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_10__.showError)(t('pdftool', 'Could not merge PDF.'));
         this.closeModal();
-      } // this.merging = false
-
+      }
 
       this.closeModal();
     },
@@ -23697,12 +23698,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/getUrl.js */ "./node_modules/css-loader/dist/runtime/getUrl.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__);
 // Imports
 
 
+
+var ___CSS_LOADER_URL_IMPORT_0___ = new URL(/* asset import */ __webpack_require__(/*! ../../../../../../../../img/application-pdf.svg */ "./img/application-pdf.svg"), __webpack_require__.b);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".pdftool-modal h2[data-v-31f3240f] {\n  text-align: center;\n  margin-top: 20px;\n}\n.pdftool-modal .pdftool-filename[data-v-31f3240f] {\n  width: 100%;\n  max-width: 500px;\n  margin: auto;\n  padding: 4px 0;\n}\n.pdftool-modal .pdftool-filename #filename[data-v-31f3240f] {\n  width: 80%;\n  margin-left: 4px;\n}\n.pdftool-modal .desk[data-v-31f3240f] {\n  width: 100%;\n  max-width: 500px;\n  height: fit-content;\n  border: 2px solid gray;\n  border-radius: 5px;\n  margin: 20px auto 20px auto;\n  padding: 4px 0;\n  background: lightgray;\n}\n.pdftool-modal .desk .document[data-v-31f3240f] {\n  width: calc(100% - 25px);\n  border: 2px solid gray;\n  border-radius: 4px;\n  margin: 4px auto;\n  padding: 0 5px;\n  font-weight: 600;\n  background: lightskyblue;\n  cursor: grab;\n}\n.pdftool-modal .desk .document.sortable-chosen[data-v-31f3240f] {\n  cursor: grabbing;\n}\n.pdftool-modal .modal-error[data-v-31f3240f] {\n  display: flex;\n  justify-content: space-around;\n}\n.pdftool-modal .buttons[data-v-31f3240f] {\n  display: flex;\n  justify-content: space-evenly;\n  width: 60%;\n  margin: auto;\n  padding-bottom: 20px;\n}\n.pdftool-modal .buttons button[data-v-31f3240f] {\n  height: 1em;\n}\ninput[type=text][data-v-31f3240f] {\n  width: 100%;\n}\ntextarea[data-v-31f3240f] {\n  flex-grow: 1;\n  width: 100%;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".pdftool-modal h2[data-v-31f3240f] {\n  text-align: center;\n  margin-top: 20px;\n}\n.pdftool-modal .pdftool-filename[data-v-31f3240f] {\n  width: 100%;\n  max-width: 500px;\n  margin: auto;\n  padding: 4px 0;\n}\n.pdftool-modal .pdftool-filename #filename[data-v-31f3240f] {\n  width: 80%;\n  margin-left: 4px;\n}\n.pdftool-modal .desk[data-v-31f3240f] {\n  width: 100%;\n  max-width: 500px;\n  height: fit-content;\n  border: 2px solid gray;\n  border-radius: 5px;\n  margin: 20px auto 20px auto;\n  padding: 4px 0;\n  background: lightgray;\n}\n.pdftool-modal .desk .document[data-v-31f3240f] {\n  width: calc(100% - 25px);\n  border: 2px solid gray;\n  border-radius: 4px;\n  margin: 4px auto;\n  padding: 0 5px;\n  font-weight: 600;\n  background: lightskyblue;\n  cursor: grab;\n}\n.pdftool-modal .desk .document.sortable-chosen[data-v-31f3240f] {\n  cursor: grabbing;\n}\n.pdftool-modal .modal-error[data-v-31f3240f] {\n  display: flex;\n  justify-content: space-around;\n}\n.pdftool-modal .buttons[data-v-31f3240f] {\n  display: flex;\n  justify-content: space-evenly;\n  width: 60%;\n  margin: auto;\n  padding-bottom: 20px;\n}\n.pdftool-modal .buttons button[data-v-31f3240f] {\n  height: 1em;\n}\ninput[type=text][data-v-31f3240f] {\n  width: 100%;\n}\ntextarea[data-v-31f3240f] {\n  flex-grow: 1;\n  width: 100%;\n}\n.mime-pdf[data-v-31f3240f] {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -61999,6 +62005,17 @@ module.exports = function whichTypedArray(value) {
 
 /***/ }),
 
+/***/ "./img/application-pdf.svg":
+/*!*********************************!*\
+  !*** ./img/application-pdf.svg ***!
+  \*********************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE2IDE2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0yLjUgMWMtMC4yOCAwLTAuNSAwLjIyLTAuNSAwLjV2MTNjMCAwLjI4IDAuMjIgMC41IDAuNSAwLjVoMTFjMC4yOCAwIDAuNS0wLjIyIDAuNS0wLjV2LTEwLjVsLTMtM3oiIGZpbGw9IiNkYzUwNDciLz48ZyBmaWxsPSIjZmZmIiBhcmlhLWxhYmVsPSJQREYiPjxwYXRoIGQ9Im00LjkwOTMgOC40NDN2MS4wNTdoLTAuNjE4MTN2LTNoMS4xNzAzcTAuMzM3OTEgMCAwLjU5MzQxIDAuMTIzNjMgMC4yNTc1NSAwLjEyMzYzIDAuMzk1NiAwLjM1MjM0IDAuMTM4MDUgMC4yMjY2NSAwLjEzODA1IDAuNTE3MTcgMCAwLjQ0MDkzLTAuMzAyODggMC42OTY0My0wLjMwMDgyIDAuMjUzNDMtMC44MzQ0OCAwLjI1MzQzem0wLTAuNTAwNjloMC41NTIycTAuMjQ1MTkgMCAwLjM3Mjk0LTAuMTE1MzggMC4xMjk4MS0wLjExNTM4IDAuMTI5ODEtMC4zMjk2NyAwLTAuMjIwNDctMC4xMjk4MS0wLjM1NjQ2dC0wLjM1ODUyLTAuMTQwMTFoLTAuNTY2NjJ6Ii8+PHBhdGggZD0ibTcuMDExIDkuNXYtM2gwLjkyMzA4cTAuMzk1NiAwIDAuNzA2NzMgMC4xNzkyNiAwLjMxMzE5IDAuMTc3MiAwLjQ4ODMyIDAuNTA2ODcgMC4xNzUxNCAwLjMyNzYxIDAuMTc1MTQgMC43NDU4OHYwLjEzODA1cTAgMC40MTgyNy0wLjE3MzA4IDAuNzQzODItMC4xNzEwMiAwLjMyNTU1LTAuNDg0MiAwLjUwNDgxLTAuMzEzMTkgMC4xNzkyNi0wLjcwNjczIDAuMTgxMzJ6bTAuNjE4MTMtMi40OTkzdjIuMDAyN2gwLjI5ODc2cTAuMzYyNjQgMCAwLjU1NDI2LTAuMjM2OTUgMC4xOTE2Mi0wLjIzNjk1IDAuMTk1NzQtMC42Nzc4OHYtMC4xNTg2NXEwLTAuNDU3NDItMC4xODk1Ni0wLjY5MjMxLTAuMTg5NTYtMC4yMzY5NS0wLjU1NDI2LTAuMjM2OTV6Ii8+PHBhdGggZD0ibTExLjU2IDguMjc0aC0xLjE4Njh2MS4yMjZoLTAuNjE4MTN2LTNoMS45NTMzdjAuNTAwNjloLTEuMzM1MnYwLjc3NDczaDEuMTg2OHoiLz48L2c+PC9zdmc+Cg==";
+
+/***/ }),
+
 /***/ "./node_modules/@nextcloud/dialogs/styles/close-dark.svg":
 /*!***************************************************************!*\
   !*** ./node_modules/@nextcloud/dialogs/styles/close-dark.svg ***!
@@ -62376,7 +62393,8 @@ __webpack_require__.r(__webpack_exports__);
             el: '#pdftool-content',
             render: h => h(_Merge__WEBPACK_IMPORTED_MODULE_1__["default"], {
               props: {
-                files: selection
+                files: selection,
+                filelistObj: fileList
               }
             })
           });
@@ -62424,4 +62442,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=ac73fe4d1fbe4e0c5ec7
+//# sourceMappingURL=pdftool-main.js.map?v=6c2ea1f34649880775c1

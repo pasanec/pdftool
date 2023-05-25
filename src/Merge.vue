@@ -114,21 +114,13 @@ export default {
 			console.info(data)
 			try {
 				const response = await axios.post(generateUrl('/apps/pdftool/merge'), data)
-				console.info(response)
-				OCA.Files.FileList.prototype.addAndFetchFileInfo(response.data, '', {scrollTo:true}).then(function(status, data) {
-						deferred.resolve(status, data);
-					}, function() {
-						OC.Notification.show(t('files', 'Could not create folder "{dir}"',
-							{dir: response.data}), {type: 'error'}
-						)
-					})
+				await this.filelistObj.reload()
+				this.filelistObj.scrollTo(response.data.substring(response.data.indexOf('/') + 1))
 			} catch (e) {
 				console.error(e)
 				showError(t('pdftool', 'Could not merge PDF.'))
 				this.closeModal()
 			}
-			// this.merging = false
-			this.filelistObj.reload()
 			this.closeModal()
 		},
 		/**
