@@ -36,7 +36,7 @@
 				name: 'pdftool',
 				displayName: 'Pdf Merger',
                 permissions: OC.PERMISSION_READ, // Don't know if it's working
-				iconClass: 'mime-pdf',
+				iconClass: 'icon-pdf',
 				order: 0,
 				action: (selection) => {
                     console.info('PdfTool Multiselect action')

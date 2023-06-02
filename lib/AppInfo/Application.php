@@ -45,6 +45,7 @@ class Application extends App {
         $dispatcher->addListener(LoadAdditionalScriptsEvent::class, function(LoadAdditionalScriptsEvent $event) {
             // Util::addScript(Application::APP_ID, 'pdfmenu', 'viewer');
             Util::addScript(Application::APP_ID, 'pdftool-main');
+            Util::addStyle(Application::APP_ID, 'style');
         });
 
 	}

@@ -1,3 +1,7 @@
 #hello {
 	color: red;
 }
+.icon-pdf {
+	background-image: url(../img/application-pdf.svg);
+	filter: var(--background-invert-if-dark);
+}

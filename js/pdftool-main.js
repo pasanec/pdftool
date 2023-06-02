@@ -62378,7 +62378,7 @@ __webpack_require__.r(__webpack_exports__);
         displayName: 'Pdf Merger',
         permissions: OC.PERMISSION_READ,
         // Don't know if it's working
-        iconClass: 'mime-pdf',
+        iconClass: 'icon-pdf',
         order: 0,
         action: selection => {
           console.info('PdfTool Multiselect action');
@@ -62442,4 +62442,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=6c2ea1f34649880775c1
+//# sourceMappingURL=pdftool-main.js.map?v=786a88ff455419b80940
