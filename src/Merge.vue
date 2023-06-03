@@ -67,6 +67,7 @@ import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
+
 export default {
 	name: 'Merge',
 	components: {
@@ -302,10 +303,9 @@ export default {
 	.mime-pdf {
 		background-image: url(/img/application-pdf.svg);
 		height: 2em;
-		width: 1em;
+		width: 2em;
 		background-size: contain;
 		background-repeat: no-repeat;
-		// display: inline-block;
 		display: inline-block;
 		vertical-align: middle;
 	}
