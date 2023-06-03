@@ -17484,6 +17484,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -23708,7 +23711,7 @@ var ___CSS_LOADER_URL_IMPORT_0___ = new URL(/* asset import */ __webpack_require
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".pdftool-modal h2[data-v-31f3240f] {\n  text-align: center;\n  margin-top: 20px;\n}\n.pdftool-modal .pdftool-filename[data-v-31f3240f] {\n  width: 100%;\n  max-width: 500px;\n  margin: auto;\n  padding: 4px 0;\n}\n.pdftool-modal .pdftool-filename #filename[data-v-31f3240f] {\n  width: 80%;\n  margin-left: 4px;\n}\n.pdftool-modal .desk[data-v-31f3240f] {\n  width: 100%;\n  max-width: 500px;\n  height: fit-content;\n  border: 2px solid gray;\n  border-radius: 5px;\n  margin: 20px auto 20px auto;\n  padding: 4px 0;\n  background: lightgray;\n}\n.pdftool-modal .desk .document[data-v-31f3240f] {\n  width: calc(100% - 25px);\n  border: 2px solid gray;\n  border-radius: 4px;\n  margin: 4px auto;\n  padding: 0 5px;\n  font-weight: 600;\n  background: lightskyblue;\n  cursor: grab;\n}\n.pdftool-modal .desk .document.sortable-chosen[data-v-31f3240f] {\n  cursor: grabbing;\n}\n.pdftool-modal .modal-error[data-v-31f3240f] {\n  display: flex;\n  justify-content: space-around;\n}\n.pdftool-modal .buttons[data-v-31f3240f] {\n  display: flex;\n  justify-content: space-evenly;\n  width: 60%;\n  margin: auto;\n  padding-bottom: 20px;\n}\n.pdftool-modal .buttons button[data-v-31f3240f] {\n  height: 1em;\n}\ninput[type=text][data-v-31f3240f] {\n  width: 100%;\n}\ntextarea[data-v-31f3240f] {\n  flex-grow: 1;\n  width: 100%;\n}\n.mime-pdf[data-v-31f3240f] {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".pdftool-modal h2[data-v-31f3240f] {\n  text-align: center;\n  margin-top: 20px;\n}\n.pdftool-modal .pdftool-filename[data-v-31f3240f] {\n  width: 100%;\n  max-width: 500px;\n  margin: auto;\n  padding: 4px 0;\n}\n.pdftool-modal .pdftool-filename #filename[data-v-31f3240f] {\n  width: 80%;\n  margin-left: 4px;\n}\n.pdftool-modal .desk[data-v-31f3240f] {\n  width: 100%;\n  max-width: 500px;\n  height: fit-content;\n  border: 2px solid gray;\n  border-radius: 5px;\n  margin: 20px auto 20px auto;\n  padding: 4px 0;\n  background: lightgray;\n}\n.pdftool-modal .desk .document[data-v-31f3240f] {\n  width: calc(100% - 25px);\n  border: 2px solid gray;\n  border-radius: 4px;\n  margin: 4px auto;\n  padding: 0 5px;\n  font-weight: 600;\n  background: lightskyblue;\n  cursor: grab;\n}\n.pdftool-modal .desk .document .filename[data-v-31f3240f] {\n  height: 2em;\n  line-height: 2em;\n  vertical-align: middle;\n  display: inline-block;\n}\n.pdftool-modal .desk .document.sortable-chosen[data-v-31f3240f] {\n  cursor: grabbing;\n}\n.pdftool-modal .modal-error[data-v-31f3240f] {\n  display: flex;\n  justify-content: space-around;\n}\n.pdftool-modal .buttons[data-v-31f3240f] {\n  display: flex;\n  justify-content: space-evenly;\n  width: 60%;\n  margin: auto;\n  padding-bottom: 20px;\n}\n.pdftool-modal .buttons button[data-v-31f3240f] {\n  height: 1em;\n}\ninput[type=text][data-v-31f3240f] {\n  width: 100%;\n}\ntextarea[data-v-31f3240f] {\n  flex-grow: 1;\n  width: 100%;\n}\n.mime-pdf[data-v-31f3240f] {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  height: 2em;\n  width: 1em;\n  background-size: contain;\n  background-repeat: no-repeat;\n  display: inline-block;\n  vertical-align: middle;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -50464,7 +50467,13 @@ var render = function () {
                   return _c(
                     "div",
                     { key: element.id, staticClass: "document" },
-                    [_vm._v(_vm._s(element.name))]
+                    [
+                      _c("div", { staticClass: "mime-pdf" }),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "filename" }, [
+                        _vm._v(_vm._s(element.name)),
+                      ]),
+                    ]
                   )
                 }),
                 0
@@ -62442,4 +62451,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=786a88ff455419b80940
+//# sourceMappingURL=pdftool-main.js.map?v=bb3bd1a590dc70fac411

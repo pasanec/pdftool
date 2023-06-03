@@ -12,7 +12,10 @@
 				<input v-model="filename" id="filename"/>
 			</div>
 			<draggable class="desk" v-model="fileList" group="files" @start="drag=true" @end="drag=false">
-   			<div class="document" v-for="element in fileList" :key="element.id">{{element.name}}</div>
+   			<div class="document" v-for="element in fileList" :key="element.id">
+				<div class="mime-pdf"></div>
+				<div class="filename">{{element.name}}</div>
+			</div>
 			</draggable>
 			<div class="buttons">
 				<Button
@@ -260,6 +263,12 @@ export default {
 				font-weight: 600;
 				background: lightskyblue;
 				cursor: grab;
+				.filename {
+					height: 2em;
+					line-height: 2em;
+					vertical-align: middle;
+					display: inline-block;
+				}
 			}
 			.document.sortable-chosen {
 				cursor: grabbing;
@@ -292,5 +301,12 @@ export default {
 	}
 	.mime-pdf {
 		background-image: url(/img/application-pdf.svg);
+		height: 2em;
+		width: 1em;
+		background-size: contain;
+		background-repeat: no-repeat;
+		// display: inline-block;
+		display: inline-block;
+		vertical-align: middle;
 	}
 </style>

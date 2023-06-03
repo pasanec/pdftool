@@ -5,3 +5,7 @@
 	background-image: url(../img/pdftool-icon-pdf.svg);
 	filter: var(--background-invert-if-dark);
 }
+.document-pdf {
+	background-image: url(../img/application-pdf.svg);
+	filter: var(--background-invert-if-dark);
+}
