@@ -30,7 +30,7 @@
 //  const merger = document.createElement('div')
 //  merger.setAttribute('id', 'pdftools-content')
  (function() {
-	const FilesPlugin = {
+	const PdftoolMultiselect = {
 		attach(fileList) {
 			fileList.registerMultiSelectFileAction({
 				name: 'pdftool',
@@ -86,7 +86,7 @@
 		},
 	}
 
-	OC.Plugins.register('OCA.Files.FileList', FilesPlugin)
+	OC.Plugins.register('OCA.Files.FileList', PdftoolMultiselect)
 })()
 
 

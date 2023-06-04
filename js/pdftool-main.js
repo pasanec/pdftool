@@ -17487,6 +17487,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -62363,9 +62384,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Merge__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Merge */ "./src/Merge.vue");
 /* provided dependency */ var console = __webpack_require__(/*! ./node_modules/console-browserify/index.js */ "./node_modules/console-browserify/index.js");
 /**
- * @copyright Copyright (c) 2018 John Molakvoæ <skjnldsv@protonmail.com>
+ * @copyright Copyright (c) 2023 Immanuel Pasanec <i@pasanec.de>
  *
- * @author John Molakvoæ <skjnldsv@protonmail.com>
+ * @author Immanuel Pasanec <i@pasanec.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -62391,7 +62412,7 @@ __webpack_require__.r(__webpack_exports__);
 //  merger.setAttribute('id', 'pdftools-content')
 
 (function () {
-  const FilesPlugin = {
+  const PdftoolMultiselect = {
     attach(fileList) {
       fileList.registerMultiSelectFileAction({
         name: 'pdftool',
@@ -62452,7 +62473,7 @@ __webpack_require__.r(__webpack_exports__);
     }
 
   };
-  OC.Plugins.register('OCA.Files.FileList', FilesPlugin);
+  OC.Plugins.register('OCA.Files.FileList', PdftoolMultiselect);
 })(); //  Vue.mixin({ methods: { t, n } })
 //  export default new Vue({
 //      el: '#pdftools-content',
@@ -62462,4 +62483,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=0799cfe37dc351dc395f
+//# sourceMappingURL=pdftool-main.js.map?v=b850435c2f339029aed2
