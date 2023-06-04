@@ -50518,7 +50518,7 @@ var render = function () {
                       },
                       on: { click: _vm.closeModal },
                     },
-                    [[_vm._v("Cancel")]],
+                    [[_vm._v(_vm._s(_vm.t("pdftool", "Cancel")))]],
                     2
                   ),
                 ],
@@ -62395,7 +62395,7 @@ __webpack_require__.r(__webpack_exports__);
     attach(fileList) {
       fileList.registerMultiSelectFileAction({
         name: 'pdftool',
-        displayName: 'Pdf Merger',
+        displayName: t('pdftool', 'Pdf Merger'),
         permissions: OC.PERMISSION_READ,
         // Don't know if it's working
         iconClass: 'icon-pdf',
@@ -62462,4 +62462,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=ca70e9df38bb1a6530ae
+//# sourceMappingURL=pdftool-main.js.map?v=0799cfe37dc351dc395f

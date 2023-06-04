@@ -34,7 +34,7 @@
 		attach(fileList) {
 			fileList.registerMultiSelectFileAction({
 				name: 'pdftool',
-				displayName: 'Pdf Merger',
+				displayName: t('pdftool', 'Pdf Merger'),
                 permissions: OC.PERMISSION_READ, // Don't know if it's working
 				iconClass: 'icon-pdf',
 				order: 0,

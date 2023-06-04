@@ -30,7 +30,7 @@
 					:disabled="false"
 					:readonly="false"
 					type="primary">
-					<template>Cancel</template>
+					<template>{{ t('pdftool', 'Cancel') }}</template>
 				</Button>
 			</div>
 		</Modal>
