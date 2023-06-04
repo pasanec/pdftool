@@ -1,7 +1,7 @@
 /**
- * @copyright Copyright (c) 2018 John Molakvoæ <skjnldsv@protonmail.com>
+ * @copyright Copyright (c) 2023 Immanuel Pasanec <i@pasanec.de>
  *
- * @author John Molakvoæ <skjnldsv@protonmail.com>
+ * @author Immanuel Pasanec <i@pasanec.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
