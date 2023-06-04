@@ -87,6 +87,37 @@
 	}
 
 	OC.Plugins.register('OCA.Files.FileList', PdftoolMultiselect)
+
+    // const PdfToolSplitAction = {
+    //     attach: function (menu) {
+    //         menu.addMenuEntry({
+    //             id: 'file',
+    //             displayName: 'PdfTool',
+    //             templateName: 'MyNewTemplate',
+    //             iconClass: 'icon-pdf',
+    //             fileType: 'file',
+    //             actionHandler: function () {
+    //                 console.log('PdfTool Menu clicked.');
+    //             }
+    //         });
+    //     }
+    // }
+    // OC.Plugins.register('OCA.Files.NewFileMenu', PdfToolSplitAction);
+    OCA.Files.fileActions.registerAction({
+        mime: 'application/pdf',
+        name: 'pdfToolSplitter',
+        permissions: OC.PERMISSION_READ,
+        iconClass: 'icon-pdf',
+        // icon: OC.imagePath('gallery', 'gallery-dark'),
+        actionHandler: (fileName, context) => {
+            console.info('Split Action clicked')
+            console.info(fileName)
+            console.info(context.fileInfoModel.id)
+        },
+        displayName: t('pdftool', 'PDF Splitter')
+    })
+
+
 })()
 
 
