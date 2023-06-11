@@ -187,4 +187,9 @@ class FileactionService {
         }
 
     }
+
+    public function getAbsoluteFilepath(int $fileId): string {
+        $filePath = $this->rootFolder->getById($fileId)[0]->getPath();
+        return $filePath;
+    }
 }
