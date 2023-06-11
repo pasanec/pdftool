@@ -109,5 +109,57 @@ class PdfService {
         return $userFile[0]->getInternalPath();
     }
 
+    public function split(array $file, array $splitPoints): bool {
+        $userSourceFolder = $this->fs->tellUserSourceFolder((int)$file['id']);
+        $this->logger->log('::merge: $files[0] ' . json_encode($file['id']));
+        $this->logger->log('::merge: $userSourceFolder name ' . $userSourceFolder->getName());
+
+        // TODO: Create i/o temp folders copy file in source folder.
+        $sourceData = $this->fs->copyToAppFolder([$file]);
+        $inputFolder = $sourceData[0];
+        $fileNode = $sourceData[1][0];
+
+        $outputfile = rtrim($outputfile, '.PDF');
+        $outputfile = rtrim($outputfile, '.pdf');
+        // $outputfile .= '.pdf';
+
+        $outputFolder = $this->fs->createFolder('output-split-' . uniqid($this->userId));
+
+        // TODO: Assemble input filename with source folder path.
+        $appFolder = $this->fs->tellAppFolder();
+        $filePath = $appFolder . $inputFolder->getName() . '/' . escapeshellarg($fileNode->getName()) . ' ';
+
+        // TODO: Assemble output filename with source folder path.
+        $outputPath = $appFolder . $outputFolder->getName() . '/' . escapeshellarg($outputfile);
+
+        // TODO: Sort splitpoints by value ascending.
+        asort($splitPoints);
+        // TODO: Run gs command.
+        $firstPage = 1;
+        foreach ($splitPoints as $splitPoint) {
+            $outputFile = "$outputPath $firstPage-$splitPoint.pdf";
+            $this->logger->log('::split: ' . "gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$splitPoint -sDEVICE=pdfwrite $filepath");
+            $result = shell_exec("gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$splitPoint -sDEVICE=pdfwrite $filepath");
+            if ($result === NULL) {
+                throw new Exception('PdfTools split(): An error has ocurred.');
+            }
+        }
+
+        // TODO: Copy files to user folder.
+        $srcFile = [];
+        $srcFile[] = $outputFolder->getFile($outputfile);
+
+        $userFile = $this->fs->copyFilesToUserFolder($srcFile, $userSourceFolder);
+        $this->logger->log('::merge: userFile size: ' . sizeof($userFile));
+
+        return true;
+    }
+
+    public function countPages(int $fileId): int {
+        $filePath = $this->fs->getAbsoluteFilepath($fileId);
+        $pageCount = (int) shell_exec("exiftool -T -PageCount \"$filePath\"");
+        return $pageCount;
+    }
+
 
 }
