@@ -17,6 +17,7 @@ The tool requires ghostscript to be installed on your server.]]></description>
     <dependencies>
         <nextcloud min-version="23" max-version="26"/>
         <command>gs</command>
+        <command>exiftool</command>
     </dependencies>
     <navigations>
         <navigation>
