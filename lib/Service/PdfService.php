@@ -43,14 +43,21 @@ class PdfService {
     /** @var FileactionService */
     private $fs;
 
-	public function __construct(string $appName, LogService $logger, FileactionService $fs, $userId) {
+    /** @var SettingsService */
+    private $s;
+
+	public function __construct(string $appName, LogService $logger, FileactionService $fs, SettingService $s, $userId) {
 		$this->appName = $appName;
         $this->userId = $userId;
         $this->logger = $logger;
         $this->fs = $fs;
+        $this->s = $s;
 	}
 
     public function merge(array $files, string $outputfile = ''): string {
+        if ($this->batchCountPages($files) > $this->s->getMaxPageCount()) {
+            throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
+        }
         // Get user source folder
         $userSourceFolder = $this->fs->tellUserSourceFolder((int)$files[0]['id']);
         $this->logger->log('::merge: $files[0] ' . json_encode($files[0]['id']));
@@ -110,6 +117,9 @@ class PdfService {
     }
 
     public function split(array $file, array $splitPoints): bool {
+        if ($this->countPages($file['id']) > $this->s->getMaxPageCount()) {
+            throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
+        }
         $userSourceFolder = $this->fs->tellUserSourceFolder((int)$file['id']);
         $this->logger->log('::merge: $files[0] ' . json_encode($file['id']));
         $this->logger->log('::merge: $userSourceFolder name ' . $userSourceFolder->getName());
@@ -138,8 +148,8 @@ class PdfService {
         $firstPage = 1;
         foreach ($splitPoints as $splitPoint) {
             $outputFile = "$outputPath $firstPage-$splitPoint.pdf";
-            $this->logger->log('::split: ' . "gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$splitPoint -sDEVICE=pdfwrite $filepath");
-            $result = shell_exec("gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$splitPoint -sDEVICE=pdfwrite $filepath");
+            $this->logger->log('::split: ' . "gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$splitPoint -sDEVICE=pdfwrite $filePath");
+            $result = shell_exec("gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$splitPoint -sDEVICE=pdfwrite $filePath");
             if ($result === NULL) {
                 throw new Exception('PdfTools split(): An error has ocurred.');
             }
@@ -158,6 +168,14 @@ class PdfService {
     public function countPages(int $fileId): int {
         $filePath = $this->fs->getAbsoluteFilepath($fileId);
         $pageCount = (int) shell_exec("exiftool -T -PageCount \"$filePath\"");
+        return $pageCount;
+    }
+
+    public function batchCountPages(array $files): int {
+        $pageCount = 0;
+        foreach ($files as $file) {
+            $pageCount += $this->countPages($file['id']);
+        }
         return $pageCount;
     }
 
