@@ -58,6 +58,9 @@ class PdfService {
         if ($this->batchCountPages($files) > $this->s->getMaxPageCount()) {
             throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
         }
+        if ($this->batchCountPages($files)) {
+            throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
+        }
         // Get user source folder
         $userSourceFolder = $this->fs->tellUserSourceFolder((int)$files[0]['id']);
         $this->logger->log('::merge: $files[0] ' . json_encode($files[0]['id']));
@@ -120,6 +123,11 @@ class PdfService {
         if ($this->countPages($file['id']) > $this->s->getMaxPageCount()) {
             throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
         }
+        
+        $maxSplitPage = max(array_values($splitPoints));
+        if ($maxSplitPage > $this->countPages($file['id'])) {
+            throw new Exception('Page number ' . $maxSplitPage . ' greater than file page count of ' . $this->countPages($file['id']) . ' pages.' );
+        }
         $userSourceFolder = $this->fs->tellUserSourceFolder((int)$file['id']);
         $this->logger->log('::merge: $files[0] ' . json_encode($file['id']));
         $this->logger->log('::merge: $userSourceFolder name ' . $userSourceFolder->getName());
@@ -153,6 +161,7 @@ class PdfService {
             if ($result === NULL) {
                 throw new Exception('PdfTools split(): An error has ocurred.');
             }
+
         }
 
         // TODO: Copy files to user folder.
