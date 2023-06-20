@@ -67,6 +67,11 @@ class FileactionService {
         return $this->rootFolder->getById($fileId)[0]->getParent();
     }
 
+    public function createExportFolder(string $name, Folder $userFolder): Folder {
+        $exportFolder = $userFolder->newFolder($name);
+        return $exportFolder;
+    }
+
     public function tellAppFolder(): string {
         $dataFolder = $this->config->getSystemValue('datadirectory');
         $instanceId = $this->config->getSystemValue('instanceid');
