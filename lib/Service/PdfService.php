@@ -140,6 +140,7 @@ class PdfService {
         $outputfile = rtrim($outputfile, '.PDF');
         $outputfile = rtrim($outputfile, '.pdf');
         // $outputfile .= '.pdf';
+        $exportFolderName = $outputfile .= '.pdf';
 
         $outputFolder = $this->fs->createFolder('output-split-' . uniqid($this->userId));
 
@@ -154,6 +155,7 @@ class PdfService {
         asort($splitPoints);
         // TODO: Run gs command.
         $firstPage = 1;
+        $outputFiles = [];
         foreach ($splitPoints as $splitPoint) {
             $outputFile = "$outputPath $firstPage-$splitPoint.pdf";
             $this->logger->log('::split: ' . "gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$splitPoint -sDEVICE=pdfwrite $filePath");
@@ -161,14 +163,20 @@ class PdfService {
             if ($result === NULL) {
                 throw new Exception('PdfTools split(): An error has ocurred.');
             }
-
+            $outputFileNames[] = $outputFile;
         }
-
+        
         // TODO: Copy files to user folder.
-        $srcFile = [];
-        $srcFile[] = $outputFolder->getFile($outputfile);
+        $srcFiles = [];
+        foreach ($outputFileNames as $outputFileName) {
+            $srcFiles[] = $outputFolder->getFile($outputFileName);
+        }
+        
 
-        $userFile = $this->fs->copyFilesToUserFolder($srcFile, $userSourceFolder);
+        // TODO: Create collection folder in user folder.
+        $exportFolder = $this->fs->createExportFolder($exportFolderName, $userSourceFolder);
+
+        $userFile = $this->fs->copyFilesToUserFolder($srcFiles, $exportFolder);
         $this->logger->log('::merge: userFile size: ' . sizeof($userFile));
 
         return true;
