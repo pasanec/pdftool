@@ -113,8 +113,8 @@ class PdfService {
         $this->logger->log('::merge: userFile size: ' . sizeof($userFile));
         // Delete source and destination folder
         //TODO: Function delete() doesn't exist.
-        // $this->inputFolder->delete();
-        // $this->outputFolder->delete();
+        $inputFolder->delete();
+        $outputFolder->delete();
 
         return $userFile[0]->getInternalPath();
     }
