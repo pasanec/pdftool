@@ -1,6 +1,4 @@
 <?php
-
-<?php
 /**
  *
  * @copyright Copyright (c) 2023, Immanuel Pasanec (immanuel@pasanec.de)
