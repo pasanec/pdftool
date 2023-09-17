@@ -46,7 +46,7 @@ class PdfService {
     /** @var SettingsService */
     private $s;
 
-	public function __construct(string $appName, LogService $logger, FileactionService $fs, SettingService $s, $userId) {
+	public function __construct(string $appName, LogService $logger, FileactionService $fs, SettingsService $s, $userId) {
 		$this->appName = $appName;
         $this->userId = $userId;
         $this->logger = $logger;
