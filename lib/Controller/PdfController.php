@@ -48,7 +48,7 @@ class PdfController extends Controller {
 	public function __construct($AppName, IRequest $req, PdfService $pdf, $UserId){
 		parent::__construct($AppName, $req);
 		$this->AppName = $AppName;
-		$this->userId = $UserId;
+		$this->UserId = $UserId;
 		$this->req = $req;
 		$this->pdf = $pdf;
 	}
