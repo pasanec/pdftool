@@ -138,7 +138,7 @@ class FileactionService {
     // public function copyFilesToUserFolder(ISimpleFolder $outputFolder, Folder $userFolder): array {
     public function copyFilesToUserFolder(array $outputFolder, Folder $userFolder): array {
         if ($userFolder->getPermissions() < 4) {
-            throw new NotPermittedException('No read permission for ' . $userFolder->getFullPath() . ' by ' . $this->userId);
+            throw new NotPermittedException('No read permission for ' . $userFolder->getFullPath('/') . ' by ' . $this->userId);
         }
         // $list = $outputFolder->getDirectoryListing();
         $list = $outputFolder;

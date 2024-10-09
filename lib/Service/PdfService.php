@@ -79,7 +79,7 @@ class PdfService {
         $outputfile = rtrim($outputfile, '.PDF');
         $outputfile = rtrim($outputfile, '.pdf');
         $outputfile .= '.pdf';
-        
+
         // Make output folder
         $outputFolder = $this->fs->createFolder('output-merge-' . uniqid($this->userId));
         // $this->logger->log('::merge: ' . $inputFolder->getName());
@@ -111,8 +111,6 @@ class PdfService {
         // $userFile = $this->fs->copyFilesToUserFolder($outputFolder, $userSourceFolder);
         $userFile = $this->fs->copyFilesToUserFolder($srcFile, $userSourceFolder);
         $this->logger->log('::merge: userFile size: ' . sizeof($userFile));
-        // Delete source and destination folder
-        //TODO: Function delete() doesn't exist.
         $inputFolder->delete();
         $outputFolder->delete();
 
@@ -123,7 +121,7 @@ class PdfService {
         if ($this->countPages($file['id']) > $this->s->getMaxPageCount()) {
             throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
         }
-        
+
         $maxSplitPage = max(array_values($splitPoints));
         if ($maxSplitPage > $this->countPages($file['id'])) {
             throw new Exception('Page number ' . $maxSplitPage . ' greater than file page count of ' . $this->countPages($file['id']) . ' pages.' );
@@ -155,7 +153,7 @@ class PdfService {
         asort($splitPoints);
         // TODO: Run gs command.
         $firstPage = 1;
-        $outputFiles = [];
+        $outputFileNames = [];
         foreach ($splitPoints as $splitPoint) {
             $outputFile = "$outputPath $firstPage-$splitPoint.pdf";
             $this->logger->log('::split: ' . "gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$splitPoint -sDEVICE=pdfwrite $filePath");
@@ -165,13 +163,13 @@ class PdfService {
             }
             $outputFileNames[] = $outputFile;
         }
-        
+
         // TODO: Copy files to user folder.
         $srcFiles = [];
         foreach ($outputFileNames as $outputFileName) {
             $srcFiles[] = $outputFolder->getFile($outputFileName);
         }
-        
+
 
         // TODO: Create collection folder in user folder.
         $exportFolder = $this->fs->createExportFolder($exportFolderName, $userSourceFolder);
