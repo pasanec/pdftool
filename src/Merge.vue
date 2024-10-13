@@ -21,7 +21,7 @@
 
 <template>
 	<div id="pdftool-content" class="app-pdftool">
-		<Modal
+		<ncmodal
 			v-if="modal"
 			@close="closeModal"
 			class="pdftool-modal"
@@ -39,51 +39,46 @@
 			</div>
 			</draggable>
 			<div class="buttons">
-				<Button
+				<ncbutton
 					@click="merge"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 					<template>Merge</template>
-				</Button>
-				<Button
+				</ncbutton>
+				<ncbutton
 					@click="closeModal"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 					<template>{{ t('pdftool', 'Cancel') }}</template>
-				</Button>
+				</ncbutton>
 			</div>
 		</Modal>
-		<Modal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
+		<ncmodal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
 			<div class="buttons">
-				<Button
+				<ncbutton
 					@click="closeModal"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 					<template>{{ t('pdftool', 'OK') }}</template>
-				</Button>
+				</ncbutton>
 			</div>
 		</Modal>
-		<Modal v-if="merging" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
+		<ncmodal v-if="merging" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'Merging...') }}</h2></div>
 		</Modal>
 	</div>
 </template>
 
 <script>
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import AppContent from '@nextcloud/vue/dist/Components/AppContent'
-import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
-import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
-import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
+import { NcActionButton, NcAppContent, NcAppNavigation, NcAppNavigationItem, NcAppNavigationNew, NcButton, NcModal} from '@nextcloud/vue'
 import draggable from 'vuedraggable'
-import Button from '@nextcloud/vue/dist/Components/Button'
-import Modal from '@nextcloud/vue/dist/Components/Modal'
 
-import '@nextcloud/dialogs/styles/toast.scss'
+// import '@nextcloud/dialogs/styles/toast.scss'
+import '@nextcloud/dialogs/style.css'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
@@ -93,14 +88,14 @@ import { emit } from '@nextcloud/event-bus'
 export default {
 	name: 'Merge',
 	components: {
-		ActionButton,
-		AppContent,
-		AppNavigation,
-		AppNavigationItem,
-		AppNavigationNew,
+		NcActionButton,
+		NcAppContent,
+		NcAppNavigation,
+		NcAppNavigationItem,
+		NcAppNavigationNew,
+		NcButton,
+		NcModal,
 		draggable,
-		Button,
-		Modal,
 	},
 	data() {
 		return {
