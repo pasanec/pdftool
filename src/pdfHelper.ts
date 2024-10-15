@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-import type { Capabilities } from '../types'
+import type { Capabilities } from './types'
 import type { Node, View } from '@nextcloud/files'
 
 import { emit } from '@nextcloud/event-bus'
@@ -101,28 +101,28 @@ export const displayName = (nodes: Node[], view: View) => {
 	return t('files', 'Delete')
 }
 
-export const askConfirmation = async (nodes: Node[], view: View) => {
-	const message = view.id === 'trashbin' || !isTrashbinEnabled()
-		? n('files', 'You are about to permanently delete {count} item', 'You are about to permanently delete {count} items', nodes.length, { count: nodes.length })
-		: n('files', 'You are about to delete {count} item', 'You are about to delete {count} items', nodes.length, { count: nodes.length })
-
-	return new Promise<boolean>(resolve => {
-		// TODO: Use the new dialog API
-		window.OC.dialogs.confirmDestructive(
-			message,
-			t('files', 'Confirm deletion'),
-			{
-				type: window.OC.dialogs.YES_NO_BUTTONS,
-				confirm: displayName(nodes, view),
-				confirmClasses: 'error',
-				cancel: t('files', 'Cancel'),
-			},
-			(decision: boolean) => {
-				resolve(decision)
-			},
-		)
-	})
-}
+// export const askConfirmation = async (nodes: Node[], view: View) => {
+// 	const message = view.id === 'trashbin' || !isTrashbinEnabled()
+// 		? n('files', 'You are about to permanently delete {count} item', 'You are about to permanently delete {count} items', nodes.length, { count: nodes.length })
+// 		: n('files', 'You are about to delete {count} item', 'You are about to delete {count} items', nodes.length, { count: nodes.length })
+//
+// 	return new Promise<boolean>(resolve => {
+// 		// TODO: Use the new dialog API
+// 		window.OC.dialogs.confirmDestructive(
+// 			message,
+// 			t('files', 'Confirm deletion'),
+// 			{
+// 				type: window.OC.dialogs.YES_NO_BUTTONS,
+// 				confirm: displayName(nodes, view),
+// 				confirmClasses: 'error',
+// 				cancel: t('files', 'Cancel'),
+// 			},
+// 			(decision: boolean) => {
+// 				resolve(decision)
+// 			},
+// 		)
+// 	})
+// }
 
 export const deleteNode = async (node: Node) => {
 	await axios.delete(node.encodedSource)

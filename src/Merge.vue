@@ -54,7 +54,7 @@
 					<template>{{ t('pdftool', 'Cancel') }}</template>
 				</ncbutton>
 			</div>
-		</Modal>
+		</ncmodal>
 		<ncmodal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
 			<div class="buttons">
@@ -66,10 +66,10 @@
 					<template>{{ t('pdftool', 'OK') }}</template>
 				</ncbutton>
 			</div>
-		</Modal>
+		</ncmodal>
 		<ncmodal v-if="merging" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'Merging...') }}</h2></div>
-		</Modal>
+		</ncmodal>
 	</div>
 </template>
 
