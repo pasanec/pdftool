@@ -45,7 +45,9 @@
     "@nextcloud/router": "^3.0.1",
     "@nextcloud/upload": "^1.6.1",
     "@nextcloud/vue": "^8.19.0",
+    "vue-class-component": "^7.2.6",
     "vue-material-design-icons": "^5.3.1",
+    "vue-property-decorator": "^9.1.2",
     "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
@@ -54,8 +56,13 @@
     "@nextcloud/eslint-config": "^8.4.1",
     "@nextcloud/stylelint-config": "^3.0.1",
     "@nextcloud/webpack-vue-config": "^6.1.1",
+    "@types/vue": "^1.0.31",
+    "@types/webpack-env": "^1.18.5",
+    "sass": "^1.80.3",
+    "sass-loader": "^14.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.6.3",
-    "vue": "^2.7.16"
+    "vue": "^2.7.16",
+    "vue-demi": "^0.14.10"
   }
 }

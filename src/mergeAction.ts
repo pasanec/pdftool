@@ -19,7 +19,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import { generateFilePath } from '@nextcloud/router'
+// import createApp from "vue";
+// import { generateFilePath } from '@nextcloud/router'
 import { Permission, Node, View, FileAction } from '@nextcloud/files'
 import { showInfo } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
@@ -33,18 +34,23 @@ import { addNewFileMenuEntry, registerDavProperty, registerFileAction } from '@n
 import { displayName } from './pdfHelper'
 
 // import Vue from 'vue'
+import Vue from 'vue'
 declare module "*.vue" {
-  import Vue from 'vue'
-  export default Vue
+  // export default Vue
+	interface VueConstructor {
+		// You can add properties or methods here if needed
+	}
 }
-import Merge from './Merge'
+// export default vue
+import Merge from './Merge.vue'
 
 // eslint-disable-next-line
 // __webpack_public_path__ = generateFilePath(appName, 'merge', 'js/')
 
 //  const merger = document.createElement('div')
 //  merger.setAttribute('id', 'pdftools-content')
-	export const action = new FileAction({
+	// export const action = new FileAction({
+	export const mergeAction = new FileAction({
 	id: 'pdfmerge',
 	displayName,
 	// iconSvgInline: (nodes: Node[]) => {
