@@ -24,6 +24,7 @@
 import { Permission, Node, View, FileAction } from '@nextcloud/files'
 import { showInfo } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
+import MergeSvg from '@mdi/svg/svg/merge.svg'
 // import PQueue from 'p-queue'
 
 // import CloseSvg from '@mdi/svg/svg/close.svg?raw'
@@ -36,10 +37,10 @@ import { displayName } from './pdfHelper'
 // import Vue from 'vue'
 import Vue from 'vue'
 declare module "*.vue" {
-  // export default Vue
-	interface VueConstructor {
-		// You can add properties or methods here if needed
-	}
+    // export default Vue
+    interface VueConstructor {
+        // You can add properties or methods here if needed
+    }
 }
 // export default vue
 import Merge from './Merge.vue'
@@ -49,105 +50,106 @@ import Merge from './Merge.vue'
 
 //  const merger = document.createElement('div')
 //  merger.setAttribute('id', 'pdftools-content')
-	// export const action = new FileAction({
-	export const mergeAction = new FileAction({
-	id: 'pdfmerge',
-	displayName,
-	// iconSvgInline: (nodes: Node[]) => {
-	// 	if (canUnshareOnly(nodes)) {
-	// 		return CloseSvg
-	// 	}
-	//
-	// 	if (canDisconnectOnly(nodes)) {
-	// 		return NetworkOffSvg
-	// 	}
-	//
-	// 	return TrashCanSvg
-	// },
+// export const action = new FileAction({
+export const mergeAction = new FileAction({
+    id: 'pdfmerge',
+    displayName,
+    iconSvgInline: () => MergeSvg,
+    // iconSvgInline: (nodes: Node[]) => {
+    // 	if (canUnshareOnly(nodes)) {
+    // 		return CloseSvg
+    // 	}
+    //
+    // 	if (canDisconnectOnly(nodes)) {
+    // 		return NetworkOffSvg
+    // 	}
+    //
+    // 	return TrashCanSvg
+    // },
 
-	enabled(nodes: Node[]) {
-		return nodes.length > 1 && nodes
-			.map(node => node.permissions)
-			.every(permission => (permission & Permission.DELETE) !== 0)
-	},
+    enabled(nodes: Node[]) {
+        return nodes.length > 1 && nodes
+            .map(node => node.permissions)
+            .every(permission => (permission & Permission.DELETE) !== 0)
+    },
 
-	async exec(node: Node, view: View) {
-		try {
-			console.info('PdfTool Multiselect action')
-			console.info(selection)
-				Vue.mixin({ methods: { t, n } })
+    async exec(file: Node, view: View, dir: string): Promise<boolean | null> {
+        try {
+            console.info('PdfTool Multiselect action')
+            //console.info(selection)
+            //Vue.mixin({ methods: { t, n } })
+            Vue.mixin({ methods: { t } })
 
-				new Vue({
-					el: '#pdftool-content',
-					render: h => h(Merge, {
-						props: {
-							// files: selection,
-							files: node,
-							// TODO: look for replacement.
-							filelistObj: fileList,
-						},
-					}),
-				})
-			let confirm = true
+            new Vue({
+                el: '#pdftool-content',
+                render: h => h(Merge, {
+                    props: {
+                        // files: selection,
+                        files: file,
+                        // TODO: look for replacement.
+                        //filelistObj: fileList,
+                    },
+                }),
+            })
 
-			// // If trashbin is disabled, we need to ask for confirmation
-			// if (!isTrashbinEnabled()) {
-			// 	confirm = await askConfirmation([node], view)
-			// }
-			//
-			// // If the user cancels the deletion, we don't want to do anything
-			// if (confirm === false) {
-			// 	showInfo(t('files', 'Deletion cancelled'))
-			// 	return null
-			// }
-			//
-			// await deleteNode(node)
-			//
-			// return true
-		} catch (error) {
-			logger.error('Error while deleting a file', { error, source: node.source, node })
-			return false
-		}
-	},
+            // // If trashbin is disabled, we need to ask for confirmation
+            // if (!isTrashbinEnabled()) {
+            // 	const confirm = await askConfirmation([file], view)
+            // }
+            //
+            // // If the user cancels the deletion, we don't want to do anything
+            // if (confirm === false) {
+            // 	showInfo(t('files', 'Deletion cancelled'))
+            // 	return null
+            // }
+            //
+            // await deleteNode(file)
+            //
+            return true
+        } catch (error) {
+            //logger.error('Error while deleting a file', { error, source: file.source, node: file })
+            return false
+        }
+    },
 
-	// async execBatch(nodes: Node[], view: View): Promise<(boolean | null)[]> {
-	// 	let confirm = true
-	//
-	// 	// If trashbin is disabled, we need to ask for confirmation
-	// 	if (!isTrashbinEnabled()) {
-	// 		confirm = await askConfirmation(nodes, view)
-	// 	} else if (nodes.length >= 5 && !canUnshareOnly(nodes) && !canDisconnectOnly(nodes)) {
-	// 		confirm = await askConfirmation(nodes, view)
-	// 	}
-	//
-	// 	// If the user cancels the deletion, we don't want to do anything
-	// 	if (confirm === false) {
-	// 		showInfo(t('files', 'Deletion cancelled'))
-	// 		return Promise.all(nodes.map(() => null))
-	// 	}
-	//
-	// 	// Map each node to a promise that resolves with the result of exec(node)
-	// 	const promises = nodes.map(node => {
-	// 		// Create a promise that resolves with the result of exec(node)
-	// 		const promise = new Promise<boolean>(resolve => {
-	// 			queue.add(async () => {
-	// 				try {
-	// 					await deleteNode(node)
-	// 					resolve(true)
-	// 				} catch (error) {
-	// 					logger.error('Error while deleting a file', { error, source: node.source, node })
-	// 					resolve(false)
-	// 				}
-	// 			})
-	// 		})
-	// 		return promise
-	// 	})
-	//
-	// 	return Promise.all(promises)
-	// },
+    // async execBatch(nodes: Node[], view: View): Promise<(boolean | null)[]> {
+    // 	let confirm = true
+    //
+    // 	// If trashbin is disabled, we need to ask for confirmation
+    // 	if (!isTrashbinEnabled()) {
+    // 		confirm = await askConfirmation(nodes, view)
+    // 	} else if (nodes.length >= 5 && !canUnshareOnly(nodes) && !canDisconnectOnly(nodes)) {
+    // 		confirm = await askConfirmation(nodes, view)
+    // 	}
+    //
+    // 	// If the user cancels the deletion, we don't want to do anything
+    // 	if (confirm === false) {
+    // 		showInfo(t('files', 'Deletion cancelled'))
+    // 		return Promise.all(nodes.map(() => null))
+    // 	}
+    //
+    // 	// Map each node to a promise that resolves with the result of exec(node)
+    // 	const promises = nodes.map(node => {
+    // 		// Create a promise that resolves with the result of exec(node)
+    // 		const promise = new Promise<boolean>(resolve => {
+    // 			queue.add(async () => {
+    // 				try {
+    // 					await deleteNode(node)
+    // 					resolve(true)
+    // 				} catch (error) {
+    // 					logger.error('Error while deleting a file', { error, source: node.source, node })
+    // 					resolve(false)
+    // 				}
+    // 			})
+    // 		})
+    // 		return promise
+    // 	})
+    //
+    // 	return Promise.all(promises)
+    // },
 
-	order: 100,
-	})
+    order: 100,
+})
 // 	const PdftoolMultiselect = {
 // 		attach(fileList) {
 // 			fileList.registerMultiSelectFileAction({
