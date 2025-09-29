@@ -21,13 +21,14 @@
 
 <template>
 	<div id="pdftool-content" class="app-pdftool">
-		<ncmodal
+		<NcModal
 			v-if="modal"
 			@close="closeModal"
 			class="pdftool-modal"
 			size="normal"
+			name="Merge PDF's"
 			:outTransition="true">
-			<h2>Merge PDFs</h2>
+			<h2>Merge PDF's</h2>
 			<div class="pdftool-filename">
 				<label for="filename">{{ t('pdftool', 'Output file') }}</label>
 				<input v-model="filename" id="filename"/>
@@ -35,41 +36,41 @@
 			<draggable class="desk" v-model="fileList" group="files" @start="drag=true" @end="drag=false">
    			<div class="document" v-for="element in fileList" :key="element.id">
 				<div class="mime-pdf"></div>
-				<div class="filename">{{element.name}}</div>
+				<div class="filename">{{element.displayname}}</div>
 			</div>
 			</draggable>
 			<div class="buttons">
-				<ncbutton
+				<NcButton
 					@click="merge"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 					<template>Merge</template>
-				</ncbutton>
-				<ncbutton
+				</NcButton>
+				<NcButton
 					@click="closeModal"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 					<template>{{ t('pdftool', 'Cancel') }}</template>
-				</ncbutton>
+				</NcButton>
 			</div>
-		</ncmodal>
-		<ncmodal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
+		</NcModal>
+		<NcModal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" name="Error" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
 			<div class="buttons">
-				<ncbutton
+				<NcButton
 					@click="closeModal"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 					<template>{{ t('pdftool', 'OK') }}</template>
-				</ncbutton>
+				</NcButton>
 			</div>
-		</ncmodal>
-		<ncmodal v-if="merging" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
+		</NcModal>
+		<NcModal v-if="merging" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'Merging...') }}</h2></div>
-		</ncmodal>
+		</NcModal>
 	</div>
 </template>
 
@@ -82,6 +83,7 @@ import '@nextcloud/dialogs/style.css'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import { davGetClient, davGetDefaultPropfind, davResultToNode, davRootPath } from '@nextcloud/files'
 import { emit } from '@nextcloud/event-bus'
 
 
@@ -112,7 +114,6 @@ export default {
 	},
 	props: {
 		files: [],
-		filelistObj: {},
 	},
 	computed: {
 	},
@@ -121,7 +122,7 @@ export default {
 	 */
 	async mounted() {
 		this.fileList = this.files
-		this.filename = this.files[0].name.substring(0, this.files[0].name.length - 4) + '-' + t('pdftool', 'merged') + '.pdf'
+		this.filename = this.files[0].basename.substring(0, this.files[0].basename.length - 4) + '-' + t('pdftool', 'merged') + '.pdf'
 	},
 
 	methods: {
@@ -134,11 +135,17 @@ export default {
 			}
 			console.info(data)
 			try {
+				const dirname = this.fileList[0].dirname
 				const response = await axios.post(generateUrl('/apps/pdftool/merge'), data)
 				// TODO: Find a way to implement scrolling to the new file.
-				// await this.filelistObj.reload()
-				emit('files:node:deleted', node)
-				// this.filelistObj.scrollTo(response.data.substring(response.data.indexOf('/') + 1))
+				const client = davGetClient()
+				client.stat(`${davRootPath}${dirname}`, {
+					details: true,
+					data: davGetDefaultPropfind(),
+				}).then((result) => {
+						const node = davResultToNode(result.data)
+						emit('files:node:updated', node)
+					})
 			} catch (e) {
 				console.error(e)
 				showError(t('pdftool', 'Could not merge PDF.'))

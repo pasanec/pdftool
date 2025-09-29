@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @copyright Copyright (c) 2022, Immanuel Pasanec (immanuel@pasanec.de)
@@ -34,170 +35,178 @@ use OCP\IConfig;
 
 use function PHPSTORM_META\type;
 
-class FileactionService {
-    /** @var string */
-    private string $appName;
+class FileactionService
+{
+	/** @var string */
+	private string $appName;
 
-    /** @var string */
-    private string $userId;
+	/** @var string */
+	private string $userId;
 
-    /** @var LogService */
-    private LogService $logger;
+	/** @var LogService */
+	private LogService $logger;
 
-    /** @var IAppData */
-    private IAppData $appData;
+	/** @var IAppData */
+	private IAppData $appData;
 
-    /** @var IRootFolder */
-    private IRootFolder $rootFolder;
+	/** @var IRootFolder */
+	private IRootFolder $rootFolder;
 
-    /** @var IConfig */
-    private IConfig $config;
+	/** @var IConfig */
+	private IConfig $config;
 
-    public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, IAppData $appData, IConfig $config, string $userId) {
-        $this->appName = $appName;
-        $this->logger = $logger;
-        $this->rootFolder = $rootFolder;
-        $this->appData = $appData;
-        $this->userId = $userId;
-        $this->config = $config;
-    }
+	public function __construct(string $appName, LogService $logger, IRootFolder $rootFolder, IAppData $appData, IConfig $config, string $userId)
+	{
+		$this->appName = $appName;
+		$this->logger = $logger;
+		$this->rootFolder = $rootFolder;
+		$this->appData = $appData;
+		$this->userId = $userId;
+		$this->config = $config;
+	}
 
-    public function tellUserSourceFolder(int $fileId): Folder {
-        // TODO: How to get the original file which was shown in the files app?
-        return $this->rootFolder->getById($fileId)[0]->getParent();
-    }
+	public function tellUserSourceFolder(int $fileId): Folder
+	{
+		// TODO: How to get the original file which was shown in the files app?
+		return $this->rootFolder->getById($fileId)[0]->getParent();
+	}
 
-    public function createExportFolder(string $name, Folder $userFolder): Folder {
-        $exportFolder = $userFolder->newFolder($name);
-        return $exportFolder;
-    }
+	public function createExportFolder(string $name, Folder $userFolder): Folder
+	{
+		$exportFolder = $userFolder->newFolder($name);
+		return $exportFolder;
+	}
 
-    public function tellAppFolder(): string {
-        $dataFolder = $this->config->getSystemValue('datadirectory');
-        $instanceId = $this->config->getSystemValue('instanceid');
-        $appFolder = $dataFolder . '/appdata_' . $instanceId . '/' . $this->appName . '/';
-        return $appFolder;
-    }
+	public function tellAppFolder(): string
+	{
+		$dataFolder = $this->config->getSystemValue('datadirectory');
+		$instanceId = $this->config->getSystemValue('instanceid');
+		$appFolder = $dataFolder . '/appdata_' . $instanceId . '/' . $this->appName . '/';
+		return $appFolder;
+	}
 
-    public function copyToAppFolder(array $files): array {
-        // $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder'. json_encode($files));
-        if(!sizeof($files)) {
-            $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: empty $files array from user ' . $this->userId . '.');
-            throw new EmptyFilesArray('Empty $files array from user ' . $this->userId);
-        }
-        // TODO: This is ugly!!!
-        if(!$this->hasPermissions($files[0]['id'])) {
-            $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: ' . $this->userId . ' has no read permission in folder.');
-            throw new NoReadPermissionInFolder($this->userId . ' has no read permission in folder of file ' . $files[0]);
-        }
-        $sourceNodes = [];
-        try {
-            foreach ($files as $file) {
-                // TODO: As in all other ocurrences.
-                $sourceNodes[] = $this->rootFolder->getById($file['id'])[0];
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
-        if(!$this->inSameFolder($sourceNodes)) {
-            $fileList = '';
-            foreach ($files as $file) {
-                // DODO: Fix: Array to string conversion.
-                $fileList .= $file . ' ';
-            }
-            throw new FilesNotInSameFolder($fileList);
-        }
-        $sourceFolder = $this->appData->newFolder('source-' . uniqid($this->userId));
-        $nodes = [];
-        try {
-            foreach ($sourceNodes as $sourceNode) {
-                $nodes[] = $sourceFolder->newFile($sourceNode->getName(), $sourceNode->fopen('r'));
-            }
-        } catch (Exception $e) {
-            throw $e;
-        }
+	public function copyToAppFolder(array $files): array
+	{
+		// $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder'. json_encode($files));
+		if (!sizeof($files)) {
+			$this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: empty $files array from user ' . $this->userId . '.');
+			throw new EmptyFilesArray('Empty $files array from user ' . $this->userId);
+		}
+		// TODO: This is ugly!!!
+		if (!$this->hasPermissions($files[0]['_data']['id'])) {
+			$this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: ' . $this->userId . ' has no read permission in folder.');
+			throw new NoReadPermissionInFolder($this->userId . ' has no read permission in folder of file ' . $files[0]);
+		}
+		$sourceNodes = [];
+		try {
+			foreach ($files as $file) {
+				// TODO: As in all other ocurrences.
+				$sourceNodes[] = $this->rootFolder->getById($file['_data']['id'])[0];
+			}
+		} catch (Exception $e) {
+			throw $e;
+		}
+		if (!$this->inSameFolder($sourceNodes)) {
+			$fileList = '';
+			foreach ($files as $file) {
+				// DODO: Fix: Array to string conversion.
+				$fileList .= $file . ' ';
+			}
+			throw new FilesNotInSameFolder($fileList);
+		}
+		$sourceFolder = $this->appData->newFolder('source-' . uniqid($this->userId));
+		$nodes = [];
+		try {
+			foreach ($sourceNodes as $sourceNode) {
+				$nodes[] = $sourceFolder->newFile($sourceNode->getName(), $sourceNode->fopen('r'));
+			}
+		} catch (Exception $e) {
+			throw $e;
+		}
 
-        return[$sourceFolder,  $nodes];
-    }
+		return [$sourceFolder,  $nodes];
+	}
 
-    public function createFolder(string $name): ISimpleFolder {
-        // Returns ISimpleFolder
-        return $this->appData->newFolder($name . '-' . uniqid($this->userId));
-    }
+	public function createFolder(string $name): ISimpleFolder
+	{
+		// Returns ISimpleFolder
+		return $this->appData->newFolder($name . '-' . uniqid($this->userId));
+	}
 
-    public function cleanup(string $folder): void {
-        try {
-            $this->appData->getFolder($folder)->delete();
-        } catch (Exception $e) {
-            $this->logger->log('OCA\PdfTool\Service\FileactionService::cleanup: of ' . $folder . ' failed', $e);
-            // Cleanup is not vital for successful pdf conversion.
-            // throw $e;
-        }
-    }
+	public function cleanup(string $folder): void
+	{
+		try {
+			$this->appData->getFolder($folder)->delete();
+		} catch (Exception $e) {
+			$this->logger->log('OCA\PdfTool\Service\FileactionService::cleanup: of ' . $folder . ' failed', $e);
+			// Cleanup is not vital for successful pdf conversion.
+			// throw $e;
+		}
+	}
 
-    // public function copyFilesToUserFolder(ISimpleFolder $outputFolder, Folder $userFolder): array {
-    public function copyFilesToUserFolder(array $outputFolder, Folder $userFolder): array {
-        if ($userFolder->getPermissions() < 4) {
-            throw new NotPermittedException('No read permission for ' . $userFolder->getFullPath('/') . ' by ' . $this->userId);
-        }
-        // $list = $outputFolder->getDirectoryListing();
-        $list = $outputFolder;
-        // $this->logger->log('::copyFilesToUserFolder: NAME: ' . $outputFolder->getName());
-        // $this->logger->log('::copyFilesToUserFolder: LISTYPE: ' . gettype($list));
+	// public function copyFilesToUserFolder(ISimpleFolder $outputFolder, Folder $userFolder): array {
+	public function copyFilesToUserFolder(array $outputFolder, Folder $userFolder): array
+	{
+		if ($userFolder->getPermissions() < 4) {
+			throw new NotPermittedException('No read permission for ' . $userFolder->getFullPath('/') . ' by ' . $this->userId);
+		}
+		// $list = $outputFolder->getDirectoryListing();
+		$list = $outputFolder;
+		// $this->logger->log('::copyFilesToUserFolder: NAME: ' . $outputFolder->getName());
+		// $this->logger->log('::copyFilesToUserFolder: LISTYPE: ' . gettype($list));
 
-        $fileNodes = [];
-        foreach ($list as $node) {
-            $this->logger->log('::copyFilesToUserFolder: getDirectoryListing');
-            // $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node);
-            // $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node[0]);
-            // $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node[1]);
+		$fileNodes = [];
+		foreach ($list as $node) {
+			$this->logger->log('::copyFilesToUserFolder: getDirectoryListing');
+			// $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node);
+			// $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node[0]);
+			// $this->logger->log('::copyFilesToUserFolder: Filename: ' . $node[1]);
 
-            // $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node[1]->read());
-            $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node->read());
-        }
-        return $fileNodes;
-        // return $list;
-    }
+			// $fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node[1]->read());
+			$fileNodes[] = $userFolder->newFile($userFolder->getNonExistingName($node->getName()), $node->read());
+		}
+		return $fileNodes;
+		// return $list;
+	}
 
-    private function inSameFolder(array $files): bool {
+	private function inSameFolder(array $files): bool
+	{
 
-        if ($files[0]->gettype() !== 'file') {
-            $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: filetype ' . $files[0]->gettype() . ' filename ' . $files[0]->getName());
+		if ($files[0]->gettype() !== 'file') {
+			$this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: filetype ' . $files[0]->gettype() . ' filename ' . $files[0]->getName());
 
-            return false;
-        }
-        $folder = $files[0]->getParent();
-        $storage = $files[0]->getStorage()->getId();
-        foreach ($files as $file) {
-            if($folder->getId() !== $file->getParent()->getId() || $storage !== $file->getStorage()->getId()) {
-                $this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: fo ' . $folder->getId() . ' s ' . $storage . ' fipa ' . $file->getParent()->getId() . ' fisto ' . $file->getStorage()->getId());
-                return false;
-            }
-        }
-        return true;
-    }
+			return false;
+		}
+		$folder = $files[0]->getParent();
+		$storage = $files[0]->getStorage()->getId();
+		foreach ($files as $file) {
+			if ($folder->getId() !== $file->getParent()->getId() || $storage !== $file->getStorage()->getId()) {
+				$this->logger->log('OCA\PdfTool\Service\FileactionService::inSameFolder: fo ' . $folder->getId() . ' s ' . $storage . ' fipa ' . $file->getParent()->getId() . ' fisto ' . $file->getStorage()->getId());
+				return false;
+			}
+		}
+		return true;
+	}
 
-    private function hasPermissions(int $fileId): bool {
-        try {
-            // TODO: Research possible side effects.
-            $file = $this->rootFolder->getById($fileId)[0];
-            if ($file->gettype() !== 'file') return false;
-            $folder = $file->getParent();
-            if($file->getPermissions() > 0 && $folder->getPermissions() > 5) return true;
-            return false;
-        } catch (Exception $e) {
-            $message = 'OCA\PdfTool\ServiceFilactionService::checkPermissions: ' . $this->userId . 'tried to open file or folder.';
-            $this->logger->log($message, $e);
-            return false;
-        }
+	private function hasPermissions(int $fileId): bool
+	{
+		try {
+			// TODO: Research possible side effects.
+			$file = $this->rootFolder->getById($fileId)[0];
+			if ($file->gettype() !== 'file') return false;
+			$folder = $file->getParent();
+			if ($file->getPermissions() > 0 && $folder->getPermissions() > 5) return true;
+			return false;
+		} catch (Exception $e) {
+			$message = 'OCA\PdfTool\ServiceFilactionService::checkPermissions: ' . $this->userId . 'tried to open file or folder.';
+			$this->logger->log($message, $e);
+			return false;
+		}
+	}
 
-    }
-
-    public function getAbsoluteFilepath(int $fileId): string {
-        $filePath = $this->rootFolder->getById($fileId)[0]->getPath();
-        return $filePath;
-    }
+	public function getAbsoluteFilepath(int $fileId): string
+	{
+		$filePath = $this->rootFolder->getById($fileId)[0]->getPath();
+		return $filePath;
+	}
 }
-
-
-
