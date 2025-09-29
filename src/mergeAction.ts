@@ -84,23 +84,40 @@ export const mergeAction = new FileAction({
 	},
 
 	async execBatch(files: Node[], view: View): Promise<(boolean | null)[]> {
-		try {
-			console.info('PdfTool Multiselect action')
-			Vue.mixin({ methods: { t } })
+		return new Promise(resolve => {
+			try {
+				console.info('PdfTool Multiselect action')
+				Vue.mixin({ methods: { t } })
 
-			new Vue({
-				el: '#pdftool-content',
-				render: h => h(Merge, {
-					props: {
-						files: files,
-					},
-				}),
-			})
-			return [true]
-		} catch (error) {
-			//logger.error('Error while deleting a file', { error, source: file.source, node: file })
-			return [false]
-		}
+				const vueInstance = new Vue({
+					el: '#pdftool-content',
+					render: h => h(Merge, {
+						props: {
+							files: files,
+						},
+						on: {
+							merged: (success: boolean) => {
+								vueInstance.$destroy()
+								if (vueInstance.$el) {
+									vueInstance.$el.innerHTML = ''
+								}
+								resolve([success])
+							},
+							closed: () => {
+								vueInstance.$destroy()
+								if (vueInstance.$el) {
+									vueInstance.$el.innerHTML = ''
+								}
+								resolve([null])
+							},
+						},
+					}),
+				})
+			} catch (error) {
+				// logger.error('Error while deleting a file', { error, source: file.source, node: file })
+				resolve([false])
+			}
+		})
 	},
 
 	order: 100,

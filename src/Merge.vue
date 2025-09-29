@@ -150,12 +150,13 @@ export default {
 						const node = davResultToNode(result.data)
 						emit('files:node:updated', node)
 					})
-				showSuccess(t('pdftool', 'PDFs merged successfully.'))
+				this.merging = false
+				this.$emit('merged', true)
 			} catch (e) {
 				console.error(e)
 				showError(t('pdftool', 'Could not merge PDF.'))
-			} finally {
 				this.merging = false
+				this.$emit('merged', false)
 			}
 		},
 		/**
@@ -258,6 +259,7 @@ export default {
 		closeModal() {
 			this.modal = false
 			this.merging = false
+			this.$emit('closed')
 		},
 	},
 }
