@@ -85715,14 +85715,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @nextcloud/vue */ "./node_modules/@nextcloud/vue/dist/index.mjs");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _nextcloud_dialogs_style_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @nextcloud/dialogs/style.css */ "./node_modules/@nextcloud/dialogs/dist/style.css");
-/* harmony import */ var _nextcloud_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @nextcloud/router */ "./node_modules/@nextcloud/router/dist/index.mjs");
-/* harmony import */ var _nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @nextcloud/dialogs */ "./node_modules/@nextcloud/dialogs/dist/index.mjs");
-/* harmony import */ var _nextcloud_axios__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @nextcloud/axios */ "./node_modules/@nextcloud/axios/dist/index.mjs");
-/* harmony import */ var _nextcloud_files__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @nextcloud/files */ "./node_modules/@nextcloud/files/dist/index.mjs");
-/* harmony import */ var _nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @nextcloud/event-bus */ "./node_modules/@nextcloud/event-bus/dist/index.mjs");
+/* harmony import */ var _nextcloud_vue_components_NcLoadingIcon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @nextcloud/vue/components/NcLoadingIcon */ "./node_modules/@nextcloud/vue/dist/Components/NcLoadingIcon.mjs");
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _nextcloud_dialogs_style_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @nextcloud/dialogs/style.css */ "./node_modules/@nextcloud/dialogs/dist/style.css");
+/* harmony import */ var _nextcloud_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @nextcloud/router */ "./node_modules/@nextcloud/router/dist/index.mjs");
+/* harmony import */ var _nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @nextcloud/dialogs */ "./node_modules/@nextcloud/dialogs/dist/index.mjs");
+/* harmony import */ var _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @nextcloud/axios */ "./node_modules/@nextcloud/axios/dist/index.mjs");
+/* harmony import */ var _nextcloud_files__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @nextcloud/files */ "./node_modules/@nextcloud/files/dist/index.mjs");
+/* harmony import */ var _nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @nextcloud/event-bus */ "./node_modules/@nextcloud/event-bus/dist/index.mjs");
+
 
 
 
@@ -85743,7 +85745,8 @@ __webpack_require__.r(__webpack_exports__);
     NcAppNavigationNew: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppNavigationNew,
     NcButton: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcButton,
     NcModal: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcModal,
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_1___default())
+    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_2___default()),
+    NcLoadingIcon: _nextcloud_vue_components_NcLoadingIcon__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data() {
     return {
@@ -85771,31 +85774,31 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     async merge() {
-      console.info('Merging');
-      // this.merging = true
+      this.modal = false;
+      this.merging = true;
       const data = {
         fileList: this.fileList,
         outputFile: this.filename
       };
-      console.info(data);
       try {
         const dirname = this.fileList[0].dirname;
-        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_5__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_3__.generateUrl)('/apps/pdftool/merge'), data);
+        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/merge'), data);
         // TODO: Find a way to implement scrolling to the new file.
-        const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_6__.davGetClient)();
-        client.stat(`${_nextcloud_files__WEBPACK_IMPORTED_MODULE_6__.davRootPath}${dirname}`, {
+        const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
+        client.stat(`${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`, {
           details: true,
-          data: (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_6__.davGetDefaultPropfind)()
+          data: (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetDefaultPropfind)()
         }).then(result => {
-          const node = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_6__.davResultToNode)(result.data);
-          (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_7__.emit)('files:node:updated', node);
+          const node = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davResultToNode)(result.data);
+          (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', node);
         });
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showSuccess)(t('pdftool', 'PDFs merged successfully.'));
       } catch (e) {
         console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_4__.showError)(t('pdftool', 'Could not merge PDF.'));
-        this.closeModal();
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not merge PDF.'));
+      } finally {
+        this.merging = false;
       }
-      this.closeModal();
     },
     /**
      * Create a new note and focus the note content field automatically
@@ -85853,13 +85856,13 @@ __webpack_require__.r(__webpack_exports__);
     async createNote(note) {
       this.updating = true;
       try {
-        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_5__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_3__.generateUrl)('/apps/pdftool/notes'), note);
+        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/notes'), note);
         const index = this.notes.findIndex(match => match.id === this.currentNoteId);
         this.$set(this.notes, index, response.data);
         this.currentNoteId = response.data.id;
       } catch (e) {
         console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_4__.showError)(t('pdftool', 'Could not create the note'));
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not create the note'));
       }
       this.updating = false;
     },
@@ -85870,10 +85873,10 @@ __webpack_require__.r(__webpack_exports__);
     async updateNote(note) {
       this.updating = true;
       try {
-        await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_5__["default"].put((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_3__.generateUrl)(`/apps/pdftool/notes/${note.id}`), note);
+        await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].put((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)(`/apps/pdftool/notes/${note.id}`), note);
       } catch (e) {
         console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_4__.showError)(t('pdftool', 'Could not update the note'));
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not update the note'));
       }
       this.updating = false;
     },
@@ -85883,19 +85886,20 @@ __webpack_require__.r(__webpack_exports__);
      */
     async deleteNote(note) {
       try {
-        await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_5__["default"].delete((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_3__.generateUrl)(`/apps/pdftool/notes/${note.id}`));
+        await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].delete((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)(`/apps/pdftool/notes/${note.id}`));
         this.notes.splice(this.notes.indexOf(note), 1);
         if (this.currentNoteId === note.id) {
           this.currentNoteId = null;
         }
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_4__.showSuccess)(t('pdftool', 'Note deleted'));
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showSuccess)(t('pdftool', 'Note deleted'));
       } catch (e) {
         console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_4__.showError)(t('pdftool', 'Could not delete the note'));
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not delete the note'));
       }
     },
     closeModal() {
       this.modal = false;
+      this.merging = false;
     }
   }
 });
@@ -86032,15 +86036,17 @@ var render = function render() {
   }, [[_vm._v(_vm._s(_vm.t("pdftool", "OK")))]], 2)], 1)]) : _vm._e(), _vm._v(" "), _vm.merging ? _c("NcModal", {
     staticClass: "pdftool-modal",
     attrs: {
-      size: "normal",
-      outTransition: true
-    },
-    on: {
-      close: _vm.closeModal
+      "show-close": false,
+      size: "normal"
     }
   }, [_c("div", {
-    staticClass: "modal-error"
-  }, [_c("h2", [_vm._v(_vm._s(_vm.t("pdftool", "Merging...")))])])]) : _vm._e()], 1);
+    staticClass: "loading-container"
+  }, [_c("NcLoadingIcon", {
+    attrs: {
+      size: 64,
+      appearance: "dark"
+    }
+  }), _vm._v(" "), _c("p", [_vm._v(_vm._s(_vm.t("pdftool", "Merging...")))])], 1)]) : _vm._e()], 1);
 };
 var staticRenderFns = [];
 render._withStripped = true;
@@ -100854,6 +100860,16 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.pdftool-modal h2[data-v-31f3240f] {
 }
 .pdftool-modal .buttons button[data-v-31f3240f] {
   height: 1em;
+}
+.loading-container[data-v-31f3240f] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.loading-container p[data-v-31f3240f] {
+  margin-top: 10px;
 }
 input[type=text][data-v-31f3240f] {
   width: 100%;
@@ -175666,4 +175682,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=7d79811b145ee7172451
+//# sourceMappingURL=pdftool-main.js.map?v=2bdfbf9b4c040c201a67
