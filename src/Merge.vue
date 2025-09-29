@@ -68,14 +68,18 @@
 				</NcButton>
 			</div>
 		</NcModal>
-		<NcModal v-if="merging" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
-			<div class="modal-error"><h2>{{ t('pdftool', 'Merging...') }}</h2></div>
+		<NcModal v-if="merging" :show-close="false" class="pdftool-modal" size="normal">
+			<div class="loading-container">
+				<NcLoadingIcon :size="64" appearance="dark" />
+				<p>{{ t('pdftool', 'Merging...') }}</p>
+			</div>
 		</NcModal>
 	</div>
 </template>
 
 <script>
 import { NcActionButton, NcAppContent, NcAppNavigation, NcAppNavigationItem, NcAppNavigationNew, NcButton, NcModal} from '@nextcloud/vue'
+import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import draggable from 'vuedraggable'
 
 // import '@nextcloud/dialogs/styles/toast.scss'
@@ -98,6 +102,7 @@ export default {
 		NcButton,
 		NcModal,
 		draggable,
+		NcLoadingIcon,
 	},
 	data() {
 		return {
@@ -127,13 +132,12 @@ export default {
 
 	methods: {
 		async merge() {
-			console.info('Merging')
-			// this.merging = true
+			this.modal = false
+			this.merging = true
 			const data = {
 				fileList: this.fileList,
 				outputFile: this.filename,
 			}
-			console.info(data)
 			try {
 				const dirname = this.fileList[0].dirname
 				const response = await axios.post(generateUrl('/apps/pdftool/merge'), data)
@@ -146,12 +150,13 @@ export default {
 						const node = davResultToNode(result.data)
 						emit('files:node:updated', node)
 					})
+				showSuccess(t('pdftool', 'PDFs merged successfully.'))
 			} catch (e) {
 				console.error(e)
 				showError(t('pdftool', 'Could not merge PDF.'))
-				this.closeModal()
+			} finally {
+				this.merging = false
 			}
-			this.closeModal()
 		},
 		/**
 		 * Create a new note and focus the note content field automatically
@@ -252,6 +257,7 @@ export default {
 		},
 		closeModal() {
 			this.modal = false
+			this.merging = false
 		},
 	},
 }
@@ -316,6 +322,17 @@ export default {
 			}
 		}
 
+	}
+
+	.loading-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		p {
+			margin-top: 10px;
+		}
 	}
 
 	input[type='text'] {
