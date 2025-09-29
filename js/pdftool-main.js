@@ -85932,13 +85932,13 @@ var render = function render() {
     staticClass: "pdftool-modal",
     attrs: {
       size: "normal",
-      name: "Merge PDF's",
+      name: _vm.t("pdftool", "Merge PDF's"),
       outTransition: true
     },
     on: {
       close: _vm.closeModal
     }
-  }, [_c("h2", [_vm._v("Merge PDF's")]), _vm._v(" "), _c("div", {
+  }, [_c("h2", [_vm._v(_vm._s(_vm.t("pdftool", "Merge PDF's")))]), _vm._v(" "), _c("div", {
     staticClass: "pdftool-filename"
   }, [_c("label", {
     attrs: {
@@ -86003,7 +86003,7 @@ var render = function render() {
     on: {
       click: _vm.merge
     }
-  }, [[_vm._v("Merge")]], 2), _vm._v(" "), _c("NcButton", {
+  }, [[_vm._v(_vm._s(_vm.t("pdftool", "Merge")))]], 2), _vm._v(" "), _c("NcButton", {
     attrs: {
       disabled: false,
       readonly: false,
@@ -86016,7 +86016,7 @@ var render = function render() {
     staticClass: "pdftool-modal",
     attrs: {
       size: "normal",
-      name: "Error",
+      name: _vm.t("pdftool", "Error"),
       outTransition: true
     },
     on: {
@@ -175151,7 +175151,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const mergeAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
   id: 'pdfmerge',
-  displayName: (files, view) => 'Merge PDF\'s',
+  displayName: (files, view) => (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Merge PDF\'s'),
   iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${_mdi_js__WEBPACK_IMPORTED_MODULE_2__.mdiFilePdfBox}" /></svg>`,
   enabled(nodes) {
     window.console.info(nodes);
@@ -175701,4 +175701,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=3d72e30a15ec6b62ccb0
+//# sourceMappingURL=pdftool-main.js.map?v=44bf8483ea1f5f46535c
