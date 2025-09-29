@@ -26,9 +26,9 @@
 			@close="closeModal"
 			class="pdftool-modal"
 			size="normal"
-			name="Merge PDF's"
+						:name="t('pdftool', 'Merge PDF\'s')"
 			:outTransition="true">
-			<h2>Merge PDF's</h2>
+						<h2>{{ t('pdftool', 'Merge PDF\'s') }}</h2>
 			<div class="pdftool-filename">
 				<label for="filename">{{ t('pdftool', 'Output file') }}</label>
 				<input v-model="filename" id="filename"/>
@@ -45,7 +45,7 @@
 					:disabled="false"
 					:readonly="false"
 					type="primary">
-					<template>Merge</template>
+										<template>{{ t('pdftool', 'Merge') }}</template>
 				</NcButton>
 				<NcButton
 					@click="closeModal"
@@ -56,7 +56,7 @@
 				</NcButton>
 			</div>
 		</NcModal>
-		<NcModal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" name="Error" :outTransition="true">
+				<NcModal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :name="t('pdftool', 'Error')" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
 			<div class="buttons">
 				<NcButton

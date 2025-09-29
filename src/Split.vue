@@ -27,7 +27,7 @@
 			class="pdftool-modal"
 			size="normal"
 			:outTransition="true">
-			<h2>Merge PDFs</h2>
+						<h2>{{ t('pdftool', 'Split PDF') }}</h2>
 			<div class="pdftool-filename">
 				<label for="filename">{{ t('pdftool', 'Output file') }}</label>
 				<input v-model="filename" id="filename"/>
@@ -40,11 +40,11 @@
 			</draggable>
 			<div class="buttons">
 				<Button
-					@click="merge"
+					@click="split"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
-					<template>Merge</template>
+										<template>{{ t('pdftool', 'Split') }}</template>
 				</Button>
 				<Button
 					@click="closeModal"
@@ -67,8 +67,8 @@
 				</Button>
 			</div>
 		</Modal>
-		<Modal v-if="merging" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
-			<div class="modal-error"><h2>{{ t('pdftool', 'Merging...') }}</h2></div>
+		<Modal v-if="splitting" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
+			<div class="modal-error"><h2>{{ t('pdftool', 'Splitting...') }}</h2></div>
 		</Modal>
 	</div>
 </template>
@@ -90,7 +90,7 @@ import axios from '@nextcloud/axios'
 
 
 export default {
-	name: 'Merge',
+	name: 'Split',
 	components: {
 		ActionButton,
 		AppContent,
@@ -106,7 +106,7 @@ export default {
 			notes: [],
 			modal: true,
 			error: false,
-			merging: false,
+			splitting: false,
 			currentNoteId: null,
 			updating: false,
 			loading: true,
@@ -125,25 +125,25 @@ export default {
 	 */
 	async mounted() {
 		this.fileList = this.files
-		this.filename = this.files[0].name.substring(0, this.files[0].name.length - 4) + '-' + t('pdftool', 'merged') + '.pdf'
+		this.filename = this.files[0].name.substring(0, this.files[0].name.length - 4) + '-' + t('pdftool', 'split') + '.pdf'
 	},
 
-	methods: {
-		async merge() {
-			console.info('Merging')
-			// this.merging = true
+		methods: {
+		async split() {
+			console.info('Splitting')
+			this.splitting = true
 			const data = {
 				fileList: this.fileList,
 				outputFile: this.filename,
 			}
 			console.info(data)
 			try {
-				const response = await axios.post(generateUrl('/apps/pdftool/merge'), data)
+				const response = await axios.post(generateUrl('/apps/pdftool/split'), data)
 				await this.filelistObj.reload()
 				this.filelistObj.scrollTo(response.data.substring(response.data.indexOf('/') + 1))
 			} catch (e) {
 				console.error(e)
-				showError(t('pdftool', 'Could not merge PDF.'))
+				showError(t('pdftool', 'Could not split PDF.'))
 				this.closeModal()
 			}
 			this.closeModal()

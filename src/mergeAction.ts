@@ -38,7 +38,7 @@ import Merge from './Merge.vue'
 
 export const mergeAction = new FileAction({
 	id: 'pdfmerge',
-	displayName: (files: Node[], view: View) => 'Merge PDF\'s',
+	displayName: (files: Node[], view: View) => t('pdftool', 'Merge PDF\'s'),
 	iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${mdiFilePdfBox}" /></svg>`,
 	enabled(nodes: Node[]) {
 		window.console.info(nodes)
