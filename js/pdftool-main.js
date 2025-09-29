@@ -85792,12 +85792,13 @@ __webpack_require__.r(__webpack_exports__);
           const node = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davResultToNode)(result.data);
           (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', node);
         });
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showSuccess)(t('pdftool', 'PDFs merged successfully.'));
+        this.merging = false;
+        this.$emit('merged', true);
       } catch (e) {
         console.error(e);
         (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not merge PDF.'));
-      } finally {
         this.merging = false;
+        this.$emit('merged', false);
       }
     },
     /**
@@ -85900,6 +85901,7 @@ __webpack_require__.r(__webpack_exports__);
     closeModal() {
       this.modal = false;
       this.merging = false;
+      this.$emit('closed');
     }
   }
 });
@@ -175194,26 +175196,43 @@ const mergeAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction
     }
   },
   async execBatch(files, view) {
-    try {
-      console.info('PdfTool Multiselect action');
-      vue__WEBPACK_IMPORTED_MODULE_3__["default"].mixin({
-        methods: {
-          t: _nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate
-        }
-      });
-      new vue__WEBPACK_IMPORTED_MODULE_3__["default"]({
-        el: '#pdftool-content',
-        render: h => h(_Merge_vue__WEBPACK_IMPORTED_MODULE_4__["default"], {
-          props: {
-            files: files
+    return new Promise(resolve => {
+      try {
+        console.info('PdfTool Multiselect action');
+        vue__WEBPACK_IMPORTED_MODULE_3__["default"].mixin({
+          methods: {
+            t: _nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate
           }
-        })
-      });
-      return [true];
-    } catch (error) {
-      //logger.error('Error while deleting a file', { error, source: file.source, node: file })
-      return [false];
-    }
+        });
+        const vueInstance = new vue__WEBPACK_IMPORTED_MODULE_3__["default"]({
+          el: '#pdftool-content',
+          render: h => h(_Merge_vue__WEBPACK_IMPORTED_MODULE_4__["default"], {
+            props: {
+              files: files
+            },
+            on: {
+              merged: success => {
+                vueInstance.$destroy();
+                if (vueInstance.$el) {
+                  vueInstance.$el.innerHTML = '';
+                }
+                resolve([success]);
+              },
+              closed: () => {
+                vueInstance.$destroy();
+                if (vueInstance.$el) {
+                  vueInstance.$el.innerHTML = '';
+                }
+                resolve([null]);
+              }
+            }
+          })
+        });
+      } catch (error) {
+        // logger.error('Error while deleting a file', { error, source: file.source, node: file })
+        resolve([false]);
+      }
+    });
   },
   order: 100
 });
@@ -175682,4 +175701,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=2bdfbf9b4c040c201a67
+//# sourceMappingURL=pdftool-main.js.map?v=3d72e30a15ec6b62ccb0
