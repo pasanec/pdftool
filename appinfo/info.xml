@@ -6,7 +6,7 @@
     <summary>Merge and split PDF files.</summary>
     <description><![CDATA[A files plugin to merge and split PDF files.
 The tool requires ghostscript to be installed on your server.]]></description>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <licence>agpl</licence>
     <author mail="immanuel@pasanec.de" homepage="https://www.pasanec.de">Immanuel Pasanec</author>
     <namespace>PdfTool</namespace>
@@ -15,7 +15,7 @@ The tool requires ghostscript to be installed on your server.]]></description>
     <category>tools</category>
     <bugs>https://github.com/pasanec/pdftool</bugs>
     <dependencies>
-        <nextcloud min-version="29" max-version="30"/>
+        <nextcloud min-version="30" max-version="31"/>
         <command>gs</command>
         <command>exiftool</command>
     </dependencies>
@@ -25,4 +25,7 @@ The tool requires ghostscript to be installed on your server.]]></description>
             <route>pdftool.page.index</route>
         </navigation>
     </navigations>
+    <settings>
+        <admin>OCA\PdfTool\Settings\Admin</admin>
+    </settings>
 </info>

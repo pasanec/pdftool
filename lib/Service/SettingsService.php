@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @copyright Copyright (c) 2023, Immanuel Pasanec (immanuel@pasanec.de)
@@ -20,26 +21,68 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace OCA\PdfTool\Service;
 
-class SettingsService {
-    // Until settings are ready, everything here is hardcoded.
+use OCP\IConfig;
 
-        /** @var string */
-        private $appName;
+class SettingsService
+{
+	private IConfig $config;
+	private string $appName;
 
-        /** @var string */
-        private $userId;
+	public function __construct(IConfig $config, string $appName)
+	{
+		$this->config = $config;
+		$this->appName = $appName;
+	}
 
-        public function __construct(string $appName, $userId) {
-            $this->appName = $appName;
-            $this->userId = $userId;
-        }
+	public function getEngine(): string
+	{
+		return $this->config->getAppValue($this->appName, 'pdf_tool_engine', 'tcpdf');
+	}
 
-        public function getMaxPageCount(): int {
-            // You have to change the code, if you want more/less.
-            // It's restricted to prevent misuse.
-            return 60;
-        }
+	public function setEngine(string $engine): void
+	{
+		$this->config->setAppValue($this->appName, 'pdf_tool_engine', $engine);
+	}
+
+	public function getMaxPages(): int
+	{
+		return (int)$this->config->getAppValue($this->appName, 'pdf_tool_max_pages', '60');
+	}
+
+	public function getMaxPageCount(): int
+	{
+		return $this->getMaxPages();
+	}
+
+	public function setMaxPages(int $maxPages): void
+	{
+		$this->config->setAppValue($this->appName, 'pdf_tool_max_pages', $maxPages);
+	}
+
+	public function getMaxPdfs(): int
+	{
+		return (int)$this->config->getAppValue($this->appName, 'pdf_tool_max_pdfs', '10');
+	}
+
+	public function setMaxPdfs(int $maxPdfs): void
+	{
+		$this->config->setAppValue($this->appName, 'pdf_tool_max_pdfs', $maxPdfs);
+	}
+
+	public function isGsAvailable(): bool
+	{
+		$output = shell_exec('which gs');
+		return !empty($output) && strpos($output, 'no gs in') === false;
+	}
+
+	public function isExiftoolAvailable(): bool
+	{
+		$output = shell_exec('which exiftool');
+		return !empty($output) && strpos($output, 'no exiftool in') === false;
+	}
 }
 

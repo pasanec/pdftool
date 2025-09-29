@@ -1,3 +1,9 @@
-const webpackConfig = require('@nextcloud/webpack-vue-config')
+const path = require("path");
+const webpackConfig = require("@nextcloud/webpack-vue-config");
 
-module.exports = webpackConfig
+webpackConfig.entry = {
+  ...webpackConfig.entry,
+  admin: "./src/admin.js",
+};
+
+module.exports = webpackConfig;
