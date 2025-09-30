@@ -85967,7 +85967,11 @@ __webpack_require__.r(__webpack_exports__);
       loading: true,
       fileList: [],
       filename: '',
-      pageNumbers: {} // Added for page numbers
+      pageNumbers: {},
+      // Added for page numbers
+      nextId: 1,
+      warnId: null,
+      warnMessage: ''
     };
   },
   props: {
@@ -85979,6 +85983,33 @@ __webpack_require__.r(__webpack_exports__);
     this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/';
   },
   methods: {
+    updatePageNumber(id, newValue) {
+      const value = Number(newValue);
+      if (isNaN(value) || !Number.isInteger(value) || value < 1) {
+        this.warnMessage = t('pdftool', 'Page number must be a positive integer.');
+        this.warnId = null;
+        this.$nextTick(() => {
+          this.warnId = id;
+        });
+        setTimeout(() => {
+          this.warnId = null;
+        }, 3000);
+        return;
+      }
+      const isDuplicate = Object.entries(this.pageNumbers).some(([key, val]) => key !== id && val === value);
+      if (isDuplicate) {
+        this.warnMessage = t('pdftool', 'Duplicate numbers not allowed!');
+        this.warnId = null;
+        this.$nextTick(() => {
+          this.warnId = id;
+        });
+        setTimeout(() => {
+          this.warnId = null;
+        }, 3000);
+        return;
+      }
+      this.$set(this.pageNumbers, id, value);
+    },
     async split() {
       // Renamed from merge
       this.modal = false;
@@ -86009,102 +86040,16 @@ __webpack_require__.r(__webpack_exports__);
         this.$emit('split', false); // Renamed event
       }
     },
-    /**
-     * Create a new note and focus the note content field automatically
-     * @param {Object} note Note object
-     */
-    openNote(note) {
-      if (this.updating) {
-        return;
-      }
-      this.currentNoteId = note.id;
-      this.$nextTick(() => {
-        this.$refs.content.focus();
-      });
+    addPageNumber() {
+      const newId = this.nextId++;
+      const values = Object.values(this.pageNumbers);
+      const newValue = values.length > 0 ? Math.max(0, ...values.filter(v => Number.isInteger(v))) + 1 : 1;
+      this.$set(this.pageNumbers, newId, newValue);
+      window.console.log(this.pageNumbers);
     },
-    /**
-     * Action tiggered when clicking the save button
-     * create a new note or save
-     */
-    saveNote() {
-      if (this.currentNoteId === -1) {
-        this.createNote(this.currentNote);
-      } else {
-        this.updateNote(this.currentNote);
-      }
-    },
-    /**
-     * Create a new note and focus the note content field automatically
-     * The note is not yet saved, therefore an id of -1 is used until it
-     * has been persisted in the backend
-     */
-    newNote() {
-      if (this.currentNoteId !== -1) {
-        this.currentNoteId = -1;
-        this.notes.push({
-          id: -1,
-          title: '',
-          content: ''
-        });
-        this.$nextTick(() => {
-          this.$refs.title.focus();
-        });
-      }
-    },
-    /**
-     * Abort creating a new note
-     */
-    cancelNewNote() {
-      this.notes.splice(this.notes.findIndex(note => note.id === -1), 1);
-      this.currentNoteId = null;
-    },
-    /**
-     * Create a new note by sending the information to the server
-     * @param {Object} note Note object
-     */
-    async createNote(note) {
-      this.updating = true;
-      try {
-        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/notes'), note);
-        const index = this.notes.findIndex(match => match.id === this.currentNoteId);
-        this.$set(this.notes, index, response.data);
-        this.currentNoteId = response.data.id;
-      } catch (e) {
-        console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not create the note'));
-      }
-      this.updating = false;
-    },
-    /**
-     * Update an existing note on the server
-     * @param {Object} note Note object
-     */
-    async updateNote(note) {
-      this.updating = true;
-      try {
-        await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].put((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)(`/apps/pdftool/notes/${note.id}`), note);
-      } catch (e) {
-        console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not update the note'));
-      }
-      this.updating = false;
-    },
-    /**
-     * Delete a note, remove it from the frontend and show a hint
-     * @param {Object} note Note object
-     */
-    async deleteNote(note) {
-      try {
-        await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].delete((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)(`/apps/pdftool/notes/${note.id}`));
-        this.notes.splice(this.notes.indexOf(note), 1);
-        if (this.currentNoteId === note.id) {
-          this.currentNoteId = null;
-        }
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showSuccess)(t('pdftool', 'Note deleted'));
-      } catch (e) {
-        console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not delete the note'));
-      }
+    removePageNumber(id) {
+      // New method to remove a page number
+      this.$delete(this.pageNumbers, id);
     },
     closeModal() {
       this.modal = false;
@@ -86321,42 +86266,44 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "desk"
-  }, [_vm._l(_vm.pageNumbers, function (number) {
+  }, [_vm._l(_vm.pageNumbers, function (pageNumber, id) {
     return _c("div", {
-      key: _vm.element.id,
+      key: id,
       staticClass: "document"
     }, [_c("div", {
       staticClass: "mime-pdf"
     }), _vm._v(" "), _c("div", {
       staticClass: "filename"
-    }, [_vm._v(_vm._s(_vm.t("pdftool", "Page")))]), _vm._v(" "), _c("input", {
-      directives: [{
-        name: "model",
-        rawName: "v-model.number",
-        value: _vm.pageNumbers[number.id],
-        expression: "pageNumbers[number.id]",
-        modifiers: {
-          number: true
-        }
-      }],
+    }, [_vm._v(_vm._s(_vm.t("pdftool", "Page")))]), _vm._v(" "), _vm.warnId === id ? _c("div", {
+      staticClass: "pagewarning"
+    }, [_vm._v(_vm._s(_vm.warnMessage))]) : _vm._e(), _vm._v(" "), _c("input", {
       staticClass: "page-number-input",
       attrs: {
         type: "number",
         min: "1"
       },
       domProps: {
-        value: _vm.pageNumbers[number.id]
+        value: _vm.pageNumbers[id]
       },
       on: {
-        input: function ($event) {
-          if ($event.target.composing) return;
-          _vm.$set(_vm.pageNumbers, number.id, _vm._n($event.target.value));
-        },
-        blur: function ($event) {
-          return _vm.$forceUpdate();
+        change: function ($event) {
+          return _vm.updatePageNumber(id, $event.target.value);
         }
       }
-    })]);
+    }), _vm._v(" "), _c("NcButton", {
+      attrs: {
+        "aria-label": _vm.t("pdftool", "Remove split point."),
+        disabled: false,
+        readonly: false,
+        size: "small",
+        variant: "tertiary"
+      },
+      on: {
+        click: function ($event) {
+          return _vm.removePageNumber(id);
+        }
+      }
+    }, [_vm._v("\n\t\t\t\t\t×\n\t\t\t\t")])], 1);
   }), _vm._v(" "), _c("div", {
     staticClass: "add-button-container"
   }, [_c("NcButton", {
@@ -86365,6 +86312,9 @@ var render = function render() {
       disabled: false,
       size: "normal",
       variant: "tertiary"
+    },
+    on: {
+      click: _vm.addPageNumber
     }
   }, [_c("Plus", {
     attrs: {
@@ -176413,4 +176363,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=648ede6e83e896788c9f
+//# sourceMappingURL=pdftool-main.js.map?v=3b79b3946ac6b2a2b7ec
