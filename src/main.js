@@ -26,7 +26,7 @@ import {
   registerFileAction,
   registerFileListAction,
 } from "@nextcloud/files";
-import { mergeAction } from "./mergeAction.ts";
+import { pdfAction } from "./pdfAction.ts";
 
 // import Vue from 'vue'
 // import Merge from './Merge'
@@ -124,7 +124,7 @@ import { mergeAction } from "./mergeAction.ts";
   // 	displayName: t('pdftool', 'PDF Splitter')
   // })
   window.console.info("Registering PDF Merge action");
-  registerFileAction(mergeAction);
+  registerFileAction(pdfAction);
 })();
 
 //  Vue.mixin({ methods: { t, n } })

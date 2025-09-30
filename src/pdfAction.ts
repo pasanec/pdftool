@@ -36,7 +36,7 @@ declare module "*.vue" {
 }
 import Merge from './Merge.vue'
 
-export const mergeAction = new FileAction({
+export const pdfAction = new FileAction({
 	id: 'pdfmerge',
 	displayName: (files: Node[], view: View) => t('pdftool', 'Merge PDF\'s'),
 	iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${mdiFilePdfBox}" /></svg>`,
@@ -49,6 +49,7 @@ export const mergeAction = new FileAction({
 				&& node.dirname === dirname)
 	},
 
+	// TODO: Implement for splitting files.
 	async exec(file: Node, view: View, dir: string): Promise<boolean | null> {
 		try {
 			console.info('PdfTool Multiselect action')
