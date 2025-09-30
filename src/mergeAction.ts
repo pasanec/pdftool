@@ -42,8 +42,11 @@ export const mergeAction = new FileAction({
 	iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${mdiFilePdfBox}" /></svg>`,
 	enabled(nodes: Node[]) {
 		window.console.info(nodes)
+		const dirname = nodes[0].dirname
 		return nodes.length > 1 && nodes
-			.every(node => (node.permissions & Permission.DELETE) !== 0 && node.extension === '.pdf')
+			.every(node => (node.permissions & Permission.DELETE) !== 0
+				&& node.extension === '.pdf'
+				&& node.dirname === dirname)
 	},
 
 	async exec(file: Node, view: View, dir: string): Promise<boolean | null> {
