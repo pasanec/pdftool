@@ -67,7 +67,6 @@ class FileactionService
 
 	public function tellUserSourceFolder(int $fileId): Folder
 	{
-		// TODO: How to get the original file which was shown in the files app?
 		return $this->rootFolder->getById($fileId)[0]->getParent();
 	}
 
@@ -87,30 +86,23 @@ class FileactionService
 
 	public function copyToAppFolder(array $files): array
 	{
-		// $this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder'. json_encode($files));
 		if (!sizeof($files)) {
 			$this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: empty $files array from user ' . $this->userId . '.');
 			throw new EmptyFilesArray('Empty $files array from user ' . $this->userId);
 		}
-		// TODO: This is ugly!!!
 		if (!$this->hasPermissions($files[0]['_data']['id'])) {
-			$this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: ' . $this->userId . ' has no read permission in folder.');
-			throw new NoReadPermissionInFolder($this->userId . ' has no read permission in folder of file ' . $files[0]);
+			$this->logger->log('OCA\PdfTool\Service\FileactionService::copyToAppFolder: '
+				. $this->userId
+				. ' has no read permission in folder.');
+			throw new NoReadPermissionInFolder($this->userId
+				. ' has no read permission in folder of file '
+				. $files[0]['_data']['id']);
 		}
-		$sourceNodes = [];
-		try {
-			foreach ($files as $file) {
-				// TODO: As in all other ocurrences.
-				$sourceNodes[] = $this->rootFolder->getById($file['_data']['id'])[0];
-			}
-		} catch (Exception $e) {
-			throw $e;
-		}
+		$sourceNodes = $this->getNodes($files);
 		if (!$this->inSameFolder($sourceNodes)) {
 			$fileList = '';
-			foreach ($files as $file) {
-				// DODO: Fix: Array to string conversion.
-				$fileList .= $file . ' ';
+			foreach ($sourceNodes as $node) {
+				$fileList .= $node->getInternalPath() . "\n";
 			}
 			throw new FilesNotInSameFolder($fileList);
 		}
@@ -186,6 +178,24 @@ class FileactionService
 			}
 		}
 		return true;
+	}
+
+	public function getNode(array $file): File | Folder
+	{
+		try {
+			return $this->rootFolder->getById($file['_data']['id'])[0];
+		} catch (Exception $e) {
+			throw new Exception('Not a file array.');
+		}
+	}
+
+	public function getNodes(array $files): array
+	{
+		$nodes = [];
+		foreach ($files as $file) {
+			$nodes[] = $this->getNode($file);
+		}
+		return $nodes;
 	}
 
 	private function hasPermissions(int $fileId): bool
