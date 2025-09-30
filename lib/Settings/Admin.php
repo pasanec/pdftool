@@ -7,7 +7,7 @@ namespace OCA\PdfTool\Settings;
 use OCA\PdfTool\Service\SettingsService;
 use OCP\IConfig;
 use OCP\Settings\ISettings;
-use OCP\TemplateResponse;
+use OCP\AppFramework\Http\TemplateResponse;
 
 class Admin implements ISettings
 {
@@ -20,9 +20,6 @@ class Admin implements ISettings
 		$this->settingsService = $settingsService;
 	}
 
-	/**
-	 * @return Template
-	 */
 	public function getForm(): TemplateResponse
 	{
 		$gsIsAvailable = $this->settingsService->isGsAvailable();
@@ -42,7 +39,7 @@ class Admin implements ISettings
 
 	public function getSection(): string
 	{
-		return 'pdftool';
+		return 'server';
 	}
 
 	public function getPriority(): int
