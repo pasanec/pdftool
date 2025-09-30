@@ -19,12 +19,6 @@ The tool requires ghostscript to be installed on your server.]]></description>
         <command>gs</command>
         <command>exiftool</command>
     </dependencies>
-    <navigations>
-        <navigation>
-            <name>Pdf Tool</name>
-            <route>pdftool.page.index</route>
-        </navigation>
-    </navigations>
     <settings>
         <admin>OCA\PdfTool\Settings\Admin</admin>
     </settings>
