@@ -175155,7 +175155,8 @@ const mergeAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction
   iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${_mdi_js__WEBPACK_IMPORTED_MODULE_2__.mdiFilePdfBox}" /></svg>`,
   enabled(nodes) {
     window.console.info(nodes);
-    return nodes.length > 1 && nodes.every(node => (node.permissions & _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.Permission.DELETE) !== 0 && node.extension === '.pdf');
+    const dirname = nodes[0].dirname;
+    return nodes.length > 1 && nodes.every(node => (node.permissions & _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.Permission.DELETE) !== 0 && node.extension === '.pdf' && node.dirname === dirname);
   },
   async exec(file, view, dir) {
     try {
@@ -175701,4 +175702,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=44bf8483ea1f5f46535c
+//# sourceMappingURL=pdftool-main.js.map?v=e163c2fe8dce4c68bda3
