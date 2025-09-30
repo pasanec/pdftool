@@ -32,7 +32,6 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IInitialState;
 use OCP\IConfig;
-use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCA\Files\Event\LoadAdditionalScriptsEvent;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Util;
@@ -47,11 +46,9 @@ class Application extends App implements IBootstrap
 		parent::__construct(self::APP_ID);
 		/* @var IEventDispatcher $eventDispatcher */
 		$dispatcher = $this->getContainer()->query(IEventDispatcher::class);
-		$dispatcher->addListener(BeforeTemplateRenderedEvent::class, function (BeforeTemplateRenderedEvent $event) {
-			Util::addHeader('div', ['id' => 'pdftool-content'], '');
-		});
 		$dispatcher->addListener(LoadAdditionalScriptsEvent::class, function (LoadAdditionalScriptsEvent $event) {
 			// Util::addScript(Application::APP_ID, 'pdfmenu', 'viewer');
+			Util::addHeader('div', ['id' => 'pdftool-content'], '');
 			Util::addScript(Application::APP_ID, 'pdftool-main');
 			Util::addStyle(Application::APP_ID, 'style');
 		});
