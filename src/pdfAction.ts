@@ -35,56 +35,55 @@ declare module "*.vue" {
 	}
 }
 import Merge from './Merge.vue'
+import Split from './Split.vue'
 
 export const pdfAction = new FileAction({
 	id: 'pdfmerge',
-	displayName: (files: Node[], view: View) => t('pdftool', 'Merge PDF\'s'),
+	displayName: (files: Node[], view: View) => files.length > 1 ? t('pdftool', 'Merge PDF\'s') : t('pdftool', 'Split PDF'),
 	iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${mdiFilePdfBox}" /></svg>`,
 	enabled(nodes: Node[]) {
 		window.console.info(nodes)
 		const dirname = nodes[0].dirname
-		return nodes.length > 1 && nodes
-			.every(node => (node.permissions & Permission.DELETE) !== 0
-				&& node.extension === '.pdf'
-				&& node.dirname === dirname)
+		return nodes.every(node =>
+			(node.permissions & Permission.DELETE) !== 0
+			&& node.extension === '.pdf'
+			&& node.dirname === dirname)
 	},
 
-	// TODO: Implement for splitting files.
 	async exec(file: Node, view: View, dir: string): Promise<boolean | null> {
-		try {
-			console.info('PdfTool Multiselect action')
-			Vue.mixin({ methods: { t } })
+		return new Promise(resolve => {
+			try {
+				console.info('PdfTool Multiselect action')
+				Vue.mixin({ methods: { t } })
 
-			new Vue({
-				el: '#pdftool-content',
-				render: h => h(Merge, {
-					props: {
-						// files: selection,
-						files: file,
-						// TODO: look for replacement.
-						//filelistObj: fileList,
-					},
-				}),
-			})
-
-			// // If trashbin is disabled, we need to ask for confirmation
-			// if (!isTrashbinEnabled()) {
-			// 	const confirm = await askConfirmation([file], view)
-			// }
-			//
-			// // If the user cancels the deletion, we don't want to do anything
-			// if (confirm === false) {
-			// 	showInfo(t('files', 'Deletion cancelled'))
-			// 	return null
-			// }
-			//
-			// await deleteNode(file)
-			//
-			return true
-		} catch (error) {
-			//logger.error('Error while deleting a file', { error, source: file.source, node: file })
-			return false
-		}
+				const vueInstance = new Vue({
+					el: '#pdftool-content',
+					render: h => h(Split, {
+						props: {
+							file: file,
+						},
+						on: {
+							merged: (success: boolean) => {
+								vueInstance.$destroy()
+								if (vueInstance.$el) {
+									vueInstance.$el.innerHTML = ''
+								}
+								resolve(success)
+							},
+							closed: () => {
+								vueInstance.$destroy()
+								if (vueInstance.$el) {
+									vueInstance.$el.innerHTML = ''
+								}
+								resolve(null)
+							},
+						},
+					}),
+				})
+			} catch (error) {
+				resolve(false)
+			}
+		})
 	},
 
 	async execBatch(files: Node[], view: View): Promise<(boolean | null)[]> {

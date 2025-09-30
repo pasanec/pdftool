@@ -1,152 +1,173 @@
 <!--
- @copyright Copyright (c) 2023 Immanuel Pasanec <i@pasanec.de>
- 
+ @copyright Copyright (c) 2025 Immanuel Pasanec <i@pasanec.de>
+
  @author Immanuel Pasanec <i@pasanec.de>
- 
+
  @license GNU AGPL version 3 or any later version
- 
+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as
  published by the Free Software Foundation, either version 3 of the
  License, or (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Affero General Public License for more details.
- 
+
  You should have received a copy of the GNU Affero General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <template>
 	<div id="pdftool-content" class="app-pdftool">
-		<Modal
+		<NcModal
 			v-if="modal"
 			@close="closeModal"
 			class="pdftool-modal"
 			size="normal"
+						:name="t('pdftool', 'Split PDF\'s')"
 			:outTransition="true">
-						<h2>{{ t('pdftool', 'Split PDF') }}</h2>
+						<h2>{{ t('pdftool', 'Split PDF\'s') }}</h2>
 			<div class="pdftool-filename">
-				<label for="filename">{{ t('pdftool', 'Output file') }}</label>
+				<label for="filename">{{ t('pdftool', 'Output folder') }}</label>
 				<input v-model="filename" id="filename"/>
 			</div>
-			<draggable class="desk" v-model="fileList" group="files" @start="drag=true" @end="drag=false">
-   			<div class="document" v-for="element in fileList" :key="element.id">
+			<div class="desk">
+   			<div class="document" v-for="number in pageNumbers" :key="element.id">
 				<div class="mime-pdf"></div>
-				<div class="filename">{{element.name}}</div>
+				<div class="filename">{{ t('pdftool', 'Page') }}</div>
+				<input type="number" v-model.number="pageNumbers[number.id]" min="1" class="page-number-input" />
 			</div>
-			</draggable>
+			<div class="add-button-container">
+				<NcButton
+			:aria-label="t('pdftool', 'Add split point.')"
+			:disabled="false"
+			:size="'normal'"
+			variant="tertiary">
+				<Plus :size="20" />
+		</NcButton>
+			</div>
+			</div>
 			<div class="buttons">
-				<Button
+				<NcButton
 					@click="split"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 										<template>{{ t('pdftool', 'Split') }}</template>
-				</Button>
-				<Button
+				</NcButton>
+				<NcButton
 					@click="closeModal"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 					<template>{{ t('pdftool', 'Cancel') }}</template>
-				</Button>
+				</NcButton>
 			</div>
-		</Modal>
-		<Modal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
+		</NcModal>
+				<NcModal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :name="t('pdftool', 'Error')" :outTransition="true">
 			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
 			<div class="buttons">
-				<Button
+				<NcButton
 					@click="closeModal"
 					:disabled="false"
 					:readonly="false"
 					type="primary">
 					<template>{{ t('pdftool', 'OK') }}</template>
-				</Button>
+				</NcButton>
 			</div>
-		</Modal>
-		<Modal v-if="splitting" @close="closeModal" class="pdftool-modal" size="normal" :outTransition="true">
-			<div class="modal-error"><h2>{{ t('pdftool', 'Splitting...') }}</h2></div>
-		</Modal>
+		</NcModal>
+		<NcModal v-if="splitting" :show-close="false" class="pdftool-modal" size="normal">
+			<div class="loading-container">
+				<NcLoadingIcon :size="64" appearance="dark" />
+				<p>{{ t('pdftool', 'Splitting...') }}</p>
+			</div>
+		</NcModal>
 	</div>
 </template>
 
 <script>
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
-import AppContent from '@nextcloud/vue/dist/Components/AppContent'
-import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
-import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
-import AppNavigationNew from '@nextcloud/vue/dist/Components/AppNavigationNew'
-import draggable from 'vuedraggable'
-import Button from '@nextcloud/vue/dist/Components/Button'
-import Modal from '@nextcloud/vue/dist/Components/Modal'
+import { NcActionButton, NcAppContent, NcAppNavigation, NcAppNavigationItem, NcAppNavigationNew, NcButton, NcModal} from '@nextcloud/vue'
+import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
+import Plus from 'vue-material-design-icons/Plus.vue'
+// import draggable from 'vuedraggable' // Removed draggable
 
-import '@nextcloud/dialogs/styles/toast.scss'
+// import '@nextcloud/dialogs/styles/toast.scss'
+import '@nextcloud/dialogs/style.css'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
+import { davGetClient, davGetDefaultPropfind, davResultToNode, davRootPath } from '@nextcloud/files'
+import { emit } from '@nextcloud/event-bus'
 
 
 export default {
-	name: 'Split',
+	name: 'Split', // Changed from Merge
 	components: {
-		ActionButton,
-		AppContent,
-		AppNavigation,
-		AppNavigationItem,
-		AppNavigationNew,
-		draggable,
-		Button,
-		Modal,
+		NcActionButton,
+		NcAppContent,
+		NcAppNavigation,
+		NcAppNavigationItem,
+		NcAppNavigationNew,
+		NcButton,
+		NcModal,
+		// draggable, // Removed draggable
+		NcLoadingIcon,
+		Plus,
 	},
 	data() {
 		return {
 			notes: [],
 			modal: true,
 			error: false,
-			splitting: false,
+			splitting: false, // Renamed from merging
 			currentNoteId: null,
 			updating: false,
 			loading: true,
 			fileList: [],
 			filename: '',
+			pageNumbers: {}, // Added for page numbers
 		}
 	},
 	props: {
-		files: [],
-		filelistObj: {},
+		file: {},
 	},
 	computed: {
 	},
-	/**
-	 * Fetch list of notes when the component is loaded
-	 */
 	async mounted() {
-		this.fileList = this.files
-		this.filename = this.files[0].name.substring(0, this.files[0].name.length - 4) + '-' + t('pdftool', 'split') + '.pdf'
+		this.file= this.file
+		this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/'
 	},
 
-		methods: {
-		async split() {
-			console.info('Splitting')
+	methods: {
+		async split() { // Renamed from merge
+			this.modal = false
 			this.splitting = true
 			const data = {
-				fileList: this.fileList,
+				file: this.file,
+				pageNumbers: this.pageNumbers, // Added page numbers
 				outputFile: this.filename,
 			}
-			console.info(data)
 			try {
-				const response = await axios.post(generateUrl('/apps/pdftool/split'), data)
-				await this.filelistObj.reload()
-				this.filelistObj.scrollTo(response.data.substring(response.data.indexOf('/') + 1))
+				const dirname = this.file.dirname
+				const response = await axios.post(generateUrl('/apps/pdftool/split'), data) // Changed endpoint to /split
+				const client = davGetClient()
+				client.stat(`${davRootPath}${dirname}`, {
+					details: true,
+					data: davGetDefaultPropfind(),
+				}).then((result) => {
+						const node = davResultToNode(result.data)
+						emit('files:node:updated', node)
+					})
+				this.splitting = false
+				this.$emit('split', true) // Renamed event
 			} catch (e) {
 				console.error(e)
-				showError(t('pdftool', 'Could not split PDF.'))
-				this.closeModal()
+				showError(t('pdftool', 'Could not split PDF.')) // Changed error message
+				this.splitting = false
+				this.$emit('split', false) // Renamed event
 			}
-			this.closeModal()
 		},
 		/**
 		 * Create a new note and focus the note content field automatically
@@ -247,6 +268,8 @@ export default {
 		},
 		closeModal() {
 			this.modal = false
+			this.splitting = false // Renamed from merging
+			this.$emit('closed')
 		},
 	},
 }
@@ -276,6 +299,11 @@ export default {
 			margin: 20px auto 20px auto;
 			padding: 4px 0;
 			background: lightgray;
+			.add-button-container {
+				display: flex;
+				justify-content: center;
+				padding: 10px 0;
+			}
 			.document {
 				width: calc(100% - 25px);
 				border: 2px solid gray;
@@ -284,16 +312,18 @@ export default {
 				padding: 0 5px;
 				font-weight: 600;
 				background: lightskyblue;
-				cursor: grab;
+				display: flex;
+				align-items: center;
 				.filename {
 					height: 2em;
 					line-height: 2em;
 					vertical-align: middle;
 					display: inline-block;
+					flex-grow: 1;
 				}
-			}
-			.document.sortable-chosen {
-				cursor: grabbing;
+				.page-number-input {
+					width: 60px;
+				}
 			}
 		}
 		.modal-error {
@@ -311,6 +341,17 @@ export default {
 			}
 		}
 
+	}
+
+	.loading-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		p {
+			margin-top: 10px;
+		}
 	}
 
 	input[type='text'] {
