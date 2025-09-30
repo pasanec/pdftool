@@ -34,17 +34,28 @@
 				<input v-model="filename" id="filename"/>
 			</div>
 			<div class="desk">
-   			<div class="document" v-for="number in pageNumbers" :key="element.id">
+   			<div class="document" v-for="(pageNumber, id) in pageNumbers" :key="id">
 				<div class="mime-pdf"></div>
 				<div class="filename">{{ t('pdftool', 'Page') }}</div>
-				<input type="number" v-model.number="pageNumbers[number.id]" min="1" class="page-number-input" />
+				<div class="pagewarning" v-if="warnId === id" >{{ warnMessage }}</div>
+				<input type="number" :value="pageNumbers[id]" @change="updatePageNumber(id, $event.target.value)" min="1" class="page-number-input" />
+				<NcButton
+					@click="removePageNumber(id)"
+					:aria-label="t('pdftool', 'Remove split point.')"
+					:disabled="false"
+					:readonly="false"
+					:size="'small'"
+					variant="tertiary">
+					&times;
+				</NcButton>
 			</div>
 			<div class="add-button-container">
 				<NcButton
-			:aria-label="t('pdftool', 'Add split point.')"
-			:disabled="false"
-			:size="'normal'"
-			variant="tertiary">
+					@click="addPageNumber"
+					:aria-label="t('pdftool', 'Add split point.')"
+					:disabled="false"
+					:size="'normal'"
+					variant="tertiary">
 				<Plus :size="20" />
 		</NcButton>
 			</div>
@@ -128,6 +139,9 @@ export default {
 			fileList: [],
 			filename: '',
 			pageNumbers: {}, // Added for page numbers
+			nextId: 1,
+			warnId: null,
+			warnMessage: '',
 		}
 	},
 	props: {
@@ -141,6 +155,36 @@ export default {
 	},
 
 	methods: {
+		updatePageNumber(id, newValue) {
+			const value = Number(newValue)
+
+			if (isNaN(value) || !Number.isInteger(value) || value < 1) {
+				this.warnMessage = t('pdftool', 'Page number must be a positive integer.')
+				this.warnId = null
+				this.$nextTick(() => {
+					this.warnId = id
+				})
+				setTimeout(() => {
+					this.warnId = null
+				}, 3000)
+				return
+			}
+
+			const isDuplicate = Object.entries(this.pageNumbers).some(([key, val]) => key !== id && val === value)
+			if (isDuplicate) {
+				this.warnMessage = t('pdftool', 'Duplicate numbers not allowed!')
+				this.warnId = null
+				this.$nextTick(() => {
+					this.warnId = id
+				})
+				setTimeout(() => {
+					this.warnId = null
+				}, 3000)
+				return
+			}
+
+			this.$set(this.pageNumbers, id, value)
+		},
 		async split() { // Renamed from merge
 			this.modal = false
 			this.splitting = true
@@ -169,102 +213,15 @@ export default {
 				this.$emit('split', false) // Renamed event
 			}
 		},
-		/**
-		 * Create a new note and focus the note content field automatically
-		 * @param {Object} note Note object
-		 */
-		openNote(note) {
-			if (this.updating) {
-				return
-			}
-			this.currentNoteId = note.id
-			this.$nextTick(() => {
-				this.$refs.content.focus()
-			})
+		addPageNumber() {
+			const newId = this.nextId++
+			const values = Object.values(this.pageNumbers)
+			const newValue = values.length > 0 ? Math.max(0, ...values.filter(v => Number.isInteger(v))) + 1 : 1
+			this.$set(this.pageNumbers, newId, newValue)
+			window.console.log(this.pageNumbers)
 		},
-		/**
-		 * Action tiggered when clicking the save button
-		 * create a new note or save
-		 */
-		saveNote() {
-			if (this.currentNoteId === -1) {
-				this.createNote(this.currentNote)
-			} else {
-				this.updateNote(this.currentNote)
-			}
-		},
-		/**
-		 * Create a new note and focus the note content field automatically
-		 * The note is not yet saved, therefore an id of -1 is used until it
-		 * has been persisted in the backend
-		 */
-		newNote() {
-			if (this.currentNoteId !== -1) {
-				this.currentNoteId = -1
-				this.notes.push({
-					id: -1,
-					title: '',
-					content: '',
-				})
-				this.$nextTick(() => {
-					this.$refs.title.focus()
-				})
-			}
-		},
-		/**
-		 * Abort creating a new note
-		 */
-		cancelNewNote() {
-			this.notes.splice(this.notes.findIndex((note) => note.id === -1), 1)
-			this.currentNoteId = null
-		},
-		/**
-		 * Create a new note by sending the information to the server
-		 * @param {Object} note Note object
-		 */
-		async createNote(note) {
-			this.updating = true
-			try {
-				const response = await axios.post(generateUrl('/apps/pdftool/notes'), note)
-				const index = this.notes.findIndex((match) => match.id === this.currentNoteId)
-				this.$set(this.notes, index, response.data)
-				this.currentNoteId = response.data.id
-			} catch (e) {
-				console.error(e)
-				showError(t('pdftool', 'Could not create the note'))
-			}
-			this.updating = false
-		},
-		/**
-		 * Update an existing note on the server
-		 * @param {Object} note Note object
-		 */
-		async updateNote(note) {
-			this.updating = true
-			try {
-				await axios.put(generateUrl(`/apps/pdftool/notes/${note.id}`), note)
-			} catch (e) {
-				console.error(e)
-				showError(t('pdftool', 'Could not update the note'))
-			}
-			this.updating = false
-		},
-		/**
-		 * Delete a note, remove it from the frontend and show a hint
-		 * @param {Object} note Note object
-		 */
-		async deleteNote(note) {
-			try {
-				await axios.delete(generateUrl(`/apps/pdftool/notes/${note.id}`))
-				this.notes.splice(this.notes.indexOf(note), 1)
-				if (this.currentNoteId === note.id) {
-					this.currentNoteId = null
-				}
-				showSuccess(t('pdftool', 'Note deleted'))
-			} catch (e) {
-				console.error(e)
-				showError(t('pdftool', 'Could not delete the note'))
-			}
+		removePageNumber(id) { // New method to remove a page number
+			this.$delete(this.pageNumbers, id)
 		},
 		closeModal() {
 			this.modal = false
