@@ -151,11 +151,7 @@ export default {
 	async mounted() {
 		this.file= this.file
 		this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/'
-		this.pageCount = axios.get(generateUrl('/apps/pdftool/pagecount'), {
-			params: {
-				file: this.file,
-			},
-		}).then((response) => {
+		this.pageCount = axios.get(generateUrl('/apps/pdftool/pagecount/' + this.file.fileid)).then((response) => {
 			this.pageCount = response.data.pageCount
 			this.loading = false
 		}).catch((error) => {

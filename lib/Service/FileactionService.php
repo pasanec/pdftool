@@ -216,7 +216,14 @@ class FileactionService
 
 	public function getAbsoluteFilepath(int $fileId): string
 	{
+		$dataFolder = $this->config->getSystemValue('datadirectory');
 		$filePath = $this->rootFolder->getById($fileId)[0]->getPath();
-		return $filePath;
+		return $dataFolder . '/' . $filePath;
+	}
+
+	public function getMimeType(int $fileId): string
+	{
+		$file = $this->rootFolder->getById($fileId)[0];
+		return $file->getMimeType();
 	}
 }

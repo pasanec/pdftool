@@ -187,8 +187,13 @@ class PdfService
 
 	public function countPages(int $fileId): int
 	{
+		if ($this->fs->getMimeType($fileId) !== 'application/pdf') {
+			throw new Exception('File with id ' . $fileId . ' is not a PDF.');
+		}
 		$filePath = $this->fs->getAbsoluteFilepath($fileId);
-		$pageCount = (int) shell_exec("exiftool -T -PageCount \"$filePath\"");
+		$escapedPath = addcslashes($filePath, '()\\');
+		$command = "gs -q -dNODISPLAY -dNOSAFER -c \"(" . $escapedPath . ") (r) file runpdfbegin pdfpagecount = quit\"";
+		$pageCount = (int) shell_exec($command);
 		return $pageCount;
 	}
 

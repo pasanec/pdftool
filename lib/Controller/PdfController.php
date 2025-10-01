@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @copyright Copyright (c) 2022, Immanuel Pasanec (immanuel@pasanec.de)
@@ -29,9 +30,10 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 
-class PdfController extends Controller {
+class PdfController extends Controller
+{
 
-    /** @var string */
+	/** @var string */
 	protected string $AppName;
 
 	/** @var IRequest */
@@ -40,12 +42,13 @@ class PdfController extends Controller {
 	/** @var PdfService */
 	private PdfService $pdf;
 
-    /** @var string */
+	/** @var string */
 	private string $UserId;
 
 	use Errors;
 
-	public function __construct($AppName, IRequest $req, PdfService $pdf, $UserId){
+	public function __construct($AppName, IRequest $req, PdfService $pdf, $UserId)
+	{
 		parent::__construct($AppName, $req);
 		$this->AppName = $AppName;
 		$this->UserId = $UserId;
@@ -56,8 +59,9 @@ class PdfController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function merge(array $fileList, string $outputFile = '') : DataResponse {
-		
+	public function merge(array $fileList, string $outputFile = ''): DataResponse
+	{
+
 		return $this->handleExceptions(function () use ($fileList, $outputFile) {
 			return $this->pdf->merge($fileList, $outputFile);
 		});
@@ -66,7 +70,8 @@ class PdfController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function split(string $file) : DataResponse {
+	public function split(string $file): DataResponse
+	{
 		$filename = ['split(1).pdf', 'split(2).pdf'];
 		return new DataResponse($filename);
 	}
@@ -74,20 +79,31 @@ class PdfController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function sort(string $file) : DataResponse {
-		$filename = ['sorted.pdf', ];
+	public function sort(string $file): DataResponse
+	{
+		$filename = ['sorted.pdf',];
 		return new DataResponse($filename);
 	}
 
 	/**
 	 * @NoAdminRequired
 	 */
-	public function preview(array $request) : DataResponse {
-		$thumbnails = [ 
-			'file1.pdf' => 'base64string',
-			'file2.pdf' => 'base64string',
-		 ]; // 2D array of base64 strings.
-		return new DataResponse($thumbnails);
+	public function pageCount(int $fileid): DataResponse
+	{
+		return $this->handleExceptions(function () use ($fileid) {
+			return $this->pdf->countPages($fileid);
+		});
 	}
 
+	/**
+	 * @NoAdminRequired
+	 */
+	public function preview(array $request): DataResponse
+	{
+		$thumbnails = [
+			'file1.pdf' => 'base64string',
+			'file2.pdf' => 'base64string',
+		]; // 2D array of base64 strings.
+		return new DataResponse($thumbnails);
+	}
 }

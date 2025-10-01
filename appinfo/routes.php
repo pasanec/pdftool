@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @copyright Copyright (c) 2022, Immanuel Pasanec (immanuel@pasanec.de)
@@ -21,12 +22,13 @@
  */
 
 return [
-    'routes' => [
-	   ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-	   ['name' => 'pdf#merge', 'url' => '/merge', 'verb' => 'POST'],
-	   ['name' => 'pdf#split', 'url' => '/split', 'verb' => 'POST'],
-	   ['name' => 'pdf#sort', 'url' => '/sort', 'verb' => 'POST'],
-	   ['name' => 'pdf#preview', 'url' => '/preview', 'verb' => 'POST'],
-	   ['name' => 'pdf#renderStatus', 'url' => '/status/{uuid}', 'verb' => 'GET'],
-    ]
+	'routes' => [
+		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+		['name' => 'pdf#merge', 'url' => '/merge', 'verb' => 'POST'],
+		['name' => 'pdf#split', 'url' => '/split', 'verb' => 'POST'],
+		['name' => 'pdf#sort', 'url' => '/sort', 'verb' => 'POST'],
+		['name' => 'pdf#preview', 'url' => '/preview', 'verb' => 'POST'],
+		['name' => 'pdf#renderStatus', 'url' => '/status/{uuid}', 'verb' => 'GET'],
+		['name' => 'pdf#pageCount', 'url' => '/pagecount/{fileid}', 'verb' => 'GET'],
+	]
 ];
