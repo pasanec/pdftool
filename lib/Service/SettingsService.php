@@ -78,11 +78,4 @@ class SettingsService
 		$output = shell_exec('which gs');
 		return !empty($output) && strpos($output, 'no gs in') === false;
 	}
-
-	public function isExiftoolAvailable(): bool
-	{
-		$output = shell_exec('which exiftool');
-		return !empty($output) && strpos($output, 'no exiftool in') === false;
-	}
 }
-

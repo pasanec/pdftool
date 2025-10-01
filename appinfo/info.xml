@@ -16,8 +16,6 @@ The tool requires ghostscript to be installed on your server.]]></description>
     <bugs>https://github.com/pasanec/pdftool</bugs>
     <dependencies>
         <nextcloud min-version="30" max-version="31"/>
-        <command>gs</command>
-        <command>exiftool</command>
     </dependencies>
     <settings>
         <admin>OCA\PdfTool\Settings\Admin</admin>

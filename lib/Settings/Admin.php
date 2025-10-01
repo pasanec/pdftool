@@ -23,7 +23,6 @@ class Admin implements ISettings
 	public function getForm(): TemplateResponse
 	{
 		$gsIsAvailable = $this->settingsService->isGsAvailable();
-		$exiftoolIsAvailable = $this->settingsService->isExiftoolAvailable();
 
 		$parameters = [
 			'pdfToolEngine' => $this->settingsService->getEngine(),
