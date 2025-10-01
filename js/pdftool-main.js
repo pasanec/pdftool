@@ -85957,21 +85957,19 @@ __webpack_require__.r(__webpack_exports__);
   },
   data() {
     return {
-      notes: [],
       modal: true,
       error: false,
       splitting: false,
       // Renamed from merging
-      currentNoteId: null,
       updating: false,
       loading: true,
-      fileList: [],
       filename: '',
       pageNumbers: {},
       // Added for page numbers
       nextId: 1,
       warnId: null,
-      warnMessage: ''
+      warnMessage: '',
+      pageCount: 0
     };
   },
   props: {
@@ -85981,9 +85979,26 @@ __webpack_require__.r(__webpack_exports__);
   async mounted() {
     this.file = this.file;
     this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/';
+    this.pageCount = _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].get((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/pagecount/' + this.file.fileid)).then(response => {
+      this.pageCount = response.data.pageCount;
+      this.loading = false;
+    }).catch(error => {
+      console.error(error);
+      (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not retrieve page count.'));
+      this.error = true;
+      this.loading = false;
+    });
   },
   methods: {
     updatePageNumber(id, newValue) {
+      if (Number(newValue) >= this.pageCount) {
+        const value = 1;
+        return;
+      }
+      if (Number(newValue) < 1) {
+        const value = this.pageCount - 1;
+        return;
+      }
       const value = Number(newValue);
       if (isNaN(value) || !Number.isInteger(value) || value < 1) {
         this.warnMessage = t('pdftool', 'Page number must be a positive integer.');
@@ -86017,8 +86032,7 @@ __webpack_require__.r(__webpack_exports__);
       const data = {
         file: this.file,
         pageNumbers: this.pageNumbers,
-        // Added page numbers
-        outputFile: this.filename
+        outputFolder: this.filename
       };
       try {
         const dirname = this.file.dirname;
@@ -86041,6 +86055,10 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     addPageNumber() {
+      if (pageNumbers.length === this.pageCount - 1) {
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'There are no more pages to split.')); // Changed error message
+        return;
+      }
       const newId = this.nextId++;
       const values = Object.values(this.pageNumbers);
       const newValue = values.length > 0 ? Math.max(0, ...values.filter(v => Number.isInteger(v))) + 1 : 1;
@@ -86290,7 +86308,9 @@ var render = function render() {
           return _vm.updatePageNumber(id, $event.target.value);
         }
       }
-    }), _vm._v(" "), _c("NcButton", {
+    }), _vm._v(" "), _c("div", {
+      staticClass: "filename"
+    }, [_vm._v("/ " + _vm._s(pageNumber + 1))]), _vm._v(" "), _c("NcButton", {
       attrs: {
         "aria-label": _vm.t("pdftool", "Remove split point."),
         disabled: false,
@@ -176363,4 +176383,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=3b79b3946ac6b2a2b7ec
+//# sourceMappingURL=pdftool-main.js.map?v=d31f7a1b87f71829ea40
