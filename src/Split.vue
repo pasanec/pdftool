@@ -39,6 +39,7 @@
 				<div class="filename">{{ t('pdftool', 'Page') }}</div>
 				<div class="pagewarning" v-if="warnId === id" >{{ warnMessage }}</div>
 				<input type="number" :value="pageNumbers[id]" @change="updatePageNumber(id, $event.target.value)" min="1" class="page-number-input" />
+				<div class="filename">/ {{pageNumber + 1}}</div>
 				<NcButton
 					@click="removePageNumber(id)"
 					:aria-label="t('pdftool', 'Remove split point.')"
@@ -129,19 +130,17 @@ export default {
 	},
 	data() {
 		return {
-			notes: [],
 			modal: true,
 			error: false,
 			splitting: false, // Renamed from merging
-			currentNoteId: null,
 			updating: false,
 			loading: true,
-			fileList: [],
 			filename: '',
 			pageNumbers: {}, // Added for page numbers
 			nextId: 1,
 			warnId: null,
 			warnMessage: '',
+			pageCount: 0,
 		}
 	},
 	props: {
@@ -152,10 +151,31 @@ export default {
 	async mounted() {
 		this.file= this.file
 		this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/'
+		this.pageCount = axios.get(generateUrl('/apps/pdftool/pagecount'), {
+			params: {
+				file: this.file,
+			},
+		}).then((response) => {
+			this.pageCount = response.data.pageCount
+			this.loading = false
+		}).catch((error) => {
+			console.error(error)
+			showError(t('pdftool', 'Could not retrieve page count.'))
+			this.error = true
+			this.loading = false
+		})
 	},
 
 	methods: {
 		updatePageNumber(id, newValue) {
+			if (Number(newValue) >= this.pageCount) {
+				const value = 1
+				return
+			}
+			if (Number(newValue) < 1) {
+				const value = this.pageCount - 1
+				return
+			}
 			const value = Number(newValue)
 
 			if (isNaN(value) || !Number.isInteger(value) || value < 1) {
@@ -190,8 +210,8 @@ export default {
 			this.splitting = true
 			const data = {
 				file: this.file,
-				pageNumbers: this.pageNumbers, // Added page numbers
-				outputFile: this.filename,
+				pageNumbers: this.pageNumbers,
+				outputFolder: this.filename,
 			}
 			try {
 				const dirname = this.file.dirname
@@ -214,6 +234,10 @@ export default {
 			}
 		},
 		addPageNumber() {
+			if (pageNumbers.length === this.pageCount - 1) {
+				showError(t('pdftool', 'There are no more pages to split.')) // Changed error message
+				return
+			}
 			const newId = this.nextId++
 			const values = Object.values(this.pageNumbers)
 			const newValue = values.length > 0 ? Math.max(0, ...values.filter(v => Number.isInteger(v))) + 1 : 1
