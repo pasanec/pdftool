@@ -29,7 +29,6 @@ class Admin implements ISettings
 			'pdfToolMaxPages' => $this->settingsService->getMaxPages(),
 			'pdfToolMaxPdfs' => $this->settingsService->getMaxPdfs(),
 			'gsIsAvailable' => $gsIsAvailable,
-			'exiftoolIsAvailable' => $exiftoolIsAvailable,
 		];
 
 		// return new Template('pdftool', 'admin', 'blank', $parameters);
