@@ -64,7 +64,7 @@
 			<div class="buttons">
 				<NcButton
 					@click="split"
-					:disabled="false"
+					:disabled="pageNumbers.length != 0"
 					:readonly="false"
 					type="primary">
 										<template>{{ t('pdftool', 'Split') }}</template>
