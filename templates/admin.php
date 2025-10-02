@@ -22,15 +22,11 @@ style('pdftool', 'pdftool-admin');
 					p('disabled');
 				}
 				?>>
-			<label for="pdftool_engine_gs"><?php p($l->t('Use ghostscript and exif tool')); ?></label>
+			<label for="pdftool_engine_gs"><?php p($l->t('Use ghostscript')); ?></label>
 			<?php if (!$_['gsIsAvailable']) { ?>
 				<p class="settings-hint warning"><?php p($l->t('Ghostscript is not available. Please install it and configure the path in your environment.')); ?></p>
 			<?php } ?>
-			<?php if (false) { ?>
-				<p class="settings-hint warning"><?php p($l->t('Exiftool is not available. Please install it and configure the path in your environment.')); ?></p>
-			<?php } ?>
-		</div>
-		<div>
+			<br>
 			<input type="radio" name="pdftool_engine" id="pdftool_engine_tcpdf" value="tcpdf"
 				<?php if ($_['pdfToolEngine'] === 'tcpdf') {
 					p('checked');
