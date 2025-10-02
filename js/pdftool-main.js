@@ -86343,7 +86343,7 @@ var render = function render() {
     staticClass: "buttons"
   }, [_c("NcButton", {
     attrs: {
-      disabled: false,
+      disabled: _vm.pageNumbers.length != 0,
       readonly: false,
       type: "primary"
     },
@@ -176382,4 +176382,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=52df65c50b717c32c390
+//# sourceMappingURL=pdftool-main.js.map?v=1ad7ba54d6d5dc382c75
