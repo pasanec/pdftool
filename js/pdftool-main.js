@@ -56139,7 +56139,7 @@ const _sfc_main = {
    * Load groups matching the empty query to reduce API calls
    */
   async mounted() {
-    const storageName = `${"pdftool"}:${"0.0.1"}/initialGroups`;
+    const storageName = `${"pdftool"}:${"0.0.3"}/initialGroups`;
     let savedGroups = window.sessionStorage.getItem(storageName);
     if (savedGroups) {
       savedGroups = Object.fromEntries(JSON.parse(savedGroups).map((group) => [group.id, group]));
@@ -86291,7 +86291,7 @@ var render = function render() {
       staticClass: "mime-pdf"
     }), _vm._v(" "), _c("div", {
       staticClass: "filename"
-    }, [_vm._v(_vm._s(_vm.t("pdftool", "Page")))]), _vm._v(" "), _vm.warnId === id ? _c("div", {
+    }, [_vm._v(_vm._s(_vm.t("pdftool", "Page split point")))]), _vm._v(" "), _vm.warnId === id ? _c("div", {
       staticClass: "pagewarning"
     }, [_vm._v(_vm._s(_vm.warnMessage))]) : _vm._e(), _vm._v(" "), _c("input", {
       staticClass: "page-number-input",
@@ -86308,7 +86308,7 @@ var render = function render() {
         }
       }
     }), _vm._v(" "), _c("div", {
-      staticClass: "filename"
+      staticClass: "filename pagenum"
     }, [_vm._v("/ " + _vm._s(pageNumber + 1))]), _vm._v(" "), _c("NcButton", {
       attrs: {
         "aria-label": _vm.t("pdftool", "Remove split point."),
@@ -101293,8 +101293,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.pdftool-modal h2[data-v-2ddb4c1e] {
 }
 .pdftool-modal .desk .add-button-container[data-v-2ddb4c1e] {
   display: flex;
-  justify-content: center;
+  justify-content: right;
   padding: 10px 0;
+}
+.pdftool-modal .desk .add-button-container .button-vue[data-v-2ddb4c1e] {
+  margin-right: 10px;
 }
 .pdftool-modal .desk .document[data-v-2ddb4c1e] {
   width: calc(100% - 25px);
@@ -101313,6 +101316,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.pdftool-modal h2[data-v-2ddb4c1e] {
   vertical-align: middle;
   display: inline-block;
   flex-grow: 1;
+  padding-left: 10px;
+}
+.pdftool-modal .desk .document .filename.pagenum[data-v-2ddb4c1e] {
+  flex-grow: 0.04;
+  padding-left: 3px;
 }
 .pdftool-modal .desk .document .page-number-input[data-v-2ddb4c1e] {
   width: 60px;
@@ -176382,4 +176390,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=1ad7ba54d6d5dc382c75
+//# sourceMappingURL=pdftool-main.js.map?v=d688feba7bce14e6d474
