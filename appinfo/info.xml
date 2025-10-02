@@ -6,7 +6,7 @@
     <summary>Merge and split PDF files.</summary>
     <description><![CDATA[A files plugin to merge and split PDF files.
 The tool requires ghostscript to be installed on your server.]]></description>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <licence>agpl</licence>
     <author mail="immanuel@pasanec.de" homepage="https://www.pasanec.de">Immanuel Pasanec</author>
     <namespace>PdfTool</namespace>

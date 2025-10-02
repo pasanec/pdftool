@@ -1,6 +1,6 @@
 {
   "name": "pdftool",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "A files plugin to merge and split PDF files.",
   "main": "index.js",
   "directories": {
