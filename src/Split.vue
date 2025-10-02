@@ -230,7 +230,7 @@ export default {
 			}
 		},
 		addPageNumber() {
-			if (pageNumbers.length === this.pageCount - 1) {
+			if (this.pageNumbers.length === this.pageCount - 1) {
 				showError(t('pdftool', 'There are no more pages to split.')) // Changed error message
 				return
 			}
