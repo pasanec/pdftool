@@ -206,6 +206,13 @@ class TcPdf implements IPdf
 		}
 
 		$exportFolderName = $outputfileBase . '_split';
+		$finalExportFolderName = $exportFolderName;
+		$counter = 1;
+		while ($userSourceFolder->nodeExists($finalExportFolderName)) {
+			$finalExportFolderName = $exportFolderName . ' (' . $counter . ')';
+			$counter++;
+		}
+		$exportFolderName = $finalExportFolderName;
 		$exportFolder = $this->fs->createExportFolder($exportFolderName, $userSourceFolder);
 
 		$userFile = $this->fs->copyFilesToUserFolder($srcFiles, $exportFolder);
