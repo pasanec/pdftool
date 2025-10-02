@@ -36,10 +36,10 @@
 			<div class="desk">
    			<div class="document" v-for="(pageNumber, id) in pageNumbers" :key="id">
 				<div class="mime-pdf"></div>
-				<div class="filename">{{ t('pdftool', 'Page') }}</div>
+				<div class="filename">{{ t('pdftool', 'Page split point') }}</div>
 				<div class="pagewarning" v-if="warnId === id" >{{ warnMessage }}</div>
 				<input type="number" :value="pageNumbers[id]" @change="updatePageNumber(id, $event.target.value)" min="1" class="page-number-input" />
-				<div class="filename">/ {{pageNumber + 1}}</div>
+				<div class="filename pagenum">/ {{pageNumber + 1}}</div>
 				<NcButton
 					@click="removePageNumber(id)"
 					:aria-label="t('pdftool', 'Remove split point.')"
@@ -278,8 +278,11 @@ export default {
 			background: lightgray;
 			.add-button-container {
 				display: flex;
-				justify-content: center;
+				justify-content: right;
 				padding: 10px 0;
+				.button-vue {
+					margin-right: 10px;
+				}
 			}
 			.document {
 				width: calc(100% - 25px);
@@ -297,6 +300,11 @@ export default {
 					vertical-align: middle;
 					display: inline-block;
 					flex-grow: 1;
+					padding-left: 10px;
+				}
+				.filename.pagenum {
+					flex-grow: 0.04;
+					padding-left: 3px;
 				}
 				.page-number-input {
 					width: 60px;
