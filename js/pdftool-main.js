@@ -85783,7 +85783,6 @@ __webpack_require__.r(__webpack_exports__);
       try {
         const dirname = this.fileList[0].dirname;
         const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/merge'), data);
-        // TODO: Find a way to implement scrolling to the new file.
         const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
         client.stat(`${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`, {
           details: true,
@@ -85793,12 +85792,12 @@ __webpack_require__.r(__webpack_exports__);
           (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', node);
         });
         this.merging = false;
-        this.$emit('merged', true);
+        this.$emit('processed', true);
       } catch (e) {
         console.error(e);
         (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not merge PDF.'));
         this.merging = false;
-        this.$emit('merged', false);
+        this.$emit('processed', false);
       }
     },
     /**
@@ -86036,7 +86035,7 @@ __webpack_require__.r(__webpack_exports__);
       };
       try {
         const dirname = this.file.dirname;
-        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/split'), data); // Changed endpoint to /split
+        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/split'), data);
         const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
         client.stat(`${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`, {
           details: true,
@@ -86046,16 +86045,16 @@ __webpack_require__.r(__webpack_exports__);
           (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', node);
         });
         this.splitting = false;
-        this.$emit('split', true); // Renamed event
+        this.$emit('processed', true);
       } catch (e) {
         console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not split PDF.')); // Changed error message
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not split PDF.'));
         this.splitting = false;
-        this.$emit('split', false); // Renamed event
+        this.$emit('processed', false);
       }
     },
     addPageNumber() {
-      if (pageNumbers.length === this.pageCount - 1) {
+      if (this.pageNumbers.length === this.pageCount - 1) {
         (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'There are no more pages to split.')); // Changed error message
         return;
       }
@@ -175957,7 +175956,7 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
               file: file
             },
             on: {
-              merged: success => {
+              processed: success => {
                 vueInstance.$destroy();
                 if (vueInstance.$el) {
                   vueInstance.$el.innerHTML = '';
@@ -175995,7 +175994,7 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
               files: files
             },
             on: {
-              merged: success => {
+              processed: success => {
                 vueInstance.$destroy();
                 if (vueInstance.$el) {
                   vueInstance.$el.innerHTML = '';
@@ -176383,4 +176382,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=d31f7a1b87f71829ea40
+//# sourceMappingURL=pdftool-main.js.map?v=52df65c50b717c32c390
