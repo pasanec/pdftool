@@ -63,7 +63,7 @@ export const pdfAction = new FileAction({
 							file: file,
 						},
 						on: {
-							merged: (success: boolean) => {
+							processed: (success: boolean) => {
 								vueInstance.$destroy()
 								if (vueInstance.$el) {
 									vueInstance.$el.innerHTML = ''
@@ -99,7 +99,7 @@ export const pdfAction = new FileAction({
 							files: files,
 						},
 						on: {
-							merged: (success: boolean) => {
+							processed: (success: boolean) => {
 								vueInstance.$destroy()
 								if (vueInstance.$el) {
 									vueInstance.$el.innerHTML = ''

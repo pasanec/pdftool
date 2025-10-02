@@ -211,7 +211,7 @@ export default {
 			}
 			try {
 				const dirname = this.file.dirname
-				const response = await axios.post(generateUrl('/apps/pdftool/split'), data) // Changed endpoint to /split
+				const response = await axios.post(generateUrl('/apps/pdftool/split'), data)
 				const client = davGetClient()
 				client.stat(`${davRootPath}${dirname}`, {
 					details: true,
@@ -221,12 +221,12 @@ export default {
 						emit('files:node:updated', node)
 					})
 				this.splitting = false
-				this.$emit('split', true) // Renamed event
+				this.$emit('processed', true)
 			} catch (e) {
 				console.error(e)
-				showError(t('pdftool', 'Could not split PDF.')) // Changed error message
+				showError(t('pdftool', 'Could not split PDF.'))
 				this.splitting = false
-				this.$emit('split', false) // Renamed event
+				this.$emit('processed', false)
 			}
 		},
 		addPageNumber() {

@@ -141,7 +141,6 @@ export default {
 			try {
 				const dirname = this.fileList[0].dirname
 				const response = await axios.post(generateUrl('/apps/pdftool/merge'), data)
-				// TODO: Find a way to implement scrolling to the new file.
 				const client = davGetClient()
 				client.stat(`${davRootPath}${dirname}`, {
 					details: true,
@@ -151,12 +150,12 @@ export default {
 						emit('files:node:updated', node)
 					})
 				this.merging = false
-				this.$emit('merged', true)
+				this.$emit('processed', true)
 			} catch (e) {
 				console.error(e)
 				showError(t('pdftool', 'Could not merge PDF.'))
 				this.merging = false
-				this.$emit('merged', false)
+				this.$emit('processed', false)
 			}
 		},
 		/**
