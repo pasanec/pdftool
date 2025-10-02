@@ -218,7 +218,7 @@ class FileactionService
 	{
 		$dataFolder = $this->config->getSystemValue('datadirectory');
 		$filePath = $this->rootFolder->getById($fileId)[0]->getPath();
-		return $dataFolder . '/' . $filePath;
+		return $dataFolder . $filePath;
 	}
 
 	public function getMimeType(int $fileId): string
