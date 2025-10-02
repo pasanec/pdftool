@@ -63,9 +63,6 @@ class GhostScript implements IPdf
 		if ($this->batchCountPages($files) / sizeof($files) > $this->s->getMaxPageCount()) {
 			throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
 		}
-		//if ($this->batchCountPages($files)) {
-		//throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
-		//}
 		// Get user source folder
 		$userSourceFolder = $this->fs->tellUserSourceFolder((int)$files[0]['_data']['id']);
 		$this->logger->log('::merge: $files[0] ' . json_encode($files[0]['_data']['id']));
@@ -75,46 +72,32 @@ class GhostScript implements IPdf
 		$sourceData = $this->fs->copyToAppFolder($files);
 		$inputFolder = $sourceData[0];
 		$fileNodes = $sourceData[1];
-		// Set output file if not empty string
-		// if ($outputfile === '') {
-		//     $outputfile = substr_replace($fileNodes[0]->getName(), strlen($fileNodes[0]->getName()), -4) . '-merged.pdf';
-		// } else if (!strpos($outputfile, '.pdf', -4) || !strpos($outputfile, '.PDF', -4)) {
-		//     $outputfile .= '.pdf';
-		// }
 		$outputfile = rtrim($outputfile, '.PDF');
 		$outputfile = rtrim($outputfile, '.pdf');
 		$outputfile .= '.pdf';
 
 		// Make output folder
 		$outputFolder = $this->fs->createFolder('output-merge-' . uniqid($this->userId));
-		// $this->logger->log('::merge: ' . $inputFolder->getName());
-		// Assemble string of all absolute file paths separated by space
 		$filePaths = ' ';
 		$appFolder = $this->fs->tellAppFolder();
 		foreach ($fileNodes as $fileNode) {
 			$filePaths .= $appFolder . $inputFolder->getName() . '/' . escapeshellarg($fileNode->getName()) . ' ';
 		}
-		// Assemble String of output file path for ghostscript
 		$outputPath = $appFolder . $outputFolder->getName() . '/' . escapeshellarg($outputfile) . ' ';
 
-		// Execute ghostscript
 		$this->logger->log('::merge: ' . 'gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . $outputPath . ' -dBATCH ' . $filePaths);
 		$result = shell_exec('gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . $outputPath . ' -dBATCH ' . $filePaths);
-		// TODO: Custom Exception
-		// $this->logger->log('::merge: result: ' . $result);
 		if ($result === NULL) {
 			throw new Exception('PdfTools merge(): An error has ocurred.');
 		}
+
 		// Copy output file into user folder
 		$this->logger->log('::merge: outputFolder: ' . $outputFolder->getName());
 		$this->logger->log('::merge: userSourceFolder: ' . $userSourceFolder->getName());
-		// $this->logger->log('::merge: TYPEOF: ' . gettype(($outputFolder->getFile($outputfile))));
-		//TODO: Copying files doesn't work.
-		$srcFile = [];
-		$srcFile[] = $outputFolder->getFile($outputfile);
+		$sourceFile = [];
+		$sourceFile[] = $outputFolder->getFile($outputfile);
 
-		// $userFile = $this->fs->copyFilesToUserFolder($outputFolder, $userSourceFolder);
-		$userFile = $this->fs->copyFilesToUserFolder($srcFile, $userSourceFolder);
+		$userFile = $this->fs->copyFilesToUserFolder($sourceFile, $userSourceFolder);
 		$this->logger->log('::merge: userFile size: ' . sizeof($userFile));
 		$inputFolder->delete();
 		$outputFolder->delete();
@@ -124,66 +107,137 @@ class GhostScript implements IPdf
 
 	public function split(array $file, array $pageNumbers): bool
 	{
-		if ($this->countPages($file['id']) > $this->s->getMaxPageCount()) {
-			throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
+		$pageCount = $this->countPages($file['_data']['id']);
+		if ($pageCount > $this->s->getMaxPageCount()) {
+			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
 		}
 
-		$maxSplitPage = max(array_values($pageNumbers));
-		if ($maxSplitPage > $this->countPages($file['id'])) {
-			throw new Exception('Page number ' . $maxSplitPage . ' greater than file page count of ' . $this->countPages($file['id']) . ' pages.');
-		}
-		$userSourceFolder = $this->fs->tellUserSourceFolder((int)$file['id']);
-		$this->logger->log('::merge: $files[0] ' . json_encode($file['id']));
-		$this->logger->log('::merge: $userSourceFolder name ' . $userSourceFolder->getName());
-
-		// TODO: Create i/o temp folders copy file in source folder.
-		$sourceData = $this->fs->copyToAppFolder([$file]);
-		$inputFolder = $sourceData[0];
-		$fileNode = $sourceData[1][0];
-
-		$outputfile = rtrim($outputfile, '.PDF');
-		$outputfile = rtrim($outputfile, '.pdf');
-		// $outputfile .= '.pdf';
-		$exportFolderName = $outputfile .= '.pdf';
-
-		$outputFolder = $this->fs->createFolder('output-split-' . uniqid($this->userId));
-
-		// TODO: Assemble input filename with source folder path.
-		$appFolder = $this->fs->tellAppFolder();
-		$filePath = $appFolder . $inputFolder->getName() . '/' . escapeshellarg($fileNode->getName()) . ' ';
-
-		// TODO: Assemble output filename with source folder path.
-		$outputPath = $appFolder . $outputFolder->getName() . '/' . escapeshellarg($outputfile);
-
-		// TODO: Sort splitpoints by value ascending.
-		asort($pageNumbers);
-		// TODO: Run gs command.
-		$firstPage = 1;
-		$outputFileNames = [];
-		foreach ($pageNumbers as $pageNumber) {
-			$outputFile = "$outputPath $firstPage-$pageNumber.pdf";
-			$this->logger->log('::split: ' . "gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$pageNumber -sDEVICE=pdfwrite $filePath");
-			$result = shell_exec("gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputFile -dFirstPage=$firstPage -dLastPage=$pageNumber -sDEVICE=pdfwrite $filePath");
-			if ($result === NULL) {
-				throw new Exception('PdfTools split(): An error has ocurred.');
+		// Validate page numbers
+		if (!empty($pageNumbers)) {
+			$maxSplitPage = max(array_values($pageNumbers));
+			if ($maxSplitPage > $pageCount) {
+				throw new Exception('Page number ' . $maxSplitPage . ' greater than file page count of ' . $pageCount . ' pages.');
 			}
-			$outputFileNames[] = $outputFile;
 		}
 
-		// TODO: Copy files to user folder.
-		$srcFiles = [];
-		foreach ($outputFileNames as $outputFileName) {
-			$srcFiles[] = $outputFolder->getFile($outputFileName);
+		$userSourceFolder = $this->fs->tellUserSourceFolder((int)$file['_data']['id']);
+		$this->logger->log('::split: File ID ' . json_encode($file['_data']['id']));
+		$this->logger->log('::split: User source folder name: ' . $userSourceFolder->getName());
+
+		$inputFolder = null;
+		$outputFolder = null;
+
+		try {
+			$sourceData = $this->fs->copyToAppFolder([$file]);
+			$inputFolder = $sourceData[0];
+			$fileNode = $sourceData[1][0];
+
+			$originalFileName = $fileNode->getName();
+			$outputfile = pathinfo($originalFileName, PATHINFO_FILENAME);
+
+			$exportFolderName = $outputfile . '_split';
+
+			$finalExportFolderName = $exportFolderName;
+			$counter = 1;
+			while ($userSourceFolder->nodeExists($finalExportFolderName)) {
+				$finalExportFolderName = $exportFolderName . ' (' . $counter . ')';
+				$counter++;
+			}
+			$exportFolderName = $finalExportFolderName;
+			$exportFolder = $this->fs->createExportFolder($exportFolderName, $userSourceFolder);
+
+			$outputFolder = $this->fs->createFolder('output-split-' . uniqid($this->userId));
+			$appFolder = $this->fs->tellAppFolder();
+
+			$inputFilePath = $appFolder . $inputFolder->getName() . '/' . $fileNode->getName();
+
+			asort($pageNumbers);
+			$pageNumbers = array_unique(array_values($pageNumbers));
+
+			$firstPage = 1;
+			$outputFilePaths = [];
+
+			foreach ($pageNumbers as $lastPage) {
+				if ($lastPage < $firstPage) {
+					continue; // Skip if the page number is out of order
+				}
+
+				$outputFileName = $outputfile . "_p" . $firstPage . "-" . $lastPage . ".pdf";
+				$outputFilePath = $appFolder . $outputFolder->getName() . '/' . $outputFileName;
+
+				$command = sprintf(
+					'gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=%s -dFirstPage=%d -dLastPage=%d -sDEVICE=pdfwrite %s',
+					escapeshellarg($outputFilePath),
+					$firstPage,
+					$lastPage,
+					escapeshellarg($inputFilePath)
+				);
+
+				$this->logger->log('::split: Executing: ' . $command);
+				exec($command, $cmdOutput, $return_var);
+
+				if ($return_var !== 0) {
+					$this->logger->log('::split: GhostScript error: ' . implode("\n", $cmdOutput), ['level' => 'error']);
+					throw new Exception('PdfTools split(): An error has occurred with GhostScript.');
+				}
+
+				$outputFilePaths[] = $outputFileName;
+				$firstPage = $lastPage + 1;
+			}
+
+			// Process the last part of the PDF
+			if ($firstPage <= $pageCount) {
+				$lastPage = $pageCount;
+				$outputFileName = $outputfile . "_p" . $firstPage . "-" . $lastPage . ".pdf";
+				$outputFilePath = $appFolder . $outputFolder->getName() . '/' . $outputFileName;
+
+				$command = sprintf(
+					'gs -dNOPAUSE -dQUIET -dBATCH -sOutputFile=%s -dFirstPage=%d -dLastPage=%d -sDEVICE=pdfwrite %s',
+					escapeshellarg($outputFilePath),
+					$firstPage,
+					$lastPage,
+					escapeshellarg($inputFilePath)
+				);
+
+				$this->logger->log('::split: Executing: ' . $command);
+				exec($command, $cmdOutput, $return_var);
+
+				if ($return_var !== 0) {
+					$this->logger->log('::split: GhostScript error: ' . implode("\n", $cmdOutput), ['level' => 'error']);
+					throw new Exception('PdfTools split(): An error has occurred with GhostScript.');
+				}
+				$outputFilePaths[] = $outputFileName;
+			}
+
+			// Copy files to user folder
+			$srcFiles = [];
+			foreach ($outputFilePaths as $outputFileName) {
+				if ($outputFolder->fileExists($outputFileName)) {
+					$srcFiles[] = $outputFolder->getFile($outputFileName);
+				} else {
+					$this->logger->log('::split: Could not find generated file: ' . $outputFileName, ['level' => 'warning']);
+				}
+			}
+
+			if (empty($srcFiles)) {
+				throw new Exception('PdfTools split(): No files were generated.');
+			}
+
+			$this->fs->copyFilesToUserFolder($srcFiles, $exportFolder);
+			$this->logger->log('::split: Successfully created ' . count($srcFiles) . ' split files.');
+
+			return true;
+		} catch (Exception $e) {
+			$this->logger->log('::split: Exception: ' . $e->getMessage(), ['level' => 'error']);
+			throw $e;
+		} finally {
+			if ($inputFolder !== null) {
+				$inputFolder->delete();
+			}
+			if ($outputFolder !== null) {
+				$outputFolder->delete();
+			}
 		}
-
-
-		// TODO: Create collection folder in user folder.
-		$exportFolder = $this->fs->createExportFolder($exportFolderName, $userSourceFolder);
-
-		$userFile = $this->fs->copyFilesToUserFolder($srcFiles, $exportFolder);
-		$this->logger->log('::merge: userFile size: ' . sizeof($userFile));
-
-		return true;
 	}
 
 	public function countPages(int $fileId): int
