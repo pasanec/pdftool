@@ -28,7 +28,9 @@ use OCA\PdfTool\Service\LogService;
 use OCA\PdfTool\Service\SettingsService;
 use OCP\Files\IRootFolder;
 use Exception;
+use setasign\Fpdi\PdfReader\PageBoundaries;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use Smalot\PdfParser\Parser as PdfParserParser;
 
 class TcPdf implements IPdf
 {
@@ -50,13 +52,21 @@ class TcPdf implements IPdf
 	/** @var SettingsService */
 	private $s;
 
-	public function __construct(string $appName, LogService $logger, FileactionService $fs, SettingsService $s, $userId)
+	/** @var PdfParserParser */
+	private $pdfParser;
+
+	/** @var Fpdi */
+	private $fpdfi;
+
+	public function __construct(string $appName, LogService $logger, FileactionService $fs, SettingsService $s, PdfParserParser $pdfParser, Fpdi $fpdfi, $userId)
 	{
 		$this->appName = $appName;
 		$this->userId = $userId;
 		$this->logger = $logger;
 		$this->fs = $fs;
 		$this->s = $s;
+		$this->pdfParser = $pdfParser;
+		$this->fpdfi = $fpdfi;
 	}
 
 	public function merge(array $files, string $outputfile = ''): string
@@ -81,20 +91,18 @@ class TcPdf implements IPdf
 		$appFolder = $this->fs->tellAppFolder();
 		$outputPath = $appFolder . $outputFolder->getName() . '/' . $outputfile;
 
-		$pdf = new Fpdi();
-
 		foreach ($fileNodes as $fileNode) {
 			$filePath = $appFolder . $inputFolder->getName() . '/' . $fileNode->getName();
-			$pageCount = $pdf->setSourceFile($filePath);
+			$pageCount = $this->fpdfi->setSourceFile($filePath);
 			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-				$templateId = $pdf->importPage($pageNo);
-				$size = $pdf->getTemplateSize($templateId);
-				$pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-				$pdf->useTemplate($templateId);
+				$templateId = $this->fpdfi->importPage($pageNo);
+				$size = $this->fpdfi->getTemplateSize($templateId);
+				$this->fpdfi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+				$this->fpdfi->useTemplate($templateId);
 			}
 		}
 
-		$pdf->Output($outputPath, 'F');
+		$this->fpdfi->Output($outputPath, 'F');
 
 		$srcFile = [];
 		$srcFile[] = $outputFolder->getFile($outputfile);
@@ -109,7 +117,7 @@ class TcPdf implements IPdf
 
 	public function split(array $file, array $pageNumbers, string $outputfile = ''): bool
 	{
-		$fileId = (int) $file['id'];
+		$fileId = (int) $file['_data']['id'];
 		if ($this->countPages($fileId) > $this->s->getMaxPageCount()) {
 			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
 		}
@@ -138,37 +146,56 @@ class TcPdf implements IPdf
 		$firstPage = 1;
 		$outputFileNames = [];
 
-		$originalPdf = new Fpdi();
-		$pageCount = $originalPdf->setSourceFile($filePath);
+		$pageCount = $this->fpdfi->setSourceFile($filePath);
 
 		foreach ($pageNumbers as $pageNumber) {
 			if ($pageNumber >= $firstPage) {
-				$newPdf = new Fpdi();
+				$pdf = new Fpdi();
+				$pdf->setSourceFile($filePath);
 				for ($i = $firstPage; $i <= $pageNumber; $i++) {
-					$templateId = $newPdf->importPage($i, Fpdi::PAGE_BOX_TRIMBOX, true, Fpdi::PAGE_BOX_TRIMBOX);
-					$size = $newPdf->getTemplateSize($templateId);
-					$newPdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-					$newPdf->useTemplate($templateId);
+					try {
+						$templateId = $pdf->importPage($i);
+					} catch (\Throwable $t) {
+						$this->logger->log("::split: Could not import page $i. Skipping. Error: " . $t->getMessage());
+						continue;
+					}
+					$size = $pdf->getTemplateSize($templateId);
+					if ($size['width'] == 0 || $size['height'] == 0) {
+						$this->logger->log("::split: Skipping page $i due to invalid dimensions (width or height is zero).");
+						continue;
+					}
+					$pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+					$pdf->useTemplate($templateId);
 				}
 				$outputFileName = $outputfileBase . "_$firstPage-$pageNumber.pdf";
 				$outputPath = $appFolder . $outputFolder->getName() . '/' . $outputFileName;
-				$newPdf->Output($outputPath, 'F');
+				$pdf->Output($outputPath, 'F');
 				$outputFileNames[] = $outputFileName;
 				$firstPage = $pageNumber + 1;
 			}
 		}
 
 		if ($firstPage <= $pageCount) {
-			$newPdf = new Fpdi();
+			$pdf = new Fpdi();
+			$pdf->setSourceFile($filePath);
 			for ($i = $firstPage; $i <= $pageCount; $i++) {
-				$templateId = $newPdf->importPage($i, Fpdi::PAGE_BOX_TRIMBOX, true, Fpdi::PAGE_BOX_TRIMBOX);
-				$size = $newPdf->getTemplateSize($templateId);
-				$newPdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-				$newPdf->useTemplate($templateId);
+				try {
+					$templateId = $pdf->importPage($i);
+				} catch (\Throwable $t) {
+					$this->logger->log("::split: Could not import page $i. Skipping. Error: " . $t->getMessage());
+					continue;
+				}
+				$size = $pdf->getTemplateSize($templateId);
+				if ($size['width'] == 0 || $size['height'] == 0) {
+					$this->logger->log("::split: Skipping page $i due to invalid dimensions (width or height is zero).");
+					continue;
+				}
+				$pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+				$pdf->useTemplate($templateId);
 			}
 			$outputFileName = $outputfileBase . "_$firstPage-$pageCount.pdf";
 			$outputPath = $appFolder . $outputFolder->getName() . '/' . $outputFileName;
-			$newPdf->Output($outputPath, 'F');
+			$pdf->Output($outputPath, 'F');
 			$outputFileNames[] = $outputFileName;
 		}
 
@@ -195,9 +222,22 @@ class TcPdf implements IPdf
 		if ($this->fs->getMimeType($fileId) !== 'application/pdf') {
 			throw new Exception('File with id ' . $fileId . ' is not a PDF.');
 		}
-		$filePath = $this->fs->getAbsoluteFilepath($fileId);
-		$pdf = new Fpdi();
-		return $pdf->setSourceFile($filePath);
+		try {
+			$filePath = $this->fs->getAbsoluteFilepath($fileId);
+			$this->logger->log("::countPages: $filePath ");
+			$pdf = $this->pdfParser->parseFile($filePath);
+			$details = $pdf->getDetails();
+			if (isset($details['Pages'])) {
+				$pageCount = $details['Pages'];
+				return $pageCount;
+			} else {
+				// Fallback.
+				$pages = $pdf->getPages();
+				return count($pages);
+			}
+		} catch (Exception $e) {
+			throw new Exception('Could not count pages of file with id ' . $fileId . '. ' . $e->getMessage());
+		}
 	}
 
 	public function batchCountPages(array $files): int
