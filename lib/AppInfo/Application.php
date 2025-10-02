@@ -56,7 +56,9 @@ class Application extends App implements IBootstrap
 
 	public function register(IRegistrationContext $context): void
 	{
-		/*
+		include_once __DIR__ . '/../../vendor/autoload.php';
+	}
+	/*
 		$context->registerService('SettingsService', function ($c) {
 			return new SettingsService(
 				$c->get(IConfig::class),
@@ -70,12 +72,8 @@ class Application extends App implements IBootstrap
 			);
 		});
 */
-	}
-
 	public function boot(IBootContext $context): void // Corrected parameter type hint
-	{
-		// empty
-	}
+	{}
 
 	public function init(IInitialState $initialState): void
 	{
