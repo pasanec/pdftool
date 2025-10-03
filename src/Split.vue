@@ -36,8 +36,8 @@
 			<div class="desk">
    			<div class="document" v-for="(pageNumber, id) in pageNumbers" :key="id">
 				<div class="mime-pdf"></div>
-				<div class="filename">{{ t('pdftool', 'Page split point') }}</div>
-				<div class="pagewarning" v-if="warnId === id" >{{ warnMessage }}</div>
+				<div class="filename" v-if="warnId !== id" >{{ t('pdftool', 'Page split point') }}</div>
+				<div class="pagewarning filename" v-if="warnId === id" >{{ warnMessage }}</div>
 				<input type="number" :value="pageNumbers[id]" @change="updatePageNumber(id, $event.target.value)" min="1" class="page-number-input" />
 				<div class="filename pagenum">/ {{pageNumber + 1}}</div>
 				<NcButton
@@ -54,7 +54,7 @@
 				<NcButton
 					@click="addPageNumber"
 					:aria-label="t('pdftool', 'Add split point.')"
-					:disabled="false"
+					:disabled="warnId === null ? false : true"
 					:size="'normal'"
 					variant="tertiary">
 				<Plus :size="20" />
@@ -64,7 +64,7 @@
 			<div class="buttons">
 				<NcButton
 					@click="split"
-					:disabled="pageNumbers.length != 0"
+					:disabled="Object.keys(pageNumbers).length === 0 || warnId !== null"
 					:readonly="false"
 					type="primary">
 										<template>{{ t('pdftool', 'Split') }}</template>
@@ -115,7 +115,7 @@ import { emit } from '@nextcloud/event-bus'
 
 
 export default {
-	name: 'Split', // Changed from Merge
+	name: 'Split',
 	components: {
 		NcActionButton,
 		NcAppContent,
@@ -124,7 +124,6 @@ export default {
 		NcAppNavigationNew,
 		NcButton,
 		NcModal,
-		// draggable, // Removed draggable
 		NcLoadingIcon,
 		Plus,
 	},
@@ -132,11 +131,11 @@ export default {
 		return {
 			modal: true,
 			error: false,
-			splitting: false, // Renamed from merging
+			splitting: false,
 			updating: false,
 			loading: true,
 			filename: '',
-			pageNumbers: {}, // Added for page numbers
+			pageNumbers: {},
 			nextId: 1,
 			warnId: null,
 			warnMessage: '',
@@ -172,6 +171,7 @@ export default {
 				const value = this.pageCount - 1
 				return
 			}
+			this.warnId = null
 			const value = Number(newValue)
 
 			if (isNaN(value) || !Number.isInteger(value) || value < 1) {
@@ -193,10 +193,6 @@ export default {
 				this.$nextTick(() => {
 					this.warnId = id
 				})
-				setTimeout(() => {
-					this.warnId = null
-				}, 3000)
-				return
 			}
 
 			this.$set(this.pageNumbers, id, value)
@@ -301,6 +297,10 @@ export default {
 					display: inline-block;
 					flex-grow: 1;
 					padding-left: 10px;
+				}
+				.pagewarning {
+					color: red;
+					font-weight: bold;
 				}
 				.filename.pagenum {
 					flex-grow: 0.04;
