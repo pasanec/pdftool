@@ -85941,7 +85941,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'Split',
-  // Changed from Merge
   components: {
     NcActionButton: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcActionButton,
     NcAppContent: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppContent,
@@ -85950,7 +85949,6 @@ __webpack_require__.r(__webpack_exports__);
     NcAppNavigationNew: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppNavigationNew,
     NcButton: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcButton,
     NcModal: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcModal,
-    // draggable, // Removed draggable
     NcLoadingIcon: _nextcloud_vue_components_NcLoadingIcon__WEBPACK_IMPORTED_MODULE_1__["default"],
     Plus: vue_material_design_icons_Plus_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
@@ -85959,12 +85957,10 @@ __webpack_require__.r(__webpack_exports__);
       modal: true,
       error: false,
       splitting: false,
-      // Renamed from merging
       updating: false,
       loading: true,
       filename: '',
       pageNumbers: {},
-      // Added for page numbers
       nextId: 1,
       warnId: null,
       warnMessage: '',
@@ -85998,6 +85994,7 @@ __webpack_require__.r(__webpack_exports__);
         const value = this.pageCount - 1;
         return;
       }
+      this.warnId = null;
       const value = Number(newValue);
       if (isNaN(value) || !Number.isInteger(value) || value < 1) {
         this.warnMessage = t('pdftool', 'Page number must be a positive integer.');
@@ -86017,10 +86014,6 @@ __webpack_require__.r(__webpack_exports__);
         this.$nextTick(() => {
           this.warnId = id;
         });
-        setTimeout(() => {
-          this.warnId = null;
-        }, 3000);
-        return;
       }
       this.$set(this.pageNumbers, id, value);
     },
@@ -86289,10 +86282,10 @@ var render = function render() {
       staticClass: "document"
     }, [_c("div", {
       staticClass: "mime-pdf"
-    }), _vm._v(" "), _c("div", {
+    }), _vm._v(" "), _vm.warnId !== id ? _c("div", {
       staticClass: "filename"
-    }, [_vm._v(_vm._s(_vm.t("pdftool", "Page split point")))]), _vm._v(" "), _vm.warnId === id ? _c("div", {
-      staticClass: "pagewarning"
+    }, [_vm._v(_vm._s(_vm.t("pdftool", "Page split point")))]) : _vm._e(), _vm._v(" "), _vm.warnId === id ? _c("div", {
+      staticClass: "pagewarning filename"
     }, [_vm._v(_vm._s(_vm.warnMessage))]) : _vm._e(), _vm._v(" "), _c("input", {
       staticClass: "page-number-input",
       attrs: {
@@ -86328,7 +86321,7 @@ var render = function render() {
   }, [_c("NcButton", {
     attrs: {
       "aria-label": _vm.t("pdftool", "Add split point."),
-      disabled: false,
+      disabled: _vm.warnId === null ? false : true,
       size: "normal",
       variant: "tertiary"
     },
@@ -86343,7 +86336,7 @@ var render = function render() {
     staticClass: "buttons"
   }, [_c("NcButton", {
     attrs: {
-      disabled: _vm.pageNumbers.length != 0,
+      disabled: Object.keys(_vm.pageNumbers).length === 0 || _vm.warnId !== null,
       readonly: false,
       type: "primary"
     },
@@ -101317,6 +101310,10 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.pdftool-modal h2[data-v-2ddb4c1e] {
   display: inline-block;
   flex-grow: 1;
   padding-left: 10px;
+}
+.pdftool-modal .desk .document .pagewarning[data-v-2ddb4c1e] {
+  color: red;
+  font-weight: bold;
 }
 .pdftool-modal .desk .document .filename.pagenum[data-v-2ddb4c1e] {
   flex-grow: 0.04;
@@ -176390,4 +176387,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=d688feba7bce14e6d474
+//# sourceMappingURL=pdftool-main.js.map?v=8825a4d999e7ccd36657
