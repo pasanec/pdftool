@@ -150,8 +150,8 @@ export default {
 	async mounted() {
 		this.file= this.file
 		this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/'
-		this.pageCount = axios.get(generateUrl('/apps/pdftool/pagecount/' + this.file.fileid)).then((response) => {
-			this.pageCount = response.data.pageCount
+		axios.get(generateUrl('/apps/pdftool/pagecount/' + this.file.fileid)).then((response) => {
+			this.pageCount = response.data
 			this.loading = false
 		}).catch((error) => {
 			console.error(error)
@@ -163,16 +163,16 @@ export default {
 
 	methods: {
 		updatePageNumber(id, newValue) {
+			let value
 			if (Number(newValue) >= this.pageCount) {
-				const value = 1
-				return
+				value = 1
+			} else if (Number(newValue) < 1) {
+				value = this.pageCount - 1
+			} else {
+				value = Number(newValue)
 			}
-			if (Number(newValue) < 1) {
-				const value = this.pageCount - 1
-				return
-			}
+			
 			this.warnId = null
-			const value = Number(newValue)
 
 			if (isNaN(value) || !Number.isInteger(value) || value < 1) {
 				this.warnMessage = t('pdftool', 'Page number must be a positive integer.')
