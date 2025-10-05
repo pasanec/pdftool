@@ -77,11 +77,21 @@ class PdfService
 
 	public function merge(array $files, string $outputfile = ''): string
 	{
+		if ($this->model->batchCountPages($files) / sizeof($files) > $this->s->getMaxPageCount()) {
+			throw new Exception('Max page count of ' . $this->model->s->getMaxPageCount() . ' exceeded.');
+		}
+		if (sizeof($files) > $this->s->getMaxPdfs()) {
+			throw new Exception('Max PDF count of ' . $this->model->s->getMaxPdfs() . ' exceeded.');
+		}
 		return $this->model->merge($files, $outputfile);
 	}
 
 	public function split(array $file, array $splitPoints): bool
 	{
+		$pageCount = $this->countPages($file['_data']['id']);
+		if ($pageCount > $this->s->getMaxPageCount()) {
+			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
+		}
 		return $this->model->split($file, $splitPoints);
 	}
 

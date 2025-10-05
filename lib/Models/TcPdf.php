@@ -49,32 +49,24 @@ class TcPdf implements IPdf
 	/** @var FileactionService */
 	private $fs;
 
-	/** @var SettingsService */
-	private $s;
-
 	/** @var PdfParserParser */
 	private $pdfParser;
 
 	/** @var Fpdi */
 	private $fpdfi;
 
-	public function __construct(string $appName, LogService $logger, FileactionService $fs, SettingsService $s, PdfParserParser $pdfParser, Fpdi $fpdfi, $userId)
+	public function __construct(string $appName, LogService $logger, FileactionService $fs, PdfParserParser $pdfParser, Fpdi $fpdfi, $userId)
 	{
 		$this->appName = $appName;
 		$this->userId = $userId;
 		$this->logger = $logger;
 		$this->fs = $fs;
-		$this->s = $s;
 		$this->pdfParser = $pdfParser;
 		$this->fpdfi = $fpdfi;
 	}
 
 	public function merge(array $files, string $outputfile = ''): string
 	{
-		if ($this->batchCountPages($files) / sizeof($files) > $this->s->getMaxPageCount()) {
-			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
-		}
-
 		$userSourceFolder = $this->fs->tellUserSourceFolder((int)$files[0]['_data']['id']);
 		$this->logger->log('::merge: $files[0] ' . json_encode($files[0]['_data']['id']));
 		$this->logger->log('::merge: $userSourceFolder name ' . $userSourceFolder->getName());
@@ -118,9 +110,6 @@ class TcPdf implements IPdf
 	public function split(array $file, array $pageNumbers, string $outputfile = ''): bool
 	{
 		$fileId = (int) $file['_data']['id'];
-		if ($this->countPages($fileId) > $this->s->getMaxPageCount()) {
-			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
-		}
 
 		$maxSplitPage = max(array_values($pageNumbers));
 		if ($maxSplitPage > $this->countPages($fileId)) {

@@ -46,23 +46,16 @@ class GhostScript implements IPdf
 	/** @var FileactionService */
 	private $fs;
 
-	/** @var SettingsService */
-	private $s;
-
-	public function __construct(string $appName, LogService $logger, FileactionService $fs, SettingsService $s, $userId)
+	public function __construct(string $appName, LogService $logger, FileactionService $fs, $userId)
 	{
 		$this->appName = $appName;
 		$this->userId = $userId;
 		$this->logger = $logger;
 		$this->fs = $fs;
-		$this->s = $s;
 	}
 
 	public function merge(array $files, string $outputfile = ''): string
 	{
-		if ($this->batchCountPages($files) / sizeof($files) > $this->s->getMaxPageCount()) {
-			throw new Exception('Max page count of $this->s->getMaxPageCount() exceeded.');
-		}
 		// Get user source folder
 		$userSourceFolder = $this->fs->tellUserSourceFolder((int)$files[0]['_data']['id']);
 		$this->logger->log('::merge: $files[0] ' . json_encode($files[0]['_data']['id']));
@@ -108,10 +101,6 @@ class GhostScript implements IPdf
 	public function split(array $file, array $pageNumbers): bool
 	{
 		$pageCount = $this->countPages($file['_data']['id']);
-		if ($pageCount > $this->s->getMaxPageCount()) {
-			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
-		}
-
 		// Validate page numbers
 		if (!empty($pageNumbers)) {
 			$maxSplitPage = max(array_values($pageNumbers));
@@ -228,7 +217,7 @@ class GhostScript implements IPdf
 
 			return true;
 		} catch (Exception $e) {
-			$this->logger->log('::split: Exception: ' . $e->getMessage(), ['level' => 'error']);
+			$this->logger->log('::split: Exception: ' . $e->getMessage(), $e);
 			throw $e;
 		} finally {
 			if ($inputFolder !== null) {
