@@ -162,6 +162,37 @@ export default {
 	},
 
 	methods: {
+		getParentDirname(node) {
+			if (node.dirname) {
+				return node.dirname
+			}
+
+			const filename = node.attributes?.filename
+			if (!filename) {
+				return '/'
+			}
+
+			const root = node.root || filename.match(/^\/files\/[^/]+/)?.[0] || ''
+			const relativePath = root !== '' && filename.startsWith(root)
+				? filename.substring(root.length)
+				: filename
+			const index = relativePath.lastIndexOf('/')
+
+			return index > 0 ? relativePath.substring(0, index) : '/'
+		},
+		async refreshFolder(node) {
+			const dirname = this.getParentDirname(node)
+			const path = dirname === '/' ? davRootPath : `${davRootPath}${dirname}`
+			const client = davGetClient()
+			const result = await client.stat(path, {
+				details: true,
+				data: davGetDefaultPropfind(),
+			})
+			const updatedNode = davResultToNode(result.data)
+			if (updatedNode.fileid) {
+				emit('files:node:updated', updatedNode)
+			}
+		},
 		updatePageNumber(id, newValue) {
 			let value
 			if (Number(newValue) >= this.pageCount) {
@@ -206,16 +237,8 @@ export default {
 				outputFolder: this.filename,
 			}
 			try {
-				const dirname = this.file.dirname
 				const response = await axios.post(generateUrl('/apps/pdftool/split'), data)
-				const client = davGetClient()
-				client.stat(`${davRootPath}${dirname}`, {
-					details: true,
-					data: davGetDefaultPropfind(),
-				}).then((result) => {
-						const node = davResultToNode(result.data)
-						emit('files:node:updated', node)
-					})
+				await this.refreshFolder(this.file)
 				this.splitting = false
 				this.$emit('processed', true)
 			} catch (e) {

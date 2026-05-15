@@ -131,6 +131,37 @@ export default {
 	},
 
 	methods: {
+		getParentDirname(node) {
+			if (node.dirname) {
+				return node.dirname
+			}
+
+			const filename = node.attributes?.filename
+			if (!filename) {
+				return '/'
+			}
+
+			const root = node.root || filename.match(/^\/files\/[^/]+/)?.[0] || ''
+			const relativePath = root !== '' && filename.startsWith(root)
+				? filename.substring(root.length)
+				: filename
+			const index = relativePath.lastIndexOf('/')
+
+			return index > 0 ? relativePath.substring(0, index) : '/'
+		},
+		async refreshFolder(node) {
+			const dirname = this.getParentDirname(node)
+			const path = dirname === '/' ? davRootPath : `${davRootPath}${dirname}`
+			const client = davGetClient()
+			const result = await client.stat(path, {
+				details: true,
+				data: davGetDefaultPropfind(),
+			})
+			const updatedNode = davResultToNode(result.data)
+			if (updatedNode.fileid) {
+				emit('files:node:updated', updatedNode)
+			}
+		},
 		async merge() {
 			this.modal = false
 			this.merging = true
@@ -139,16 +170,8 @@ export default {
 				outputFile: this.filename,
 			}
 			try {
-				const dirname = this.fileList[0].dirname
 				const response = await axios.post(generateUrl('/apps/pdftool/merge'), data)
-				const client = davGetClient()
-				client.stat(`${davRootPath}${dirname}`, {
-					details: true,
-					data: davGetDefaultPropfind(),
-				}).then((result) => {
-						const node = davResultToNode(result.data)
-						emit('files:node:updated', node)
-					})
+				await this.refreshFolder(this.fileList[0])
 				this.merging = false
 				this.$emit('processed', true)
 			} catch (e) {
