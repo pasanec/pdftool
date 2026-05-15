@@ -176679,19 +176679,31 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const getNodes = context => Array.isArray(context) ? context : context.nodes;
+const isPdfNode = node => node.mime === 'application/pdf' || node.extension === '.pdf';
 const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
   id: 'pdfmerge',
-  displayName: (files, view) => files.length > 1 ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Merge PDF\'s') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Split PDF'),
-  iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${_mdi_js__WEBPACK_IMPORTED_MODULE_2__.mdiFilePdfBox}" /></svg>`,
-  enabled(nodes) {
-    window.console.info(nodes);
-    const dirname = nodes[0].dirname;
-    return nodes.every(node => (node.permissions & _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.Permission.DELETE) !== 0 && node.extension === '.pdf' && node.dirname === dirname);
+  displayName: (context, view) => {
+    const files = getNodes(context);
+    return files.length > 1 ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Merge PDF\'s') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Split PDF');
   },
-  async exec(file, view, dir) {
+  title: (context, view) => {
+    const files = getNodes(context);
+    return files.length > 1 ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Merge PDF\'s') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Split PDF');
+  },
+  iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${_mdi_js__WEBPACK_IMPORTED_MODULE_2__.mdiFilePdfBox}" /></svg>`,
+  enabled(context) {
+    const nodes = getNodes(context);
+    if (nodes.length === 0) {
+      return false;
+    }
+    const dirname = nodes[0].dirname;
+    return nodes.every(node => (node.permissions & _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.Permission.DELETE) !== 0 && isPdfNode(node) && node.dirname === dirname);
+  },
+  async exec(context, view, dir) {
+    const file = 'nodes' in context ? context.nodes[0] : context;
     return new Promise(resolve => {
       try {
-        console.info('PdfTool Multiselect action');
         vue__WEBPACK_IMPORTED_MODULE_3__["default"].mixin({
           methods: {
             t: _nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate
@@ -176726,10 +176738,10 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
       }
     });
   },
-  async execBatch(files, view) {
+  async execBatch(context, view) {
+    const files = getNodes(context);
     return new Promise(resolve => {
       try {
-        console.info('PdfTool Multiselect action');
         vue__WEBPACK_IMPORTED_MODULE_3__["default"].mixin({
           methods: {
             t: _nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate
@@ -176747,21 +176759,21 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
                 if (vueInstance.$el) {
                   vueInstance.$el.innerHTML = '';
                 }
-                resolve([success]);
+                resolve(files.map(() => success));
               },
               closed: () => {
                 vueInstance.$destroy();
                 if (vueInstance.$el) {
                   vueInstance.$el.innerHTML = '';
                 }
-                resolve([null]);
+                resolve(files.map(() => null));
               }
             }
           })
         });
       } catch (error) {
         // logger.error('Error while deleting a file', { error, source: file.source, node: file })
-        resolve([false]);
+        resolve(files.map(() => false));
       }
     });
   },
@@ -177095,9 +177107,8 @@ var __webpack_exports__ = {};
   !*** ./src/main.js ***!
   \*********************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _nextcloud_router__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @nextcloud/router */ "./node_modules/@nextcloud/router/dist/index.mjs");
-/* harmony import */ var _nextcloud_files__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @nextcloud/files */ "./node_modules/@nextcloud/files/dist/index.mjs");
-/* harmony import */ var _pdfAction_ts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pdfAction.ts */ "./src/pdfAction.ts");
+/* harmony import */ var _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @nextcloud/files */ "./node_modules/@nextcloud/files/dist/index.mjs");
+/* harmony import */ var _pdfAction_ts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pdfAction.ts */ "./src/pdfAction.ts");
 /**
  * @copyright Copyright (c) 2023 Immanuel Pasanec <i@pasanec.de>
  *
@@ -177121,13 +177132,41 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 
-
-(function () {
+const toFilesRuntimeAction = action => {
+  const runtimeAction = {
+    id: action.id,
+    displayName: action.displayName,
+    title: action.title,
+    iconSvgInline: action.iconSvgInline,
+    exec: action.exec
+  };
+  for (const property of ["enabled", "execBatch", "order", "hotkey", "destructive", "parent", "default", "inline", "renderInline"]) {
+    if (action[property] !== undefined) {
+      runtimeAction[property] = action[property];
+    }
+  }
+  return runtimeAction;
+};
+const registerInFilesRuntime = async action => {
+  try {
+    const filesModule = await import(/* webpackIgnore: true */"/dist/index-Dpj4ddZx.chunk.mjs");
+    if (typeof filesModule?.b === "function") {
+      filesModule.b(toFilesRuntimeAction(action));
+      return true;
+    }
+  } catch (error) {
+    window.console.error("Could not register PDF action in Files runtime", error);
+  }
+  return false;
+};
+(async function () {
   window.console.info("Registering PDF Merge action");
-  (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_1__.registerFileAction)(_pdfAction_ts__WEBPACK_IMPORTED_MODULE_2__.pdfAction);
+  if (!(await registerInFilesRuntime(_pdfAction_ts__WEBPACK_IMPORTED_MODULE_1__.pdfAction))) {
+    (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.registerFileAction)(_pdfAction_ts__WEBPACK_IMPORTED_MODULE_1__.pdfAction);
+  }
 })();
 })();
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=0410ee3d79df734a5f94
+//# sourceMappingURL=pdftool-main.js.map?v=8117f5225bea4230e34e
