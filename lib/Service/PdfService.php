@@ -77,13 +77,49 @@ class PdfService
 
 	public function merge(array $files, string $outputfile = ''): string
 	{
+		$files = $this->normalizeFileList($files);
+		if (sizeof($files) === 0) {
+			throw new Exception('No PDF files provided for merge.');
+		}
 		if ($this->model->batchCountPages($files) / sizeof($files) > $this->s->getMaxPageCount()) {
-			throw new Exception('Max page count of ' . $this->model->s->getMaxPageCount() . ' exceeded.');
+			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
 		}
 		if (sizeof($files) > $this->s->getMaxPdfs()) {
-			throw new Exception('Max PDF count of ' . $this->model->s->getMaxPdfs() . ' exceeded.');
+			throw new Exception('Max PDF count of ' . $this->s->getMaxPdfs() . ' exceeded.');
 		}
 		return $this->model->merge($files, $outputfile);
+	}
+
+	private function normalizeFileList(array $files): array
+	{
+		if (isset($files['_data']) && is_array($files['_data'])) {
+			return [$files];
+		}
+
+		if (isset($files['id'])) {
+			return [['_data' => ['id' => (int)$files['id']]]];
+		}
+
+		if (isset($files['nodes']) && is_array($files['nodes'])) {
+			return $this->normalizeFileList($files['nodes']);
+		}
+
+		$normalized = [];
+		foreach ($files as $file) {
+			if (is_string($file)) {
+				$decoded = json_decode($file, true);
+				if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+					$normalized = array_merge($normalized, $this->normalizeFileList($decoded));
+				}
+				continue;
+			}
+
+			if (is_array($file)) {
+				$normalized = array_merge($normalized, $this->normalizeFileList($file));
+			}
+		}
+
+		return $normalized;
 	}
 
 	public function split(array $file, array $splitPoints): bool

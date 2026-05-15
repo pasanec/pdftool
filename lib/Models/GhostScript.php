@@ -62,40 +62,61 @@ class GhostScript implements IPdf
 		$this->logger->log('::merge: $userSourceFolder name ' . $userSourceFolder->getName());
 		// Get file nodes array
 
-		$sourceData = $this->fs->copyToAppFolder($files);
-		$inputFolder = $sourceData[0];
-		$fileNodes = $sourceData[1];
-		$outputfile = rtrim($outputfile, '.PDF');
-		$outputfile = rtrim($outputfile, '.pdf');
+		$inputFolder = null;
+		$outputFolder = null;
+		$outputfile = preg_replace('/\.pdf$/i', '', $outputfile);
 		$outputfile .= '.pdf';
 
-		// Make output folder
-		$outputFolder = $this->fs->createFolder('output-merge-' . uniqid($this->userId));
-		$filePaths = ' ';
-		$appFolder = $this->fs->tellAppFolder();
-		foreach ($fileNodes as $fileNode) {
-			$filePaths .= $appFolder . $inputFolder->getName() . '/' . escapeshellarg($fileNode->getName()) . ' ';
+		try {
+			$sourceData = $this->fs->copyToAppFolder($files);
+			$inputFolder = $sourceData[0];
+			$fileNodes = $sourceData[1];
+
+			// Make output folder
+			$outputFolder = $this->fs->createFolder('output-merge-' . uniqid($this->userId));
+			$appFolder = $this->fs->tellAppFolder();
+			$filePaths = [];
+			foreach ($fileNodes as $fileNode) {
+				$filePaths[] = escapeshellarg($appFolder . $inputFolder->getName() . '/' . $fileNode->getName());
+			}
+			$outputPath = $appFolder . $outputFolder->getName() . '/' . $outputfile;
+
+			$command = sprintf(
+				'gs -dNOPAUSE -dQUIET -dBATCH -sDEVICE=pdfwrite -sOUTPUTFILE=%s %s',
+				escapeshellarg($outputPath),
+				implode(' ', $filePaths)
+			);
+
+			$this->logger->log('::merge: Executing: ' . $command);
+			exec($command, $cmdOutput, $return_var);
+
+			if ($return_var !== 0) {
+				$this->logger->log('::merge: GhostScript error: ' . implode("\n", $cmdOutput), ['level' => 'error']);
+				throw new Exception('PdfTools merge(): An error has occurred with GhostScript.');
+			}
+
+			if (!$outputFolder->fileExists($outputfile)) {
+				throw new Exception('PdfTools merge(): Could not find generated file.');
+			}
+
+			// Copy output file into user folder
+			$this->logger->log('::merge: outputFolder: ' . $outputFolder->getName());
+			$this->logger->log('::merge: userSourceFolder: ' . $userSourceFolder->getName());
+			$sourceFile = [];
+			$sourceFile[] = $outputFolder->getFile($outputfile);
+
+			$userFile = $this->fs->copyFilesToUserFolder($sourceFile, $userSourceFolder);
+			$this->logger->log('::merge: userFile size: ' . sizeof($userFile));
+
+			return $userFile[0]->getInternalPath();
+		} finally {
+			if ($inputFolder !== null) {
+				$inputFolder->delete();
+			}
+			if ($outputFolder !== null) {
+				$outputFolder->delete();
+			}
 		}
-		$outputPath = $appFolder . $outputFolder->getName() . '/' . escapeshellarg($outputfile) . ' ';
-
-		$this->logger->log('::merge: ' . 'gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . $outputPath . ' -dBATCH ' . $filePaths);
-		$result = shell_exec('gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=' . $outputPath . ' -dBATCH ' . $filePaths);
-		if ($result === NULL) {
-			throw new Exception('PdfTools merge(): An error has ocurred.');
-		}
-
-		// Copy output file into user folder
-		$this->logger->log('::merge: outputFolder: ' . $outputFolder->getName());
-		$this->logger->log('::merge: userSourceFolder: ' . $userSourceFolder->getName());
-		$sourceFile = [];
-		$sourceFile[] = $outputFolder->getFile($outputfile);
-
-		$userFile = $this->fs->copyFilesToUserFolder($sourceFile, $userSourceFolder);
-		$this->logger->log('::merge: userFile size: ' . sizeof($userFile));
-		$inputFolder->delete();
-		$outputFolder->delete();
-
-		return $userFile[0]->getInternalPath();
 	}
 
 	public function split(array $file, array $pageNumbers): bool
