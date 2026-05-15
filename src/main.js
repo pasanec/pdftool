@@ -19,11 +19,56 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import { generateFilePath } from "@nextcloud/router";
 import { registerFileAction } from "@nextcloud/files";
 import { pdfAction } from "./pdfAction.ts";
 
-(function () {
+const toFilesRuntimeAction = (action) => {
+  const runtimeAction = {
+    id: action.id,
+    displayName: action.displayName,
+    title: action.title,
+    iconSvgInline: action.iconSvgInline,
+    exec: action.exec,
+  };
+
+  for (const property of [
+    "enabled",
+    "execBatch",
+    "order",
+    "hotkey",
+    "destructive",
+    "parent",
+    "default",
+    "inline",
+    "renderInline",
+  ]) {
+    if (action[property] !== undefined) {
+      runtimeAction[property] = action[property];
+    }
+  }
+
+  return runtimeAction;
+};
+
+const registerInFilesRuntime = async (action) => {
+  try {
+    const filesModule = await import(
+      /* webpackIgnore: true */ "/dist/index-Dpj4ddZx.chunk.mjs"
+    );
+    if (typeof filesModule?.b === "function") {
+      filesModule.b(toFilesRuntimeAction(action));
+      return true;
+    }
+  } catch (error) {
+    window.console.error("Could not register PDF action in Files runtime", error);
+  }
+
+  return false;
+};
+
+(async function () {
   window.console.info("Registering PDF Merge action");
-  registerFileAction(pdfAction);
+  if (!(await registerInFilesRuntime(pdfAction))) {
+    registerFileAction(pdfAction);
+  }
 })();

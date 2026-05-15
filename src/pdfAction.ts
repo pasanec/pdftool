@@ -20,12 +20,11 @@
  *
  */
 
-import { Permission, Node, View, FileAction } from '@nextcloud/files'
-import { showInfo } from '@nextcloud/dialogs'
+import type { Node, View } from '@nextcloud/files'
+
+import { Permission, FileAction } from '@nextcloud/files'
 import { translate as t } from '@nextcloud/l10n'
 import { mdiFilePdfBox } from '@mdi/js'
-import { addNewFileMenuEntry, registerDavProperty, registerFileAction } from '@nextcloud/files'
-import { displayName } from './pdfHelper'
 
 // import Vue from 'vue'
 import Vue from 'vue'
@@ -37,23 +36,47 @@ declare module "*.vue" {
 import Merge from './Merge.vue'
 import Split from './Split.vue'
 
+type PdfActionContext = {
+	nodes: Node[]
+	view: View
+	folder?: {
+		path?: string
+	}
+	contents?: Node[]
+}
+
+const getNodes = (context: PdfActionContext | Node[]): Node[] => Array.isArray(context) ? context : context.nodes
+
+const isPdfNode = (node: Node): boolean => node.mime === 'application/pdf' || node.extension === '.pdf'
+
 export const pdfAction = new FileAction({
 	id: 'pdfmerge',
-	displayName: (files: Node[], view: View) => files.length > 1 ? t('pdftool', 'Merge PDF\'s') : t('pdftool', 'Split PDF'),
+	displayName: (context: PdfActionContext | Node[], view?: View) => {
+		const files = getNodes(context)
+		return files.length > 1 ? t('pdftool', 'Merge PDF\'s') : t('pdftool', 'Split PDF')
+	},
+	title: (context: PdfActionContext | Node[], view?: View) => {
+		const files = getNodes(context)
+		return files.length > 1 ? t('pdftool', 'Merge PDF\'s') : t('pdftool', 'Split PDF')
+	},
 	iconSvgInline: () => `<svg viewBox="0 0 24 24"><path d="${mdiFilePdfBox}" /></svg>`,
-	enabled(nodes: Node[]) {
-		window.console.info(nodes)
+	enabled(context: PdfActionContext | Node[]) {
+		const nodes = getNodes(context)
+		if (nodes.length === 0) {
+			return false
+		}
+
 		const dirname = nodes[0].dirname
 		return nodes.every(node =>
 			(node.permissions & Permission.DELETE) !== 0
-			&& node.extension === '.pdf'
+			&& isPdfNode(node)
 			&& node.dirname === dirname)
 	},
 
-	async exec(file: Node, view: View, dir: string): Promise<boolean | null> {
+	async exec(context: PdfActionContext | Node, view?: View, dir?: string): Promise<boolean | null> {
+		const file = 'nodes' in context ? context.nodes[0] : context
 		return new Promise(resolve => {
 			try {
-				console.info('PdfTool Multiselect action')
 				Vue.mixin({ methods: { t } })
 
 				const vueInstance = new Vue({
@@ -86,10 +109,10 @@ export const pdfAction = new FileAction({
 		})
 	},
 
-	async execBatch(files: Node[], view: View): Promise<(boolean | null)[]> {
+	async execBatch(context: PdfActionContext | Node[], view?: View): Promise<(boolean | null)[]> {
+		const files = getNodes(context)
 		return new Promise(resolve => {
 			try {
-				console.info('PdfTool Multiselect action')
 				Vue.mixin({ methods: { t } })
 
 				const vueInstance = new Vue({
@@ -104,24 +127,24 @@ export const pdfAction = new FileAction({
 								if (vueInstance.$el) {
 									vueInstance.$el.innerHTML = ''
 								}
-								resolve([success])
+								resolve(files.map(() => success))
 							},
 							closed: () => {
 								vueInstance.$destroy()
 								if (vueInstance.$el) {
 									vueInstance.$el.innerHTML = ''
 								}
-								resolve([null])
+								resolve(files.map(() => null))
 							},
 						},
 					}),
 				})
 			} catch (error) {
 				// logger.error('Error while deleting a file', { error, source: file.source, node: file })
-				resolve([false])
+				resolve(files.map(() => false))
 			}
 		})
 	},
 
 	order: 100,
-})
+} as any)
