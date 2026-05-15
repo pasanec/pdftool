@@ -15,7 +15,7 @@ The tool requires ghostscript to be installed on your server.]]></description>
     <category>tools</category>
     <bugs>https://github.com/pasanec/pdftool</bugs>
     <dependencies>
-        <nextcloud min-version="30" max-version="32"/>
+        <nextcloud min-version="30" max-version="33"/>
     </dependencies>
     <settings>
         <admin>OCA\PdfTool\Settings\Admin</admin>

@@ -8,7 +8,7 @@ Place this app in **nextcloud/apps/** directory.
 
 ### System Requirements
 
-- **Nextcloud**: Version 30-32
+- **Nextcloud**: Version 30-33
 - **PHP**: 8.0 or higher (recommended: 8.3+)
 - **Node.js**: Version 16+ (recommended: 20+)
 - **npm**: Latest version recommended
