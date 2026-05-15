@@ -87058,6 +87058,32 @@ __webpack_require__.r(__webpack_exports__);
     this.filename = this.files[0].basename.substring(0, this.files[0].basename.length - 4) + '-' + t('pdftool', 'merged') + '.pdf';
   },
   methods: {
+    getParentDirname(node) {
+      if (node.dirname) {
+        return node.dirname;
+      }
+      const filename = node.attributes?.filename;
+      if (!filename) {
+        return '/';
+      }
+      const root = node.root || filename.match(/^\/files\/[^/]+/)?.[0] || '';
+      const relativePath = root !== '' && filename.startsWith(root) ? filename.substring(root.length) : filename;
+      const index = relativePath.lastIndexOf('/');
+      return index > 0 ? relativePath.substring(0, index) : '/';
+    },
+    async refreshFolder(node) {
+      const dirname = this.getParentDirname(node);
+      const path = dirname === '/' ? _nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath : `${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`;
+      const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
+      const result = await client.stat(path, {
+        details: true,
+        data: (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetDefaultPropfind)()
+      });
+      const updatedNode = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davResultToNode)(result.data);
+      if (updatedNode.fileid) {
+        (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', updatedNode);
+      }
+    },
     async merge() {
       this.modal = false;
       this.merging = true;
@@ -87066,16 +87092,8 @@ __webpack_require__.r(__webpack_exports__);
         outputFile: this.filename
       };
       try {
-        const dirname = this.fileList[0].dirname;
         const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/merge'), data);
-        const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
-        client.stat(`${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`, {
-          details: true,
-          data: (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetDefaultPropfind)()
-        }).then(result => {
-          const node = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davResultToNode)(result.data);
-          (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', node);
-        });
+        await this.refreshFolder(this.fileList[0]);
         this.merging = false;
         this.$emit('processed', true);
       } catch (e) {
@@ -87270,6 +87288,32 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   methods: {
+    getParentDirname(node) {
+      if (node.dirname) {
+        return node.dirname;
+      }
+      const filename = node.attributes?.filename;
+      if (!filename) {
+        return '/';
+      }
+      const root = node.root || filename.match(/^\/files\/[^/]+/)?.[0] || '';
+      const relativePath = root !== '' && filename.startsWith(root) ? filename.substring(root.length) : filename;
+      const index = relativePath.lastIndexOf('/');
+      return index > 0 ? relativePath.substring(0, index) : '/';
+    },
+    async refreshFolder(node) {
+      const dirname = this.getParentDirname(node);
+      const path = dirname === '/' ? _nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath : `${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`;
+      const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
+      const result = await client.stat(path, {
+        details: true,
+        data: (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetDefaultPropfind)()
+      });
+      const updatedNode = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davResultToNode)(result.data);
+      if (updatedNode.fileid) {
+        (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', updatedNode);
+      }
+    },
     updatePageNumber(id, newValue) {
       let value;
       if (Number(newValue) >= this.pageCount) {
@@ -87311,16 +87355,8 @@ __webpack_require__.r(__webpack_exports__);
         outputFolder: this.filename
       };
       try {
-        const dirname = this.file.dirname;
         const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/split'), data);
-        const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
-        client.stat(`${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`, {
-          details: true,
-          data: (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetDefaultPropfind)()
-        }).then(result => {
-          const node = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davResultToNode)(result.data);
-          (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', node);
-        });
+        await this.refreshFolder(this.file);
         this.splitting = false;
         this.$emit('processed', true);
       } catch (e) {
@@ -177169,4 +177205,4 @@ const registerInFilesRuntime = async action => {
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=8117f5225bea4230e34e
+//# sourceMappingURL=pdftool-main.js.map?v=7411e1ee010bc5e6ddc3
