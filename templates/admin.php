@@ -44,11 +44,11 @@ style('pdftool', 'pdftool-admin');
 		<h3><?php p($l->t('Limits')); ?></h3>
 		<div>
 			<label for="pdftool_max_pages"><?php p($l->t('PDF max page count')); ?></label>
-			<input type="number" id="pdftool_max_pages" value="<?php p($_['pdfToolMaxPages']); ?>">
+			<input type="number" id="pdftool_max_pages" min="1" value="<?php p($_['pdfToolMaxPages']); ?>">
 		</div>
 		<div>
 			<label for="pdftool_max_pdfs"><?php p($l->t('Max number of PDF\'s for batch processing')); ?></label>
-			<input type="number" id="pdftool_max_pdfs" value="<?php p($_['pdfToolMaxPdfs']); ?>">
+			<input type="number" id="pdftool_max_pdfs" min="1" value="<?php p($_['pdfToolMaxPdfs']); ?>">
 		</div>
 	</div>
 </div>

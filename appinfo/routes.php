@@ -30,5 +30,6 @@ return [
 		['name' => 'pdf#preview', 'url' => '/preview', 'verb' => 'POST'],
 		['name' => 'pdf#renderStatus', 'url' => '/status/{uuid}', 'verb' => 'GET'],
 		['name' => 'pdf#pageCount', 'url' => '/pagecount/{fileid}', 'verb' => 'GET'],
+		['name' => 'settings#updateAdmin', 'url' => '/settings/admin', 'verb' => 'POST'],
 	]
 ];
