@@ -29,6 +29,7 @@ use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 
 class PdfController extends Controller
 {
@@ -56,9 +57,7 @@ class PdfController extends Controller
 		$this->pdf = $pdf;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function merge(array $fileList, string $outputFile = ''): DataResponse
 	{
 
@@ -67,9 +66,7 @@ class PdfController extends Controller
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function split(string | array $file, array $pageNumbers, string $outputFolder = ''): DataResponse
 	{
 		return $this->handleExceptions(function () use ($file, $pageNumbers, $outputFolder) {
@@ -77,18 +74,14 @@ class PdfController extends Controller
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function sort(string $file): DataResponse
 	{
 		$filename = ['sorted.pdf',];
 		return new DataResponse($filename);
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function pageCount(int $fileid): DataResponse
 	{
 		return $this->handleExceptions(function () use ($fileid) {
@@ -96,9 +89,7 @@ class PdfController extends Controller
 		});
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
+	#[NoAdminRequired]
 	public function preview(array $request): DataResponse
 	{
 		$thumbnails = [

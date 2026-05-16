@@ -8,7 +8,7 @@ import type { Node, View } from '@nextcloud/files'
 import { emit } from '@nextcloud/event-bus'
 import { FileType } from '@nextcloud/files'
 import { getCapabilities } from '@nextcloud/capabilities'
-import { n, t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import axios from '@nextcloud/axios'
 
 export const isTrashbinEnabled = () => (getCapabilities() as Capabilities)?.files?.undelete === true
@@ -100,29 +100,6 @@ export const displayName = (nodes: Node[], view: View) => {
 
 	return t('files', 'Delete')
 }
-
-// export const askConfirmation = async (nodes: Node[], view: View) => {
-// 	const message = view.id === 'trashbin' || !isTrashbinEnabled()
-// 		? n('files', 'You are about to permanently delete {count} item', 'You are about to permanently delete {count} items', nodes.length, { count: nodes.length })
-// 		: n('files', 'You are about to delete {count} item', 'You are about to delete {count} items', nodes.length, { count: nodes.length })
-//
-// 	return new Promise<boolean>(resolve => {
-// 		// TODO: Use the new dialog API
-// 		window.OC.dialogs.confirmDestructive(
-// 			message,
-// 			t('files', 'Confirm deletion'),
-// 			{
-// 				type: window.OC.dialogs.YES_NO_BUTTONS,
-// 				confirm: displayName(nodes, view),
-// 				confirmClasses: 'error',
-// 				cancel: t('files', 'Cancel'),
-// 			},
-// 			(decision: boolean) => {
-// 				resolve(decision)
-// 			},
-// 		)
-// 	})
-// }
 
 export const deleteNode = async (node: Node) => {
 	await axios.delete(node.encodedSource)

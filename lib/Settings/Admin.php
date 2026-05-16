@@ -5,18 +5,15 @@ declare(strict_types=1);
 namespace OCA\PdfTool\Settings;
 
 use OCA\PdfTool\Service\SettingsService;
-use OCP\IConfig;
 use OCP\Settings\ISettings;
 use OCP\AppFramework\Http\TemplateResponse;
 
 class Admin implements ISettings
 {
-	private IConfig $config;
 	private SettingsService $settingsService;
 
-	public function __construct(IConfig $config, SettingsService $settingsService)
+	public function __construct(SettingsService $settingsService)
 	{
-		$this->config = $config;
 		$this->settingsService = $settingsService;
 	}
 

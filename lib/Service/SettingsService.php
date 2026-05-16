@@ -25,32 +25,30 @@ declare(strict_types=1);
 
 namespace OCA\PdfTool\Service;
 
-use OCP\IConfig;
+use OCP\AppFramework\Services\IAppConfig;
 
 class SettingsService
 {
-	private IConfig $config;
-	private string $appName;
+	private IAppConfig $config;
 
-	public function __construct(IConfig $config, string $appName)
+	public function __construct(IAppConfig $config)
 	{
 		$this->config = $config;
-		$this->appName = $appName;
 	}
 
 	public function getEngine(): string
 	{
-		return $this->config->getAppValue($this->appName, 'pdf_tool_engine', 'tcpdf');
+		return $this->config->getAppValueString('pdf_tool_engine', 'tcpdf');
 	}
 
 	public function setEngine(string $engine): void
 	{
-		$this->config->setAppValue($this->appName, 'pdf_tool_engine', $engine);
+		$this->config->setAppValueString('pdf_tool_engine', $engine);
 	}
 
 	public function getMaxPages(): int
 	{
-		return (int)$this->config->getAppValue($this->appName, 'pdf_tool_max_pages', '60');
+		return $this->config->getAppValueInt('pdf_tool_max_pages', 60);
 	}
 
 	public function getMaxPageCount(): int
@@ -60,17 +58,17 @@ class SettingsService
 
 	public function setMaxPages(int $maxPages): void
 	{
-		$this->config->setAppValue($this->appName, 'pdf_tool_max_pages', $maxPages);
+		$this->config->setAppValueInt('pdf_tool_max_pages', $maxPages);
 	}
 
 	public function getMaxPdfs(): int
 	{
-		return (int)$this->config->getAppValue($this->appName, 'pdf_tool_max_pdfs', '10');
+		return $this->config->getAppValueInt('pdf_tool_max_pdfs', 10);
 	}
 
 	public function setMaxPdfs(int $maxPdfs): void
 	{
-		$this->config->setAppValue($this->appName, 'pdf_tool_max_pdfs', $maxPdfs);
+		$this->config->setAppValueInt('pdf_tool_max_pdfs', $maxPdfs);
 	}
 
 	public function isGsAvailable(): bool

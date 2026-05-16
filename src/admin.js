@@ -1,39 +1,34 @@
-(function () {
-	'use strict'
+import axios from '@nextcloud/axios'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { translate as t } from '@nextcloud/l10n'
+import { generateUrl } from '@nextcloud/router'
 
-	$(document).ready(function () {
-		const adminUrl = OC.generateUrl('/apps/pdftool/settings/admin')
-		const $engineInputs = $('#pdftool_engine_setting input[type="radio"]')
-		const $maxPagesInput = $('#pdftool_max_pages')
-		const $maxPdfsInput = $('#pdftool_max_pdfs')
+document.addEventListener('DOMContentLoaded', () => {
+	const adminUrl = generateUrl('/apps/pdftool/settings/admin')
+	const engineInputs = Array.from(document.querySelectorAll('#pdftool_engine_setting input[type="radio"]'))
+	const maxPagesInput = document.querySelector('#pdftool_max_pages')
+	const maxPdfsInput = document.querySelector('#pdftool_max_pdfs')
 
-		const saveSettings = async function () {
-			$.ajax({
-				url: adminUrl,
-				method: 'POST',
-				contentType: 'application/json',
-				headers: {
-					requesttoken: OC.requestToken,
-				},
-				data: JSON.stringify({
-					engine: $engineInputs.filter(':checked').val(),
-					maxPages: Number($maxPagesInput.val()),
-					maxPdfs: Number($maxPdfsInput.val()),
-				}),
-				success: function () {
-					OC.Notification.showTemporary(OC.L10N.translate('pdftool', 'PDF Tool settings saved.'))
-				},
-				error: function (response) {
-					const message = response.responseJSON?.message
-						|| OC.L10N.translate('pdftool', 'Could not save PDF Tool settings.')
-					OC.Notification.showTemporary(message)
-				},
+	if (maxPagesInput === null || maxPdfsInput === null) {
+		return
+	}
+
+	const saveSettings = async () => {
+		const checkedEngine = engineInputs.find(input => input.checked)
+
+		try {
+			await axios.post(adminUrl, {
+				engine: checkedEngine?.value,
+				maxPages: Number(maxPagesInput.value),
+				maxPdfs: Number(maxPdfsInput.value),
 			})
+			showSuccess(t('pdftool', 'PDF Tool settings saved.'))
+		} catch (error) {
+			showError(error.response?.data?.message || t('pdftool', 'Could not save PDF Tool settings.'))
 		}
+	}
 
-		$engineInputs.change(saveSettings)
-		$maxPagesInput.change(saveSettings)
-		$maxPdfsInput.change(saveSettings)
-	})
-
-})()
+	engineInputs.forEach(input => input.addEventListener('change', saveSettings))
+	maxPagesInput.addEventListener('change', saveSettings)
+	maxPdfsInput.addEventListener('change', saveSettings)
+})

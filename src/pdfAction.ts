@@ -3,7 +3,7 @@
  *
  * @author Immanuel Pasanec <i@pasanec.de>
  *
- * @license GNU AGPL version 3 or any later version
+ * @license AGPL-3.0-or-later
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -28,13 +28,13 @@ import { mdiFilePdfBox } from '@mdi/js'
 
 // import Vue from 'vue'
 import Vue from 'vue'
-declare module "*.vue" {
+import Merge from './Merge.vue'
+import Split from './Split.vue'
+declare module '*.vue' {
 	interface VueConstructor {
 		// You can add properties or methods here if needed
 	}
 }
-import Merge from './Merge.vue'
-import Split from './Split.vue'
 
 type PdfActionContext = {
 	nodes: Node[]
@@ -59,11 +59,11 @@ const isPdfNode = (node: Node): boolean => node.mime === 'application/pdf' || no
 
 export const pdfAction = new FileAction({
 	id: 'pdfmerge',
-	displayName: (context: PdfActionContext | Node[], view?: View) => {
+	displayName: (context: PdfActionContext | Node[]) => {
 		const files = getNodes(context)
 		return files.length > 1 ? t('pdftool', 'Merge PDF\'s') : t('pdftool', 'Split PDF')
 	},
-	title: (context: PdfActionContext | Node[], view?: View) => {
+	title: (context: PdfActionContext | Node[]) => {
 		const files = getNodes(context)
 		return files.length > 1 ? t('pdftool', 'Merge PDF\'s') : t('pdftool', 'Split PDF')
 	},
@@ -81,7 +81,7 @@ export const pdfAction = new FileAction({
 			&& node.dirname === dirname)
 	},
 
-	async exec(context: PdfActionContext | Node, view?: View, dir?: string): Promise<boolean | null> {
+	async exec(context: PdfActionContext | Node): Promise<boolean | null> {
 		const file = getSingleNode(context)
 		return new Promise(resolve => {
 			try {
@@ -91,7 +91,7 @@ export const pdfAction = new FileAction({
 					el: '#pdftool-content',
 					render: h => h(Split, {
 						props: {
-							file: file,
+							file,
 						},
 						on: {
 							processed: (success: boolean) => {
@@ -132,7 +132,7 @@ export const pdfAction = new FileAction({
 					el: '#pdftool-content',
 					render: h => h(Merge, {
 						props: {
-							files: files,
+							files,
 						},
 						on: {
 							processed: (success: boolean) => {

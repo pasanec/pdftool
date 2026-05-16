@@ -21,54 +21,69 @@
 
 <template>
 	<div id="pdftool-content" class="app-pdftool">
-		<NcModal
-			v-if="modal"
-			@close="closeModal"
+		<NcModal v-if="modal"
 			class="pdftool-modal"
 			size="normal"
-						:name="t('pdftool', 'Merge PDF\'s')"
-			:outTransition="true">
-						<h2>{{ t('pdftool', 'Merge PDF\'s') }}</h2>
+			:name="t('pdftool', 'Merge PDF\'s')"
+			:out-transition="true"
+			@close="closeModal">
+			<h2>{{ t('pdftool', 'Merge PDF\'s') }}</h2>
 			<div class="pdftool-filename">
 				<label for="filename">{{ t('pdftool', 'Output file') }}</label>
-				<input v-model="filename" id="filename"/>
+				<input id="filename" v-model="filename">
 			</div>
-			<draggable class="desk" v-model="fileList" group="files" @start="drag=true" @end="drag=false">
-   			<div class="document" v-for="element in fileList" :key="element.id">
-				<div class="mime-pdf"></div>
-				<div class="filename">{{element.displayname}}</div>
-			</div>
+			<draggable v-model="fileList"
+				class="desk"
+				group="files"
+				@start="drag=true"
+				@end="drag=false">
+				<div v-for="element in fileList" :key="element.id" class="document">
+					<div class="mime-pdf" />
+					<div class="filename">
+						{{ element.displayname }}
+					</div>
+				</div>
 			</draggable>
 			<div class="buttons">
-				<NcButton
-					@click="merge"
-					:disabled="false"
+				<NcButton :disabled="false"
 					:readonly="false"
-					type="primary">
-										<template>{{ t('pdftool', 'Merge') }}</template>
+					type="button"
+					variant="primary"
+					@click="merge">
+					{{ t('pdftool', 'Merge') }}
 				</NcButton>
-				<NcButton
-					@click="closeModal"
-					:disabled="false"
+				<NcButton :disabled="false"
 					:readonly="false"
-					type="primary">
-					<template>{{ t('pdftool', 'Cancel') }}</template>
+					type="button"
+					variant="primary"
+					@click="closeModal">
+					{{ t('pdftool', 'Cancel') }}
 				</NcButton>
 			</div>
 		</NcModal>
-				<NcModal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :name="t('pdftool', 'Error')" :outTransition="true">
-			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
+		<NcModal v-if="error"
+			class="pdftool-modal"
+			size="normal"
+			:name="t('pdftool', 'Error')"
+			:out-transition="true"
+			@close="closeModal">
+			<div class="modal-error">
+				<h2>{{ t('pdftool', 'An error has occurred.') }}</h2>
+			</div>
 			<div class="buttons">
-				<NcButton
-					@click="closeModal"
-					:disabled="false"
+				<NcButton :disabled="false"
 					:readonly="false"
-					type="primary">
-					<template>{{ t('pdftool', 'OK') }}</template>
+					type="button"
+					variant="primary"
+					@click="closeModal">
+					{{ t('pdftool', 'OK') }}
 				</NcButton>
 			</div>
 		</NcModal>
-		<NcModal v-if="merging" :show-close="false" class="pdftool-modal" size="normal">
+		<NcModal v-if="merging"
+			no-close
+			class="pdftool-modal"
+			size="normal">
 			<div class="loading-container">
 				<NcLoadingIcon :size="64" appearance="dark" />
 				<p>{{ t('pdftool', 'Merging...') }}</p>
@@ -78,7 +93,7 @@
 </template>
 
 <script>
-import { NcActionButton, NcAppContent, NcAppNavigation, NcAppNavigationItem, NcAppNavigationNew, NcButton, NcModal} from '@nextcloud/vue'
+import { NcButton, NcModal } from '@nextcloud/vue'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import draggable from 'vuedraggable'
 
@@ -87,22 +102,22 @@ import '@nextcloud/dialogs/style.css'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
-import { davGetClient, davGetDefaultPropfind, davResultToNode, davRootPath } from '@nextcloud/files'
+import { defaultRootPath as davRootPath, getClient as davGetClient, getDefaultPropfind as davGetDefaultPropfind, resultToNode as davResultToNode } from '@nextcloud/files/dav'
 import { emit } from '@nextcloud/event-bus'
-
 
 export default {
 	name: 'Merge',
 	components: {
-		NcActionButton,
-		NcAppContent,
-		NcAppNavigation,
-		NcAppNavigationItem,
-		NcAppNavigationNew,
 		NcButton,
 		NcModal,
 		draggable,
 		NcLoadingIcon,
+	},
+	props: {
+		files: {
+			type: Array,
+			required: true,
+		},
 	},
 	data() {
 		return {
@@ -116,9 +131,6 @@ export default {
 			fileList: [],
 			filename: '',
 		}
-	},
-	props: {
-		files: [],
 	},
 	computed: {
 	},
@@ -170,7 +182,7 @@ export default {
 				outputFile: this.filename,
 			}
 			try {
-				const response = await axios.post(generateUrl('/apps/pdftool/merge'), data)
+				await axios.post(generateUrl('/apps/pdftool/merge'), data)
 				await this.refreshFolder(this.fileList[0])
 				this.merging = false
 				this.$emit('processed', true)
@@ -186,7 +198,7 @@ export default {
 		},
 		/**
 		 * Create a new note and focus the note content field automatically
-		 * @param {Object} note Note object
+		 * @param {object} note Note object
 		 */
 		openNote(note) {
 			if (this.updating) {
@@ -235,7 +247,7 @@ export default {
 		},
 		/**
 		 * Create a new note by sending the information to the server
-		 * @param {Object} note Note object
+		 * @param {object} note Note object
 		 */
 		async createNote(note) {
 			this.updating = true
@@ -252,7 +264,7 @@ export default {
 		},
 		/**
 		 * Update an existing note on the server
-		 * @param {Object} note Note object
+		 * @param {object} note Note object
 		 */
 		async updateNote(note) {
 			this.updating = true
@@ -266,7 +278,7 @@ export default {
 		},
 		/**
 		 * Delete a note, remove it from the frontend and show a hint
-		 * @param {Object} note Note object
+		 * @param {object} note Note object
 		 */
 		async deleteNote(note) {
 			try {

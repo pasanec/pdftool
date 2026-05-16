@@ -21,83 +21,99 @@
 
 <template>
 	<div id="pdftool-content" class="app-pdftool">
-		<NcModal
-			v-if="modal"
-			@close="closeModal"
+		<NcModal v-if="modal"
 			class="pdftool-modal"
 			size="normal"
-						:name="t('pdftool', 'Split PDF\'s')"
-			:outTransition="true">
-						<h2>{{ t('pdftool', 'Split PDF\'s') }}</h2>
+			:name="t('pdftool', 'Split PDF\'s')"
+			:out-transition="true"
+			@close="closeModal">
+			<h2>{{ t('pdftool', 'Split PDF\'s') }}</h2>
 			<div class="pdftool-filename">
 				<label for="filename">{{ t('pdftool', 'Output folder') }}</label>
-				<input
+				<input id="filename"
 					v-model="filename"
-					id="filename"
 					required
-					:aria-invalid="folderNameInvalid ? 'true' : 'false'" />
+					:aria-invalid="folderNameInvalid ? 'true' : 'false'">
 				<div v-if="folderNameInvalid" class="filename-warning">
 					{{ t('pdftool', 'Output folder is required.') }}
 				</div>
 			</div>
 			<div class="desk">
-   			<div class="document" v-for="(pageNumber, id) in pageNumbers" :key="id">
-				<div class="mime-pdf"></div>
-				<div class="filename" v-if="warnId !== id" >{{ t('pdftool', 'Page split point') }}</div>
-				<div class="pagewarning filename" v-if="warnId === id" >{{ warnMessage }}</div>
-				<input type="number" :value="pageNumbers[id]" @change="updatePageNumber(id, $event.target.value)" min="1" class="page-number-input" />
-				<div class="filename pagenum">/ {{pageNumber + 1}}</div>
-				<NcButton
-					@click="removePageNumber(id)"
-					:aria-label="t('pdftool', 'Remove split point.')"
-					:disabled="false"
-					:readonly="false"
-					:size="'small'"
-					variant="tertiary">
-					&times;
-				</NcButton>
-			</div>
-			<div class="add-button-container">
-				<NcButton
-					@click="addPageNumber"
-					:aria-label="t('pdftool', 'Add split point.')"
-					:disabled="warnId === null ? false : true"
-					:size="'normal'"
-					variant="tertiary">
-				<Plus :size="20" />
-		</NcButton>
-			</div>
+				<div v-for="(pageNumber, id) in pageNumbers" :key="id" class="document">
+					<div class="mime-pdf" />
+					<div v-if="warnId !== id" class="filename">
+						{{ t('pdftool', 'Page split point') }}
+					</div>
+					<div v-if="warnId === id" class="pagewarning filename">
+						{{ warnMessage }}
+					</div>
+					<input type="number"
+						:value="pageNumbers[id]"
+						min="1"
+						class="page-number-input"
+						@change="updatePageNumber(id, $event.target.value)">
+					<div class="filename pagenum">
+						/ {{ pageNumber + 1 }}
+					</div>
+					<NcButton :aria-label="t('pdftool', 'Remove split point.')"
+						:disabled="false"
+						:readonly="false"
+						:size="'small'"
+						variant="tertiary"
+						@click="removePageNumber(id)">
+						&times;
+					</NcButton>
+				</div>
+				<div class="add-button-container">
+					<NcButton :aria-label="t('pdftool', 'Add split point.')"
+						:disabled="warnId === null ? false : true"
+						:size="'normal'"
+						variant="tertiary"
+						@click="addPageNumber">
+						<Plus :size="20" />
+					</NcButton>
+				</div>
 			</div>
 			<div class="buttons">
-				<NcButton
-					@click="split"
-					:disabled="!canSplit"
+				<NcButton :disabled="!canSplit"
 					:readonly="false"
-					type="primary">
-										<template>{{ t('pdftool', 'Split') }}</template>
+					type="button"
+					variant="primary"
+					@click="split">
+					{{ t('pdftool', 'Split') }}
 				</NcButton>
-				<NcButton
-					@click="closeModal"
-					:disabled="false"
+				<NcButton :disabled="false"
 					:readonly="false"
-					type="primary">
-					<template>{{ t('pdftool', 'Cancel') }}</template>
+					type="button"
+					variant="primary"
+					@click="closeModal">
+					{{ t('pdftool', 'Cancel') }}
 				</NcButton>
 			</div>
 		</NcModal>
-				<NcModal v-if="error" @close="closeModal" class="pdftool-modal" size="normal" :name="t('pdftool', 'Error')" :outTransition="true">
-			<div class="modal-error"><h2>{{ t('pdftool', 'An error has occurred.') }}</h2></div>
+		<NcModal v-if="error"
+			class="pdftool-modal"
+			size="normal"
+			:name="t('pdftool', 'Error')"
+			:out-transition="true"
+			@close="closeModal">
+			<div class="modal-error">
+				<h2>{{ t('pdftool', 'An error has occurred.') }}</h2>
+			</div>
 			<div class="buttons">
-				<NcButton
-					@click="closeModal"
-					:disabled="false"
+				<NcButton :disabled="false"
 					:readonly="false"
-					type="primary">
-					<template>{{ t('pdftool', 'OK') }}</template>
+					type="button"
+					variant="primary"
+					@click="closeModal">
+					{{ t('pdftool', 'OK') }}
 				</NcButton>
 			</div>
 		</NcModal>
-		<NcModal v-if="splitting" :show-close="false" class="pdftool-modal" size="normal">
+		<NcModal v-if="splitting"
+			no-close
+			class="pdftool-modal"
+			size="normal">
 			<div class="loading-container">
 				<NcLoadingIcon :size="64" appearance="dark" />
 				<p>{{ t('pdftool', 'Splitting...') }}</p>
@@ -107,7 +123,7 @@
 </template>
 
 <script>
-import { NcActionButton, NcAppContent, NcAppNavigation, NcAppNavigationItem, NcAppNavigationNew, NcButton, NcModal} from '@nextcloud/vue'
+import { NcButton, NcModal } from '@nextcloud/vue'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import Plus from 'vue-material-design-icons/Plus.vue'
 // import draggable from 'vuedraggable' // Removed draggable
@@ -115,24 +131,24 @@ import Plus from 'vue-material-design-icons/Plus.vue'
 // import '@nextcloud/dialogs/styles/toast.scss'
 import '@nextcloud/dialogs/style.css'
 import { generateUrl } from '@nextcloud/router'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
-import { davGetClient, davGetDefaultPropfind, davResultToNode, davRootPath } from '@nextcloud/files'
+import { defaultRootPath as davRootPath, getClient as davGetClient, getDefaultPropfind as davGetDefaultPropfind, resultToNode as davResultToNode } from '@nextcloud/files/dav'
 import { emit } from '@nextcloud/event-bus'
-
 
 export default {
 	name: 'Split',
 	components: {
-		NcActionButton,
-		NcAppContent,
-		NcAppNavigation,
-		NcAppNavigationItem,
-		NcAppNavigationNew,
 		NcButton,
 		NcModal,
 		NcLoadingIcon,
 		Plus,
+	},
+	props: {
+		file: {
+			type: Object,
+			required: true,
+		},
 	},
 	data() {
 		return {
@@ -149,9 +165,6 @@ export default {
 			pageCount: 0,
 		}
 	},
-	props: {
-		file: {},
-	},
 	computed: {
 		folderNameInvalid() {
 			return this.filename.trim() === ''
@@ -161,7 +174,6 @@ export default {
 		},
 	},
 	async mounted() {
-		this.file= this.file
 		this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/'
 		axios.get(generateUrl('/apps/pdftool/pagecount/' + this.file.fileid)).then((response) => {
 			this.pageCount = response.data
@@ -215,7 +227,7 @@ export default {
 			} else {
 				value = Number(newValue)
 			}
-			
+
 			this.warnId = null
 
 			if (isNaN(value) || !Number.isInteger(value) || value < 1) {
@@ -253,7 +265,7 @@ export default {
 				outputFolder: this.filename.trim(),
 			}
 			try {
-				const response = await axios.post(generateUrl('/apps/pdftool/split'), data)
+				await axios.post(generateUrl('/apps/pdftool/split'), data)
 				await this.refreshFolder(this.file)
 				this.splitting = false
 				this.$emit('processed', true)
