@@ -81,11 +81,15 @@ class PdfService
 		if (sizeof($files) === 0) {
 			throw new Exception('No PDF files provided for merge.');
 		}
-		if ($this->model->batchCountPages($files) / sizeof($files) > $this->s->getMaxPageCount()) {
-			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
+		$maxPageCount = $this->s->getMaxPageCount();
+		$averagePageCount = $this->model->batchCountPages($files) / sizeof($files);
+		if ($averagePageCount > $maxPageCount) {
+			throw new MaxPageCountExceeded('The selected PDFs average ' . round($averagePageCount, 1) . ' pages per file, but the configured limit is ' . $maxPageCount . ' ' . $this->formatPages($maxPageCount) . '.');
 		}
-		if (sizeof($files) > $this->s->getMaxPdfs()) {
-			throw new Exception('Max PDF count of ' . $this->s->getMaxPdfs() . ' exceeded.');
+		$maxPdfs = $this->s->getMaxPdfs();
+		$fileCount = sizeof($files);
+		if ($fileCount > $maxPdfs) {
+			throw new MaxPdfCountExceeded('You selected ' . $fileCount . ' ' . $this->formatPdfs($fileCount) . ', but the configured limit is ' . $maxPdfs . ' ' . $this->formatPdfs($maxPdfs) . '.');
 		}
 		return $this->model->merge($files, $outputfile);
 	}
@@ -166,10 +170,21 @@ class PdfService
 	{
 		$file = $this->normalizeFile($file);
 		$pageCount = $this->countPages($file['_data']['id']);
-		if ($pageCount > $this->s->getMaxPageCount()) {
-			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
+		$maxPageCount = $this->s->getMaxPageCount();
+		if ($pageCount > $maxPageCount) {
+			throw new MaxPageCountExceeded('The selected PDF has ' . $pageCount . ' ' . $this->formatPages($pageCount) . ', but the configured limit is ' . $maxPageCount . ' ' . $this->formatPages($maxPageCount) . '.');
 		}
 		return $this->model->split($file, $splitPoints, $outputFolder);
+	}
+
+	private function formatPages(int $count): string
+	{
+		return $count === 1 ? 'page' : 'pages';
+	}
+
+	private function formatPdfs(int $count): string
+	{
+		return $count === 1 ? 'PDF' : 'PDFs';
 	}
 
 	public function countPages(int $fileId): int

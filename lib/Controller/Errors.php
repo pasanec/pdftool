@@ -10,6 +10,8 @@ use OCP\Files\NotPermittedException;
 
 use OCA\PdfTool\Service\EmptyFilesArray;
 use OCA\PdfTool\Service\FilesNotInSameFolder;
+use OCA\PdfTool\Service\MaxPageCountExceeded;
+use OCA\PdfTool\Service\MaxPdfCountExceeded;
 use OCA\PdfTool\Service\NoReadPermissionInFolder;
 
 trait Errors {
@@ -28,6 +30,12 @@ trait Errors {
         } catch (NotPermittedException $e) {
             $message = ['message' => 'NotPermittedException'];
 			return new DataResponse($message, Http::STATUS_OK);
+        } catch (MaxPageCountExceeded $e) {
+            $message = ['code' => 'MaxPageCountExceeded', 'message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
+        } catch (MaxPdfCountExceeded $e) {
+            $message = ['code' => 'MaxPdfCountExceeded', 'message' => $e->getMessage()];
+			return new DataResponse($message, Http::STATUS_BAD_REQUEST);
         }
 	}
 }

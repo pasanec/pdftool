@@ -176,10 +176,13 @@ export default {
 				this.$emit('processed', true)
 			} catch (e) {
 				console.error(e)
-				showError(t('pdftool', 'Could not merge PDF.'))
+				showError(this.getErrorMessage(e, t('pdftool', 'Could not merge PDF.')))
 				this.merging = false
 				this.$emit('processed', false)
 			}
+		},
+		getErrorMessage(error, fallback) {
+			return error.response?.data?.message || fallback
 		},
 		/**
 		 * Create a new note and focus the note content field automatically

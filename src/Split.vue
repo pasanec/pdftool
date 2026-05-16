@@ -259,10 +259,13 @@ export default {
 				this.$emit('processed', true)
 			} catch (e) {
 				console.error(e)
-				showError(t('pdftool', 'Could not split PDF.'))
+				showError(this.getErrorMessage(e, t('pdftool', 'Could not split PDF.')))
 				this.splitting = false
 				this.$emit('processed', false)
 			}
+		},
+		getErrorMessage(error, fallback) {
+			return error.response?.data?.message || fallback
 		},
 		addPageNumber() {
 			if (this.pageNumbers.length === this.pageCount - 1) {
