@@ -176741,6 +176741,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const getNodes = context => Array.isArray(context) ? context : context.nodes;
+const getSingleNode = context => {
+  if (Array.isArray(context)) {
+    return context[0];
+  }
+  return 'nodes' in context ? context.nodes[0] : context;
+};
 const isPdfNode = node => node.mime === 'application/pdf' || node.extension === '.pdf';
 const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
   id: 'pdfmerge',
@@ -176762,7 +176768,7 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
     return nodes.every(node => (node.permissions & _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.Permission.DELETE) !== 0 && isPdfNode(node) && node.dirname === dirname);
   },
   async exec(context, view, dir) {
-    const file = 'nodes' in context ? context.nodes[0] : context;
+    const file = getSingleNode(context);
     return new Promise(resolve => {
       try {
         vue__WEBPACK_IMPORTED_MODULE_3__["default"].mixin({
@@ -176801,6 +176807,10 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
   },
   async execBatch(context, view) {
     const files = getNodes(context);
+    if (files.length === 1) {
+      const success = await this.exec(files[0], view);
+      return [success];
+    }
     return new Promise(resolve => {
       try {
         vue__WEBPACK_IMPORTED_MODULE_3__["default"].mixin({
@@ -177230,4 +177240,4 @@ const registerInFilesRuntime = async action => {
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=bef3174bc354f6d6bcd8
+//# sourceMappingURL=pdftool-main.js.map?v=8d6fe057dbc8e01e2b46
