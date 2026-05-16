@@ -87098,10 +87098,13 @@ __webpack_require__.r(__webpack_exports__);
         this.$emit('processed', true);
       } catch (e) {
         console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not merge PDF.'));
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(this.getErrorMessage(e, t('pdftool', 'Could not merge PDF.')));
         this.merging = false;
         this.$emit('processed', false);
       }
+    },
+    getErrorMessage(error, fallback) {
+      return error.response?.data?.message || fallback;
     },
     /**
      * Create a new note and focus the note content field automatically
@@ -87371,10 +87374,13 @@ __webpack_require__.r(__webpack_exports__);
         this.$emit('processed', true);
       } catch (e) {
         console.error(e);
-        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(t('pdftool', 'Could not split PDF.'));
+        (0,_nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__.showError)(this.getErrorMessage(e, t('pdftool', 'Could not split PDF.')));
         this.splitting = false;
         this.$emit('processed', false);
       }
+    },
+    getErrorMessage(error, fallback) {
+      return error.response?.data?.message || fallback;
     },
     addPageNumber() {
       if (this.pageNumbers.length === this.pageCount - 1) {
@@ -177224,4 +177230,4 @@ const registerInFilesRuntime = async action => {
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=05e71a5ecec3d488ce1b
+//# sourceMappingURL=pdftool-main.js.map?v=bef3174bc354f6d6bcd8
