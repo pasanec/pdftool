@@ -87273,7 +87273,14 @@ __webpack_require__.r(__webpack_exports__);
   props: {
     file: {}
   },
-  computed: {},
+  computed: {
+    folderNameInvalid() {
+      return this.filename.trim() === '';
+    },
+    canSplit() {
+      return !this.folderNameInvalid && Object.keys(this.pageNumbers).length > 0 && this.warnId === null;
+    }
+  },
   async mounted() {
     this.file = this.file;
     this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/';
@@ -87347,12 +87354,15 @@ __webpack_require__.r(__webpack_exports__);
     },
     async split() {
       // Renamed from merge
+      if (!this.canSplit) {
+        return;
+      }
       this.modal = false;
       this.splitting = true;
       const data = {
         file: this.file,
         pageNumbers: this.pageNumbers,
-        outputFolder: this.filename
+        outputFolder: this.filename.trim()
       };
       try {
         const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/split'), data);
@@ -87583,7 +87593,9 @@ var render = function render() {
       expression: "filename"
     }],
     attrs: {
-      id: "filename"
+      id: "filename",
+      required: "",
+      "aria-invalid": _vm.folderNameInvalid ? "true" : "false"
     },
     domProps: {
       value: _vm.filename
@@ -87594,7 +87606,9 @@ var render = function render() {
         _vm.filename = $event.target.value;
       }
     }
-  })]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm.folderNameInvalid ? _c("div", {
+    staticClass: "filename-warning"
+  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.t("pdftool", "Output folder is required.")) + "\n\t\t\t\t")]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "desk"
   }, [_vm._l(_vm.pageNumbers, function (pageNumber, id) {
     return _c("div", {
@@ -87656,7 +87670,7 @@ var render = function render() {
     staticClass: "buttons"
   }, [_c("NcButton", {
     attrs: {
-      disabled: Object.keys(_vm.pageNumbers).length === 0 || _vm.warnId !== null,
+      disabled: !_vm.canSplit,
       readonly: false,
       type: "primary"
     },
@@ -102593,6 +102607,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.pdftool-modal h2[data-v-2ddb4c1e] {
 .pdftool-modal .pdftool-filename #filename[data-v-2ddb4c1e] {
   width: 80%;
   margin-left: 4px;
+}
+.pdftool-modal .pdftool-filename .filename-warning[data-v-2ddb4c1e] {
+  color: var(--color-error);
+  margin-left: calc(20% + 4px);
+  padding-top: 4px;
 }
 .pdftool-modal .desk[data-v-2ddb4c1e] {
   width: 100%;
@@ -177205,4 +177224,4 @@ const registerInFilesRuntime = async action => {
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=7411e1ee010bc5e6ddc3
+//# sourceMappingURL=pdftool-main.js.map?v=05e71a5ecec3d488ce1b
