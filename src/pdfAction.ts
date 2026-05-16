@@ -47,6 +47,14 @@ type PdfActionContext = {
 
 const getNodes = (context: PdfActionContext | Node[]): Node[] => Array.isArray(context) ? context : context.nodes
 
+const getSingleNode = (context: PdfActionContext | Node[] | Node): Node => {
+	if (Array.isArray(context)) {
+		return context[0]
+	}
+
+	return 'nodes' in context ? context.nodes[0] : context
+}
+
 const isPdfNode = (node: Node): boolean => node.mime === 'application/pdf' || node.extension === '.pdf'
 
 export const pdfAction = new FileAction({
@@ -74,7 +82,7 @@ export const pdfAction = new FileAction({
 	},
 
 	async exec(context: PdfActionContext | Node, view?: View, dir?: string): Promise<boolean | null> {
-		const file = 'nodes' in context ? context.nodes[0] : context
+		const file = getSingleNode(context)
 		return new Promise(resolve => {
 			try {
 				Vue.mixin({ methods: { t } })
@@ -111,6 +119,11 @@ export const pdfAction = new FileAction({
 
 	async execBatch(context: PdfActionContext | Node[], view?: View): Promise<(boolean | null)[]> {
 		const files = getNodes(context)
+		if (files.length === 1) {
+			const success = await this.exec(files[0], view)
+			return [success]
+		}
+
 		return new Promise(resolve => {
 			try {
 				Vue.mixin({ methods: { t } })
