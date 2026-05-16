@@ -21766,6 +21766,40 @@ const resultToNode = function(node, filesRoot = defaultRootPath, remoteURL = def
 
 /***/ }),
 
+/***/ "./node_modules/@nextcloud/files/dist/dav.mjs":
+/*!****************************************************!*\
+  !*** ./node_modules/@nextcloud/files/dist/dav.mjs ***!
+  \****************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   defaultDavNamespaces: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.h),
+/* harmony export */   defaultDavProperties: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.f),
+/* harmony export */   defaultRemoteURL: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.b),
+/* harmony export */   defaultRootPath: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.d),
+/* harmony export */   getClient: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.c),
+/* harmony export */   getDavNameSpaces: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.k),
+/* harmony export */   getDavProperties: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.j),
+/* harmony export */   getDefaultPropfind: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.l),
+/* harmony export */   getFavoriteNodes: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.e),
+/* harmony export */   getFavoritesReport: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.m),
+/* harmony export */   getRecentSearch: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.n),
+/* harmony export */   getRemoteURL: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.a),
+/* harmony export */   getRootPath: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.g),
+/* harmony export */   parsePermissions: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.p),
+/* harmony export */   registerDavProperty: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.i),
+/* harmony export */   resultToNode: () => (/* reexport safe */ _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__.r)
+/* harmony export */ });
+/* harmony import */ var _chunks_dav_CQDyL7M_mjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chunks/dav-CQDyL7M_.mjs */ "./node_modules/@nextcloud/files/dist/chunks/dav-CQDyL7M_.mjs");
+
+
+//# sourceMappingURL=dav.mjs.map
+
+
+/***/ }),
+
 /***/ "./node_modules/@nextcloud/files/dist/index.mjs":
 /*!******************************************************!*\
   !*** ./node_modules/@nextcloud/files/dist/index.mjs ***!
@@ -87007,7 +87041,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _nextcloud_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @nextcloud/router */ "./node_modules/@nextcloud/router/dist/index.mjs");
 /* harmony import */ var _nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @nextcloud/dialogs */ "./node_modules/@nextcloud/dialogs/dist/index.mjs");
 /* harmony import */ var _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @nextcloud/axios */ "./node_modules/@nextcloud/axios/dist/index.mjs");
-/* harmony import */ var _nextcloud_files__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @nextcloud/files */ "./node_modules/@nextcloud/files/dist/index.mjs");
+/* harmony import */ var _nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @nextcloud/files/dav */ "./node_modules/@nextcloud/files/dist/dav.mjs");
 /* harmony import */ var _nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @nextcloud/event-bus */ "./node_modules/@nextcloud/event-bus/dist/index.mjs");
 
 
@@ -87023,15 +87057,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'Merge',
   components: {
-    NcActionButton: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcActionButton,
-    NcAppContent: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppContent,
-    NcAppNavigation: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppNavigation,
-    NcAppNavigationItem: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppNavigationItem,
-    NcAppNavigationNew: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppNavigationNew,
     NcButton: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcButton,
     NcModal: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcModal,
     draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_2___default()),
     NcLoadingIcon: _nextcloud_vue_components_NcLoadingIcon__WEBPACK_IMPORTED_MODULE_1__["default"]
+  },
+  props: {
+    files: {
+      type: Array,
+      required: true
+    }
   },
   data() {
     return {
@@ -87045,9 +87080,6 @@ __webpack_require__.r(__webpack_exports__);
       fileList: [],
       filename: ''
     };
-  },
-  props: {
-    files: []
   },
   computed: {},
   /**
@@ -87073,13 +87105,13 @@ __webpack_require__.r(__webpack_exports__);
     },
     async refreshFolder(node) {
       const dirname = this.getParentDirname(node);
-      const path = dirname === '/' ? _nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath : `${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`;
-      const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
+      const path = dirname === '/' ? _nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.defaultRootPath : `${_nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.defaultRootPath}${dirname}`;
+      const client = (0,_nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.getClient)();
       const result = await client.stat(path, {
         details: true,
-        data: (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetDefaultPropfind)()
+        data: (0,_nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.getDefaultPropfind)()
       });
-      const updatedNode = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davResultToNode)(result.data);
+      const updatedNode = (0,_nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.resultToNode)(result.data);
       if (updatedNode.fileid) {
         (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', updatedNode);
       }
@@ -87092,7 +87124,7 @@ __webpack_require__.r(__webpack_exports__);
         outputFile: this.filename
       };
       try {
-        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/merge'), data);
+        await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/merge'), data);
         await this.refreshFolder(this.fileList[0]);
         this.merging = false;
         this.$emit('processed', true);
@@ -87108,7 +87140,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     /**
      * Create a new note and focus the note content field automatically
-     * @param {Object} note Note object
+     * @param {object} note Note object
      */
     openNote(note) {
       if (this.updating) {
@@ -87157,7 +87189,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     /**
      * Create a new note by sending the information to the server
-     * @param {Object} note Note object
+     * @param {object} note Note object
      */
     async createNote(note) {
       this.updating = true;
@@ -87174,7 +87206,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     /**
      * Update an existing note on the server
-     * @param {Object} note Note object
+     * @param {object} note Note object
      */
     async updateNote(note) {
       this.updating = true;
@@ -87188,7 +87220,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     /**
      * Delete a note, remove it from the frontend and show a hint
-     * @param {Object} note Note object
+     * @param {object} note Note object
      */
     async deleteNote(note) {
       try {
@@ -87231,7 +87263,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _nextcloud_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @nextcloud/router */ "./node_modules/@nextcloud/router/dist/index.mjs");
 /* harmony import */ var _nextcloud_dialogs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @nextcloud/dialogs */ "./node_modules/@nextcloud/dialogs/dist/index.mjs");
 /* harmony import */ var _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @nextcloud/axios */ "./node_modules/@nextcloud/axios/dist/index.mjs");
-/* harmony import */ var _nextcloud_files__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @nextcloud/files */ "./node_modules/@nextcloud/files/dist/index.mjs");
+/* harmony import */ var _nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @nextcloud/files/dav */ "./node_modules/@nextcloud/files/dist/dav.mjs");
 /* harmony import */ var _nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @nextcloud/event-bus */ "./node_modules/@nextcloud/event-bus/dist/index.mjs");
 
 
@@ -87248,15 +87280,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'Split',
   components: {
-    NcActionButton: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcActionButton,
-    NcAppContent: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppContent,
-    NcAppNavigation: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppNavigation,
-    NcAppNavigationItem: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppNavigationItem,
-    NcAppNavigationNew: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcAppNavigationNew,
     NcButton: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcButton,
     NcModal: _nextcloud_vue__WEBPACK_IMPORTED_MODULE_0__.NcModal,
     NcLoadingIcon: _nextcloud_vue_components_NcLoadingIcon__WEBPACK_IMPORTED_MODULE_1__["default"],
     Plus: vue_material_design_icons_Plus_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+  },
+  props: {
+    file: {
+      type: Object,
+      required: true
+    }
   },
   data() {
     return {
@@ -87273,9 +87306,6 @@ __webpack_require__.r(__webpack_exports__);
       pageCount: 0
     };
   },
-  props: {
-    file: {}
-  },
   computed: {
     folderNameInvalid() {
       return this.filename.trim() === '';
@@ -87285,7 +87315,6 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   async mounted() {
-    this.file = this.file;
     this.filename = this.file.basename.substring(0, this.file.basename.length - 4) + '-' + t('pdftool', 'split') + '/';
     _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].get((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/pagecount/' + this.file.fileid)).then(response => {
       this.pageCount = response.data;
@@ -87313,13 +87342,13 @@ __webpack_require__.r(__webpack_exports__);
     },
     async refreshFolder(node) {
       const dirname = this.getParentDirname(node);
-      const path = dirname === '/' ? _nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath : `${_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davRootPath}${dirname}`;
-      const client = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetClient)();
+      const path = dirname === '/' ? _nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.defaultRootPath : `${_nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.defaultRootPath}${dirname}`;
+      const client = (0,_nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.getClient)();
       const result = await client.stat(path, {
         details: true,
-        data: (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davGetDefaultPropfind)()
+        data: (0,_nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.getDefaultPropfind)()
       });
-      const updatedNode = (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_7__.davResultToNode)(result.data);
+      const updatedNode = (0,_nextcloud_files_dav__WEBPACK_IMPORTED_MODULE_7__.resultToNode)(result.data);
       if (updatedNode.fileid) {
         (0,_nextcloud_event_bus__WEBPACK_IMPORTED_MODULE_8__.emit)('files:node:updated', updatedNode);
       }
@@ -87368,7 +87397,7 @@ __webpack_require__.r(__webpack_exports__);
         outputFolder: this.filename.trim()
       };
       try {
-        const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/split'), data);
+        await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_6__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_4__.generateUrl)('/apps/pdftool/split'), data);
         await this.refreshFolder(this.file);
         this.splitting = false;
         this.$emit('processed', true);
@@ -87432,7 +87461,7 @@ var render = function render() {
     attrs: {
       size: "normal",
       name: _vm.t("pdftool", "Merge PDF's"),
-      outTransition: true
+      "out-transition": true
     },
     on: {
       close: _vm.closeModal
@@ -87490,33 +87519,35 @@ var render = function render() {
       staticClass: "mime-pdf"
     }), _vm._v(" "), _c("div", {
       staticClass: "filename"
-    }, [_vm._v(_vm._s(element.displayname))])]);
+    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(element.displayname) + "\n\t\t\t\t")])]);
   }), 0), _vm._v(" "), _c("div", {
     staticClass: "buttons"
   }, [_c("NcButton", {
     attrs: {
       disabled: false,
       readonly: false,
-      type: "primary"
+      type: "button",
+      variant: "primary"
     },
     on: {
       click: _vm.merge
     }
-  }, [[_vm._v(_vm._s(_vm.t("pdftool", "Merge")))]], 2), _vm._v(" "), _c("NcButton", {
+  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.t("pdftool", "Merge")) + "\n\t\t\t")]), _vm._v(" "), _c("NcButton", {
     attrs: {
       disabled: false,
       readonly: false,
-      type: "primary"
+      type: "button",
+      variant: "primary"
     },
     on: {
       click: _vm.closeModal
     }
-  }, [[_vm._v(_vm._s(_vm.t("pdftool", "Cancel")))]], 2)], 1)], 1) : _vm._e(), _vm._v(" "), _vm.error ? _c("NcModal", {
+  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.t("pdftool", "Cancel")) + "\n\t\t\t")])], 1)], 1) : _vm._e(), _vm._v(" "), _vm.error ? _c("NcModal", {
     staticClass: "pdftool-modal",
     attrs: {
       size: "normal",
       name: _vm.t("pdftool", "Error"),
-      outTransition: true
+      "out-transition": true
     },
     on: {
       close: _vm.closeModal
@@ -87529,15 +87560,16 @@ var render = function render() {
     attrs: {
       disabled: false,
       readonly: false,
-      type: "primary"
+      type: "button",
+      variant: "primary"
     },
     on: {
       click: _vm.closeModal
     }
-  }, [[_vm._v(_vm._s(_vm.t("pdftool", "OK")))]], 2)], 1)]) : _vm._e(), _vm._v(" "), _vm.merging ? _c("NcModal", {
+  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.t("pdftool", "OK")) + "\n\t\t\t")])], 1)]) : _vm._e(), _vm._v(" "), _vm.merging ? _c("NcModal", {
     staticClass: "pdftool-modal",
     attrs: {
-      "show-close": false,
+      "no-close": "",
       size: "normal"
     }
   }, [_c("div", {
@@ -87580,7 +87612,7 @@ var render = function render() {
     attrs: {
       size: "normal",
       name: _vm.t("pdftool", "Split PDF's"),
-      outTransition: true
+      "out-transition": true
     },
     on: {
       close: _vm.closeModal
@@ -87614,7 +87646,7 @@ var render = function render() {
     }
   }), _vm._v(" "), _vm.folderNameInvalid ? _c("div", {
     staticClass: "filename-warning"
-  }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.t("pdftool", "Output folder is required.")) + "\n\t\t\t\t")]) : _vm._e()]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.t("pdftool", "Output folder is required.")) + "\n\t\t\t")]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "desk"
   }, [_vm._l(_vm.pageNumbers, function (pageNumber, id) {
     return _c("div", {
@@ -87624,9 +87656,9 @@ var render = function render() {
       staticClass: "mime-pdf"
     }), _vm._v(" "), _vm.warnId !== id ? _c("div", {
       staticClass: "filename"
-    }, [_vm._v(_vm._s(_vm.t("pdftool", "Page split point")))]) : _vm._e(), _vm._v(" "), _vm.warnId === id ? _c("div", {
+    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.t("pdftool", "Page split point")) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.warnId === id ? _c("div", {
       staticClass: "pagewarning filename"
-    }, [_vm._v(_vm._s(_vm.warnMessage))]) : _vm._e(), _vm._v(" "), _c("input", {
+    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(_vm.warnMessage) + "\n\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c("input", {
       staticClass: "page-number-input",
       attrs: {
         type: "number",
@@ -87642,7 +87674,7 @@ var render = function render() {
       }
     }), _vm._v(" "), _c("div", {
       staticClass: "filename pagenum"
-    }, [_vm._v("/ " + _vm._s(pageNumber + 1))]), _vm._v(" "), _c("NcButton", {
+    }, [_vm._v("\n\t\t\t\t\t/ " + _vm._s(pageNumber + 1) + "\n\t\t\t\t")]), _vm._v(" "), _c("NcButton", {
       attrs: {
         "aria-label": _vm.t("pdftool", "Remove split point."),
         disabled: false,
@@ -87678,26 +87710,28 @@ var render = function render() {
     attrs: {
       disabled: !_vm.canSplit,
       readonly: false,
-      type: "primary"
+      type: "button",
+      variant: "primary"
     },
     on: {
       click: _vm.split
     }
-  }, [[_vm._v(_vm._s(_vm.t("pdftool", "Split")))]], 2), _vm._v(" "), _c("NcButton", {
+  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.t("pdftool", "Split")) + "\n\t\t\t")]), _vm._v(" "), _c("NcButton", {
     attrs: {
       disabled: false,
       readonly: false,
-      type: "primary"
+      type: "button",
+      variant: "primary"
     },
     on: {
       click: _vm.closeModal
     }
-  }, [[_vm._v(_vm._s(_vm.t("pdftool", "Cancel")))]], 2)], 1)]) : _vm._e(), _vm._v(" "), _vm.error ? _c("NcModal", {
+  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.t("pdftool", "Cancel")) + "\n\t\t\t")])], 1)]) : _vm._e(), _vm._v(" "), _vm.error ? _c("NcModal", {
     staticClass: "pdftool-modal",
     attrs: {
       size: "normal",
       name: _vm.t("pdftool", "Error"),
-      outTransition: true
+      "out-transition": true
     },
     on: {
       close: _vm.closeModal
@@ -87710,15 +87744,16 @@ var render = function render() {
     attrs: {
       disabled: false,
       readonly: false,
-      type: "primary"
+      type: "button",
+      variant: "primary"
     },
     on: {
       click: _vm.closeModal
     }
-  }, [[_vm._v(_vm._s(_vm.t("pdftool", "OK")))]], 2)], 1)]) : _vm._e(), _vm._v(" "), _vm.splitting ? _c("NcModal", {
+  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.t("pdftool", "OK")) + "\n\t\t\t")])], 1)]) : _vm._e(), _vm._v(" "), _vm.splitting ? _c("NcModal", {
     staticClass: "pdftool-modal",
     attrs: {
-      "show-close": false,
+      "no-close": "",
       size: "normal"
     }
   }, [_c("div", {
@@ -176717,7 +176752,7 @@ __webpack_require__.r(__webpack_exports__);
  *
  * @author Immanuel Pasanec <i@pasanec.de>
  *
- * @license GNU AGPL version 3 or any later version
+ * @license AGPL-3.0-or-later
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -176750,11 +176785,11 @@ const getSingleNode = context => {
 const isPdfNode = node => node.mime === 'application/pdf' || node.extension === '.pdf';
 const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
   id: 'pdfmerge',
-  displayName: (context, view) => {
+  displayName: context => {
     const files = getNodes(context);
     return files.length > 1 ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Merge PDF\'s') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Split PDF');
   },
-  title: (context, view) => {
+  title: context => {
     const files = getNodes(context);
     return files.length > 1 ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Merge PDF\'s') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('pdftool', 'Split PDF');
   },
@@ -176767,7 +176802,7 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
     const dirname = nodes[0].dirname;
     return nodes.every(node => (node.permissions & _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.Permission.DELETE) !== 0 && isPdfNode(node) && node.dirname === dirname);
   },
-  async exec(context, view, dir) {
+  async exec(context) {
     const file = getSingleNode(context);
     return new Promise(resolve => {
       try {
@@ -176780,7 +176815,7 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
           el: '#pdftool-content',
           render: h => h(_Split_vue__WEBPACK_IMPORTED_MODULE_5__["default"], {
             props: {
-              file: file
+              file
             },
             on: {
               processed: success => {
@@ -176822,7 +176857,7 @@ const pdfAction = new _nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.FileAction({
           el: '#pdftool-content',
           render: h => h(_Merge_vue__WEBPACK_IMPORTED_MODULE_4__["default"], {
             props: {
-              files: files
+              files
             },
             on: {
               processed: success => {
@@ -176991,7 +177026,7 @@ module.exports = "data:image/svg+xml,%3csvg%20viewBox=%270%200%2016%2016%27%20he
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "pdftool-" + chunkId + ".js?v=" + {"node_modules_nextcloud_vue_dist_Components_NcColorPicker_mjs":"c569b96d848c9c988d81","node_modules_nextcloud_vue_dist_Components_NcSelect_mjs":"54364a0860915de484b2","vendors-node_modules_rehype-highlight_index_js":"0db86e10225438d9436c","node_modules_nextcloud_dialogs_dist_chunks_index-Kg2hZgGF_mjs":"e2c03aabca20cd7e79d3","vendors-node_modules_nextcloud_dialogs_dist_chunks_FilePicker-ajWx2Snh_mjs":"3a06d36c66431188e9f1"}[chunkId] + "";
+/******/ 			return "pdftool-" + chunkId + ".js?v=" + {"node_modules_nextcloud_vue_dist_Components_NcColorPicker_mjs":"c569b96d848c9c988d81","node_modules_nextcloud_vue_dist_Components_NcSelect_mjs":"54364a0860915de484b2","vendors-node_modules_rehype-highlight_index_js":"0db86e10225438d9436c","node_modules_nextcloud_dialogs_dist_chunks_index-Kg2hZgGF_mjs":"22369654afe090a5d702","vendors-node_modules_nextcloud_dialogs_dist_chunks_FilePicker-ajWx2Snh_mjs":"83e5dc7e74fbcb15020e","data_image_svg_xml_3c_21--_20-_20SPDX-FileCopyrightText_202020_20Google_20Inc_20-_20SPDX-Lice-cc29b1":"a52ab637044ea17b08d8"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -177185,7 +177220,7 @@ __webpack_require__.r(__webpack_exports__);
  *
  * @author Immanuel Pasanec <i@pasanec.de>
  *
- * @license GNU AGPL version 3 or any later version
+ * @license AGPL-3.0-or-later
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -177203,41 +177238,10 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 
-const toFilesRuntimeAction = action => {
-  const runtimeAction = {
-    id: action.id,
-    displayName: action.displayName,
-    title: action.title,
-    iconSvgInline: action.iconSvgInline,
-    exec: action.exec
-  };
-  for (const property of ["enabled", "execBatch", "order", "hotkey", "destructive", "parent", "default", "inline", "renderInline"]) {
-    if (action[property] !== undefined) {
-      runtimeAction[property] = action[property];
-    }
-  }
-  return runtimeAction;
-};
-const registerInFilesRuntime = async action => {
-  try {
-    const filesModule = await import(/* webpackIgnore: true */"/dist/index-Dpj4ddZx.chunk.mjs");
-    if (typeof filesModule?.b === "function") {
-      filesModule.b(toFilesRuntimeAction(action));
-      return true;
-    }
-  } catch (error) {
-    window.console.error("Could not register PDF action in Files runtime", error);
-  }
-  return false;
-};
-(async function () {
-  window.console.info("Registering PDF Merge action");
-  if (!(await registerInFilesRuntime(_pdfAction_ts__WEBPACK_IMPORTED_MODULE_1__.pdfAction))) {
-    (0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.registerFileAction)(_pdfAction_ts__WEBPACK_IMPORTED_MODULE_1__.pdfAction);
-  }
-})();
+window.console.info('Registering PDF Merge action');
+(0,_nextcloud_files__WEBPACK_IMPORTED_MODULE_0__.registerFileAction)(_pdfAction_ts__WEBPACK_IMPORTED_MODULE_1__.pdfAction);
 })();
 
 /******/ })()
 ;
-//# sourceMappingURL=pdftool-main.js.map?v=8d6fe057dbc8e01e2b46
+//# sourceMappingURL=pdftool-main.js.map?v=0f820b00e0264f680bad
