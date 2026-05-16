@@ -92,7 +92,7 @@ class PdfService
 
 	private function normalizeFileList(array $files): array
 	{
-		if (isset($files['_data']) && is_array($files['_data'])) {
+		if (isset($files['_data']) && is_array($files['_data']) && isset($files['_data']['id'])) {
 			return [$files];
 		}
 
@@ -114,21 +114,62 @@ class PdfService
 				continue;
 			}
 
-			if (is_array($file)) {
-				$normalized = array_merge($normalized, $this->normalizeFileList($file));
+			try {
+				$normalized[] = $this->normalizeFile($file);
+			} catch (Exception $e) {
+				if (is_array($file)) {
+					$normalized = array_merge($normalized, $this->normalizeFileList($file));
+				}
 			}
 		}
 
 		return $normalized;
 	}
 
-	public function split(array $file, array $splitPoints): bool
+	private function normalizeFile($file): array
 	{
+		if (is_string($file)) {
+			$decoded = json_decode($file, true);
+			if (json_last_error() === JSON_ERROR_NONE) {
+				return $this->normalizeFile($decoded);
+			}
+		}
+
+		if (is_array($file) && isset($file['_data']) && is_array($file['_data']) && isset($file['_data']['id'])) {
+			return $file;
+		}
+
+		if (is_array($file) && isset($file['id'])) {
+			return ['_data' => ['id' => (int)$file['id']]];
+		}
+
+		if (is_array($file) && isset($file['nodes'])) {
+			return $this->normalizeFile($file['nodes']);
+		}
+
+		if (is_array($file)) {
+			foreach ($file as $entry) {
+				if (is_array($entry) || is_string($entry)) {
+					try {
+						return $this->normalizeFile($entry);
+					} catch (Exception $e) {
+						continue;
+					}
+				}
+			}
+		}
+
+		throw new Exception('No PDF file provided.');
+	}
+
+	public function split($file, array $splitPoints, string $outputFolder = ''): bool
+	{
+		$file = $this->normalizeFile($file);
 		$pageCount = $this->countPages($file['_data']['id']);
 		if ($pageCount > $this->s->getMaxPageCount()) {
 			throw new Exception('Max page count of ' . $this->s->getMaxPageCount() . ' exceeded.');
 		}
-		return $this->model->split($file, $splitPoints);
+		return $this->model->split($file, $splitPoints, $outputFolder);
 	}
 
 	public function countPages(int $fileId): int

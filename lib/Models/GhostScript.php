@@ -119,7 +119,7 @@ class GhostScript implements IPdf
 		}
 	}
 
-	public function split(array $file, array $pageNumbers): bool
+	public function split(array $file, array $pageNumbers, string $requestedOutputFolder = ''): bool
 	{
 		$pageCount = $this->countPages($file['_data']['id']);
 		// Validate page numbers
@@ -145,7 +145,10 @@ class GhostScript implements IPdf
 			$originalFileName = $fileNode->getName();
 			$outputfile = pathinfo($originalFileName, PATHINFO_FILENAME);
 
-			$exportFolderName = $outputfile . '_split';
+			$exportFolderName = trim($requestedOutputFolder, " \t\n\r\0\x0B/");
+			if ($exportFolderName === '') {
+				$exportFolderName = $outputfile . '_split';
+			}
 
 			$finalExportFolderName = $exportFolderName;
 			$counter = 1;

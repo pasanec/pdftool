@@ -31,7 +31,14 @@
 						<h2>{{ t('pdftool', 'Split PDF\'s') }}</h2>
 			<div class="pdftool-filename">
 				<label for="filename">{{ t('pdftool', 'Output folder') }}</label>
-				<input v-model="filename" id="filename"/>
+				<input
+					v-model="filename"
+					id="filename"
+					required
+					:aria-invalid="folderNameInvalid ? 'true' : 'false'" />
+				<div v-if="folderNameInvalid" class="filename-warning">
+					{{ t('pdftool', 'Output folder is required.') }}
+				</div>
 			</div>
 			<div class="desk">
    			<div class="document" v-for="(pageNumber, id) in pageNumbers" :key="id">
@@ -64,7 +71,7 @@
 			<div class="buttons">
 				<NcButton
 					@click="split"
-					:disabled="Object.keys(pageNumbers).length === 0 || warnId !== null"
+					:disabled="!canSplit"
 					:readonly="false"
 					type="primary">
 										<template>{{ t('pdftool', 'Split') }}</template>
@@ -146,6 +153,12 @@ export default {
 		file: {},
 	},
 	computed: {
+		folderNameInvalid() {
+			return this.filename.trim() === ''
+		},
+		canSplit() {
+			return !this.folderNameInvalid && Object.keys(this.pageNumbers).length > 0 && this.warnId === null
+		},
 	},
 	async mounted() {
 		this.file= this.file
@@ -229,12 +242,15 @@ export default {
 			this.$set(this.pageNumbers, id, value)
 		},
 		async split() { // Renamed from merge
+			if (!this.canSplit) {
+				return
+			}
 			this.modal = false
 			this.splitting = true
 			const data = {
 				file: this.file,
 				pageNumbers: this.pageNumbers,
-				outputFolder: this.filename,
+				outputFolder: this.filename.trim(),
 			}
 			try {
 				const response = await axios.post(generateUrl('/apps/pdftool/split'), data)
@@ -284,6 +300,11 @@ export default {
 			#filename {
 				width: 80%;
 				margin-left: 4px;
+			}
+			.filename-warning {
+				color: var(--color-error);
+				margin-left: calc(20% + 4px);
+				padding-top: 4px;
 			}
 		}
 		.desk {

@@ -26,6 +26,6 @@ namespace OCA\PdfTool\Models;
 interface IPdf
 {
 	public function merge(array $files, string $outputfile = ''): string;
-	public function split(array $file, array $pageNumbers): bool;
+	public function split(array $file, array $pageNumbers, string $outputFolder = ''): bool;
 	public function countPages(int $fileId): int;
 }

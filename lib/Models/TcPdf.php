@@ -107,7 +107,7 @@ class TcPdf implements IPdf
 		return $userFile[0]->getInternalPath();
 	}
 
-	public function split(array $file, array $pageNumbers, string $outputfile = ''): bool
+	public function split(array $file, array $pageNumbers, string $requestedOutputFolder = ''): bool
 	{
 		$fileId = (int) $file['_data']['id'];
 
@@ -194,7 +194,10 @@ class TcPdf implements IPdf
 			$srcFiles[] = $outputFolder->getFile($outputFileName);
 		}
 
-		$exportFolderName = $outputfileBase . '_split';
+		$exportFolderName = trim($requestedOutputFolder, " \t\n\r\0\x0B/");
+		if ($exportFolderName === '') {
+			$exportFolderName = $outputfileBase . '_split';
+		}
 		$finalExportFolderName = $exportFolderName;
 		$counter = 1;
 		while ($userSourceFolder->nodeExists($finalExportFolderName)) {

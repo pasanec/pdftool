@@ -70,10 +70,10 @@ class PdfController extends Controller
 	/**
 	 * @NoAdminRequired
 	 */
-	public function split(array $file, array $pageNumbers): DataResponse
+	public function split(string | array $file, array $pageNumbers, string $outputFolder = ''): DataResponse
 	{
-		return $this->handleExceptions(function () use ($file, $pageNumbers) {
-			return $this->pdf->split($file, $pageNumbers);
+		return $this->handleExceptions(function () use ($file, $pageNumbers, $outputFolder) {
+			return $this->pdf->split($file, $pageNumbers, $outputFolder);
 		});
 	}
 
